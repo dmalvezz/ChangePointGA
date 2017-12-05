@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EscorpioStratPSO", "EscorpioInterprete.vcxproj", "{84C84C45-05B6-43A0-BAA6-32E85D6322F1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{32D47079-0D1B-47D4-B09B-31E7C8551F89}"
+	ProjectSection(SolutionItems) = preProject
+		Performance3.psess = Performance3.psess
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{84C84C45-05B6-43A0-BAA6-32E85D6322F1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{84C84C45-05B6-43A0-BAA6-32E85D6322F1}.Debug|Win32.Build.0 = Debug|Win32
+		{84C84C45-05B6-43A0-BAA6-32E85D6322F1}.Release|Win32.ActiveCfg = Release|Win32
+		{84C84C45-05B6-43A0-BAA6-32E85D6322F1}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,1 @@
+Time(s), Twind(°C), TMotCase(°C), Flat_i(N), Flat_o(N), Flat_r(N), Frad_i(N), Frad_o(N), Frad_r(N)
