@@ -47,8 +47,7 @@ void printGeneration(Generation_ptr generation){
 
 
 void evalGenerationFitness(Generation_ptr generation, float startVelocity, int startMap){
-
-	#pragma omp parallel num_threads(8)
+	#pragma omp parallel
 	{
 		#pragma omp for
 		for(int i = 0; i < generation->size; i++){

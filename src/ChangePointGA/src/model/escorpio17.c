@@ -16,7 +16,7 @@ float getMotorMattrito (float Speed) {
 	return ret;
 }
 
-float getPower (Simulation_ptr simulation, float Ftraction, float Speed) {
+float getPower (Simulation_ptr simulation, float Ftraction, float Speed, float dt) {
 	float MotorPd = 0;
 	float ret;
 	if (Ftraction>=0)
@@ -115,8 +115,8 @@ float getPower (Simulation_ptr simulation, float Ftraction, float Speed) {
 		float PwindtoCase = (simulation->Twindings-simulation->TmotorCase)/RthWindingCase;
 		float PtoCase = PwindtoCase-PtoAmbient;
 		float PtoWind = MotorPd - PwindtoCase;
-		simulation->Twindings += (PtoWind*simulation->Tstep)/CthWinding;
-		simulation->TmotorCase += (PtoCase*simulation->Tstep)/CthCase;
+		simulation->Twindings += (PtoWind*dt)/CthWinding;
+		simulation->TmotorCase += (PtoCase*dt)/CthCase;
 	//}
 
 	// Motor swich-on penalty
@@ -126,7 +126,7 @@ float getPower (Simulation_ptr simulation, float Ftraction, float Speed) {
 		{
 			if (simulation->lastTractiveForce < MotorStartPenaltyThr)
 			{
-				ret += MotorStartPenalty/simulation->Tstep;
+				ret += MotorStartPenalty/dt;
 			}
 		}
 		simulation->lastTractiveForce = Ftraction;

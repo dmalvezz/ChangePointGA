@@ -10,7 +10,6 @@
 
 void initSimulation(Simulation_ptr simulation, float startVelocity, int startMap){
 	simulation->lastTractiveForce = 0;
-	simulation->Tstep = SPACE_STEP / MIN_AVG_SPEED;
 
 	simulation->Twindings = 38;
 	simulation->TmotorCase = 35;
@@ -70,7 +69,7 @@ SimulationResult simulate(Simulation_ptr simulation, float startPosition, float 
 
 		dt = (sqrt(delta) - simulation->velocity) / a;
 
-		dE = getPower(simulation, fTraction, simulation->velocity) * dt;
+		dE = getPower(simulation, fTraction, simulation->velocity, dt) * dt;
 
 		#ifdef KEEP_SIM_STEP
 			simulation->steps[startIndex + i].map = simulation->selectedMap;

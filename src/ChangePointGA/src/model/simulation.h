@@ -22,7 +22,7 @@
 #include "../ga/changepoint.h"
 #include "../utils/mathutils.h"
 
-#define SPACE_STEP	15.0
+#define SPACE_STEP	1.0
 #define SIM_STEP_COUNT	(TRACK_LENGTH / (int)SPACE_STEP)
 
 #define FIRST_LAP
@@ -65,7 +65,6 @@ typedef SimulationStep* SimulationStep_ptr;
 
 #define KEEP_SIM_STEP
 typedef struct Simulation{
-	float Tstep;
 	float lastTractiveForce;
 
 	float TmotorCase;	//°C (Motor Case Temperature)
@@ -115,7 +114,7 @@ SimulationResult simulate(Simulation_ptr simulation, float startPosition, float 
 void printSimulation(Simulation_ptr simulation);
 
 //Get motor power
-float getPower (Simulation_ptr simulation, float Ftraction, float Speed);
+float getPower (Simulation_ptr simulation, float Ftraction, float Speed, float dt);
 
 //Get motor attrito
 float getMotorMattrito(float Speed);
