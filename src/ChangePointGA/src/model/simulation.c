@@ -69,6 +69,10 @@ SimulationResult simulate(Simulation_ptr simulation, float startPosition, float 
 
 		dt = (sqrt(delta) - simulation->velocity) / a;
 
+		if(dt < 0){
+			simRes = SIM_DT_NEG;
+		}
+
 		dE = getPower(simulation, fTraction, simulation->velocity, dt) * dt;
 
 		#ifdef KEEP_SIM_STEP
@@ -98,10 +102,8 @@ SimulationResult simulate(Simulation_ptr simulation, float startPosition, float 
 
 
 		if(simulation->time > TRACK_LENGTH / MIN_AVG_SPEED){
-			simRes = SIM_TIME_MAX;
+			//simRes = SIM_TIME_MAX;
 		}
-
-
 
 		if(simRes != SIM_OK){
 			simulation->time = INFINITY;

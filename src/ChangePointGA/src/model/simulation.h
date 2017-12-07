@@ -41,6 +41,7 @@
 typedef enum SimulationResult{
 	SIM_OK,
 	SIM_DELTA_ERR,
+	SIM_DT_NEG,
 	SIM_VEL_NEG,
 	SIM_TIME_MAX
 }SimulationResult;
@@ -65,7 +66,7 @@ typedef SimulationStep* SimulationStep_ptr;
 
 #define KEEP_SIM_STEP
 typedef struct Simulation{
-	float lastTractiveForce;
+	float lastTractiveForce;	//Last force applied
 
 	float TmotorCase;	//°C (Motor Case Temperature)
 	float Twindings;	//°C (Motor Windings Temperature)

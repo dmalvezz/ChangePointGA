@@ -23,13 +23,14 @@
 #include "ga/ga.h"
 
 int main() {
+	//Init random
 	randInit();
 
+	//Init maps
 	initMap(&maps[0], -4800.0, 45.0, 0.0);
 	initMap(&maps[1], -4800.0, 40.0, 0.0);
 	initMap(&maps[2], -4800.0, 25.0, 0.0);
 	initMap(&maps[3], -67500.0, 200.0, 0.0);
-
 
 	//Init random first generation
 	Generation_ptr currentGeneration = initRandomGeneration(POPULATION_SIZE);
@@ -67,15 +68,6 @@ int main() {
 		updateGenerationStatistics(currentGeneration);
 		statTime = getTimeElapsed(timer);
 
-		//Print stats
-		printf("Gen %lu   fmin %.2f   fmed %.2f   lavg %d   inv %.2f\n",
-				generationCount,
-				currentGeneration->statistics.fitnessMin,
-				currentGeneration->statistics.fitnessMedian,
-				(int)currentGeneration->statistics.lengthAvg,
-				(float)currentGeneration->statistics.invalidCount / currentGeneration->count
-				);
-
 		//Perform elitsm selection
 		timer = getTime();
 		elitism(currentGeneration, nextGeneration, ELITISM_PERCENTAGE);
@@ -94,19 +86,29 @@ int main() {
 		mutation(nextGeneration, changeRandomChangePointAction, CHANGE_POINT_ACT_MUTATION_RATE);
 		mutationTime = getTimeElapsed(timer);
 
-		//Get time
-		generationTime = getTimeElapsed(generationTimer);
-		//Print time %
-		printf("ft %lf   st %lf   ut %lf   et %lf   ct %lf   mt %lf\n",
-				fitnessTime / generationTime,
-				sortTime / generationTime,
-				statTime / generationTime,
-				elitismTime / generationTime,
-				crossoverTime / generationTime,
-				mutationTime / generationTime
-				);
-		printf("Total time %lf\n", generationTime);
-		printf("==============================\n");
+		if(generationCount % 100 == 0){
+			//Get time
+			generationTime = getTimeElapsed(generationTimer);
+			//Print stats
+			printf("Gen %lu   fmin %.2f   fmed %.2f   lavg %d   inv %.2f\n",
+					generationCount,
+					currentGeneration->statistics.fitnessMin,
+					currentGeneration->statistics.fitnessMedian,
+					(int)currentGeneration->statistics.lengthAvg,
+					(float)currentGeneration->statistics.invalidCount / currentGeneration->count
+					);
+			//Print time %
+			printf("ft %lf   st %lf   ut %lf   et %lf   ct %lf   mt %lf\n",
+					fitnessTime / generationTime,
+					sortTime / generationTime,
+					statTime / generationTime,
+					elitismTime / generationTime,
+					crossoverTime / generationTime,
+					mutationTime / generationTime
+					);
+			printf("Total time %lf\n", generationTime);
+			printf("==============================\n");
+		}
 
 		//Next generation
 		swap(currentGeneration, nextGeneration);
@@ -122,6 +124,11 @@ int main() {
 			if(c == 'e'){
 				printf("Stop\n");
 				break;
+			}
+
+			if(c == 'p'){
+				printf("Press a key to resume...");
+				while (getchar() == '\n');
 			}
 		}
 	}

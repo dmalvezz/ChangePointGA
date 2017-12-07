@@ -43,7 +43,6 @@ static int kbhit(void){
   return 0;
 }
 
-
 unsigned long long getTime(){
     struct timespec t;
     int r;
