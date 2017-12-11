@@ -48,5 +48,17 @@ static int checkGeneration(Generation_ptr generation){
 	return 1;
 }
 
+static void testStrategy(){
+	Strategy str;
+	FILE* bestStrategyFile = fopen("str.bin", "rb");
+	fread(&str, sizeof(Strategy), 1, bestStrategyFile);
+	fclose(bestStrategyFile);
+
+	evalStrategyFitness(&str, START_VELOCITY, START_MAP);
+
+	printf("sim res %d \n", str.simulation.result);
+	printf("energy %f \n", str.simulation.energy);
+}
+
 
 #endif /* TEST_H_ */

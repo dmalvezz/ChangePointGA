@@ -35,7 +35,7 @@ int main() {
 	//Init random first generation
 	Generation_ptr currentGeneration = initRandomGeneration(POPULATION_SIZE);
 	//Init empty next generation
-	Generation_ptr nextGeneration =  initEmptyGeneration(POPULATION_SIZE);
+	Generation_ptr nextGeneration = initEmptyGeneration(POPULATION_SIZE);
 
 	unsigned long long generationTimer, timer;
 	unsigned long int generationCount = 0;
@@ -75,7 +75,7 @@ int main() {
 
 		//Perform crossover
 		timer = getTime();
-		crossOver(currentGeneration, nextGeneration, fitnessProportionalSelection, singlePointCrossover);
+		crossOver(currentGeneration, nextGeneration, rankSelection, singlePointCrossover);
 		crossoverTime = getTimeElapsed(timer);
 
 		//Perform mutations
@@ -86,9 +86,10 @@ int main() {
 		mutation(nextGeneration, changeRandomChangePointAction, CHANGE_POINT_ACT_MUTATION_RATE);
 		mutationTime = getTimeElapsed(timer);
 
-		if(generationCount % 100 == 0){
+		if(generationCount % 10 == 0){
 			//Get time
 			generationTime = getTimeElapsed(generationTimer);
+
 			//Print stats
 			printf("Gen %lu   fmin %.2f   fmed %.2f   lavg %d   inv %.2f\n",
 					generationCount,
@@ -97,8 +98,9 @@ int main() {
 					(int)currentGeneration->statistics.lengthAvg,
 					(float)currentGeneration->statistics.invalidCount / currentGeneration->count
 					);
+
 			//Print time %
-			printf("ft %lf   st %lf   ut %lf   et %lf   ct %lf   mt %lf\n",
+			printf("ft %0.3lf   st %0.3lf   ut %0.3lf   et %0.3lf   ct %0.3lf   mt %0.3lf\n",
 					fitnessTime / generationTime,
 					sortTime / generationTime,
 					statTime / generationTime,
@@ -134,10 +136,10 @@ int main() {
 	}
 
 	FILE* bestStrategyFile = fopen("str.bin", "wb");
-	fwrite(&currentGeneration->individuals[0].simulation, sizeof(Simulation), 1 , bestStrategyFile);
+	fwrite(&currentGeneration->individuals[0], sizeof(Strategy), 1 , bestStrategyFile);
 	fclose(bestStrategyFile);
 
-	simulationToCsv(&currentGeneration->individuals[0].simulation, "best.csv");
+	strategyToCsv(&currentGeneration->individuals[0], "best.csv");
 
 	disposeGeneration(currentGeneration);
 	disposeGeneration(nextGeneration);

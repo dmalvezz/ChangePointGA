@@ -1,0 +1,22 @@
+\select@language {italian}
+\select@language {italian}
+\contentsline {section}{\numberline {1}Introduzione}{3}
+\contentsline {subsection}{\numberline {1.1}Cos'\IeC {\`e} Eco-Marathon?}{3}
+\contentsline {subsection}{\numberline {1.2}Cos'\IeC {\`e} Escorpio?}{4}
+\contentsline {subsection}{\numberline {1.3}Obiettivo}{5}
+\contentsline {section}{\numberline {2}Il veicolo}{6}
+\contentsline {subsection}{\numberline {2.1}Caratteristiche tecniche}{6}
+\contentsline {subsection}{\numberline {2.2}Modello matematico}{6}
+\contentsline {section}{\numberline {3}Algoritmi genetici}{7}
+\contentsline {subsection}{\numberline {3.1}Introduzione}{7}
+\contentsline {subsection}{\numberline {3.2}Problema di ottimizzazione}{7}
+\contentsline {subsection}{\numberline {3.3}Popolazione}{7}
+\contentsline {subsection}{\numberline {3.4}Generazioni e fitness}{7}
+\contentsline {subsection}{\numberline {3.5}Operatori genetici}{7}
+\contentsline {subsubsection}{\numberline {3.5.1}Selezione}{7}
+\contentsline {subsubsection}{\numberline {3.5.2}Crossover}{8}
+\contentsline {subsubsection}{\numberline {3.5.3}Mutazione}{8}
+\contentsline {subsection}{\numberline {3.6}Algoritmo base}{8}
+\contentsline {subsection}{\numberline {3.7}Riproduzione degli schemi}{8}
+\contentsline {subsection}{\numberline {3.8}Vantaggi}{8}
+\contentsline {subsection}{\numberline {3.9}Problemi}{8}

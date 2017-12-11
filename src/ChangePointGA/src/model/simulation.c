@@ -102,7 +102,7 @@ SimulationResult simulate(Simulation_ptr simulation, float startPosition, float 
 
 
 		if(simulation->time > TRACK_LENGTH / MIN_AVG_SPEED){
-			//simRes = SIM_TIME_MAX;
+			simRes = SIM_TIME_MAX;
 		}
 
 		if(simRes != SIM_OK){

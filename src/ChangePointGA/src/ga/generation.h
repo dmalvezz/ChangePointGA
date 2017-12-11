@@ -53,19 +53,19 @@ Generation_ptr initRandomGeneration(int size);
 void disposeGeneration(Generation_ptr generation);
 
 //Print population individuals
-void printGeneration(Generation_ptr population);
+void printGeneration(Generation_ptr generation);
 
 
 
 /*****Fitness eval functions*****/
 //Eval fitness for all individuals
-void evalGenerationFitness(Generation_ptr population, float startVelocity, int startMap);
+void evalGenerationFitness(Generation_ptr generation, float startVelocity, int startMap);
 
 //Sort individual by fitness value
-void sortGenerationByFitness(Generation_ptr population);
+void sortGenerationByFitness(Generation_ptr generation);
 
 //Calculate population statistics
-void updateGenerationStatistics(Generation_ptr population);
+void updateGenerationStatistics(Generation_ptr generation);
 
 
 
@@ -76,11 +76,13 @@ void elitism(Generation_ptr currentGeneration, Generation_ptr nextGeneration, fl
 
 //Select an individuals with fitness proportional method
 //The statistics must be updated
-int fitnessProportionalSelection(Generation_ptr population);
+int fitnessProportionalSelection(Generation_ptr generation);
 
 //Select an individuals with tournament selection
-int tournamentSelection(Generation_ptr population);
+int tournamentSelection(Generation_ptr generation);
 
+//Select an individuals with rank selection
+int rankSelection(Generation_ptr generation);
 
 
 /*****Crossover functions*****/

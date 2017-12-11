@@ -10,6 +10,8 @@
 #define MIN_TOURNAMENT_ROUNDS	5
 #define MAX_TOURNAMENT_ROUNDS	10
 
+#define RANK_START_PROBABILITY	0.33
+
 
 void elitism(Generation_ptr currentGeneration, Generation_ptr nextGeneration, float elitismPercentage){
 	int count = currentGeneration->size * elitismPercentage;
@@ -45,3 +47,16 @@ int tournamentSelection(Generation_ptr generation){
 
 	return min;
 }
+
+int rankSelection(Generation_ptr generation){
+	int i = 0;
+	float r = randFloat(0, 1);
+	float p = 0;
+	while(i < generation->size && p <= r){
+		p += RANK_START_PROBABILITY * pow((1.0 - RANK_START_PROBABILITY), i);
+		i++;
+	}
+
+	return i - 1;
+}
+

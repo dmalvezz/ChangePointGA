@@ -130,7 +130,7 @@ void evalStrategyFitness(Strategy_ptr strategy, float startVelocity, int startMa
 				);
 	}
 
-	strategy->fitness = strategy->simulation.energy + pow(strategy->simulation.time - (TRACK_LENGTH / MIN_AVG_SPEED) + 2, 4);
+	strategy->fitness = strategy->simulation.energy + pow(strategy->simulation.time - (TRACK_LENGTH / MIN_AVG_SPEED), 4);
 }
 
 
