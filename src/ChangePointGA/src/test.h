@@ -10,6 +10,31 @@
 
 #include "ga/ga.h"
 
+static void testTrackData(){
+	Strategy str;
+	float totTime = 0 ;
+	float simTime;
+	unsigned long long timer;
+
+	for(int i = 0; i < 10000; i++){
+		initStrategy(&str, SPACE_STEP);
+
+		timer = getTime();
+		evalStrategyFitness(&str, START_VELOCITY, START_MAP);
+		simTime = getTimeElapsed(timer);
+
+		if(str.simulation.result != SIM_OK){
+			i--;
+		}
+		else{
+			printf("sim %f\n", simTime);
+			totTime += simTime;
+		}
+	}
+
+	printf("Tot time %f  avg time %f\n", (float)totTime, (float)totTime / 10000);
+}
+
 static int checkGeneration(Generation_ptr generation){
 	Strategy str;
 

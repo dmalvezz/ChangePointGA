@@ -43,9 +43,9 @@ SimulationResult simulate(Simulation_ptr simulation, float startPosition, float 
 	SimulationResult simRes = SIM_OK;
 
 	for(int i = 0; i < simStep; i++){
-		slope = getTrackSlope(simulation->position);
+		slope = getTrackSlope(simulation->position, SPACE_STEP);
 
-		radius = getTrackRadius(simulation->position);
+		radius = getTrackRadius(simulation->position, SPACE_STEP);
 
 		fTraction = getForceTraction(simulation->velocity, simulation->selectedMap);
 
@@ -100,7 +100,6 @@ SimulationResult simulate(Simulation_ptr simulation, float startPosition, float 
 			simRes = SIM_VEL_NEG;
 		}
 
-
 		if(simulation->time > TRACK_LENGTH / MIN_AVG_SPEED){
 			simRes = SIM_TIME_MAX;
 		}
@@ -110,6 +109,12 @@ SimulationResult simulate(Simulation_ptr simulation, float startPosition, float 
 			simulation->energy = INFINITY;
 			return simRes;
 		}
+	}
+
+	if(simulation->velocity < START_VELOCITY){
+		simulation->time = INFINITY;
+		simulation->energy = INFINITY;
+		return SIM_END_VEL;
 	}
 
 
@@ -162,5 +167,11 @@ void simulationToCsv(Simulation_ptr simulation, FILE* file){
 				simulation->steps[i].dt,
 				simulation->steps[i].dE
 			);
+	}
+}
+
+void simulationToStrategy(Simulation_ptr simulation, FILE* file){
+	for(int i = 0; i < SIM_STEP_COUNT; i++){
+		fprintf(file, "%f,", simulation->steps[i].ftraction);
 	}
 }

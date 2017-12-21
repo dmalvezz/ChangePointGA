@@ -20,6 +20,10 @@ void addRandomChangePoint(Strategy_ptr strategy){
 			strategy->points[r].positionIndex = randInt(strategy->points[r - 1].positionIndex , TRACK_LENGTH / SPACE_STEP);
 		}
 		else {
+			while(strategy->points[r - 1].positionIndex == strategy->points[r + 1].positionIndex){
+				r = randInt(1, strategy->size - 2);
+			}
+
 			strategy->points[r].positionIndex = randInt(strategy->points[r - 1].positionIndex, strategy->points[r + 1].positionIndex);
 		}
 
@@ -61,6 +65,9 @@ void moveRandomChangePoint(Strategy_ptr strategy){
 		strategy->points[r].positionIndex = randInt(strategy->points[r - 1].positionIndex , TRACK_LENGTH / SPACE_STEP);
 	}
 	else {
+		while(strategy->points[r - 1].positionIndex == strategy->points[r + 1].positionIndex){
+			r = randInt(1, strategy->size - 2);
+		}
 		strategy->points[r].positionIndex = randInt(strategy->points[r - 1].positionIndex, strategy->points[r + 1].positionIndex);
 	}
 

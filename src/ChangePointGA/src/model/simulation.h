@@ -13,10 +13,10 @@
 
 #define POWERTRAIN_2017
 #define ESCORPIOEVO3
-#define POWERTRAIN_FLAT
+//#define POWERTRAIN_FLAT
 
 #include "escorpio17.h"
-#include "londontrack17.h"
+#include "londontrack18.h"
 
 #include <math.h>
 #include "../ga/changepoint.h"
@@ -25,16 +25,16 @@
 #define SPACE_STEP	1.0
 #define SIM_STEP_COUNT	(TRACK_LENGTH / (int)SPACE_STEP)
 
-#define FIRST_LAP
+//#define FIRST_LAP
 #ifdef FIRST_LAP
 	#define MIN_AVG_SPEED 6.74
 #elif LAST_LAP
 	#define MIN_AVG_SPEED 6.74
 #else
-	#define MIN_AVG_SPEED 7.2
+	#define MIN_AVG_SPEED 7.0
 #endif
 
-#define START_VELOCITY	0
+#define START_VELOCITY	6.4
 #define START_MAP		1
 #define MAP_COUNT		4
 
@@ -43,6 +43,7 @@ typedef enum SimulationResult{
 	SIM_DELTA_ERR,
 	SIM_DT_NEG,
 	SIM_VEL_NEG,
+	SIM_END_VEL,
 	SIM_TIME_MAX
 }SimulationResult;
 
@@ -143,6 +144,9 @@ float getMaxForceTraction(float Speed);
 
 //Save simulation steps on csv
 void simulationToCsv(Simulation_ptr simulation, FILE* file);
+
+//Save simulation traction force on csv
+void simulationToStrategy(Simulation_ptr simulation, FILE* file);
 
 
 #endif /* SIMULATION_H_ */

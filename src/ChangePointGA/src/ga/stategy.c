@@ -49,7 +49,11 @@ void strategyToCsv(Strategy_ptr strategy, const char* fileName){
 		fprintf(file, "\n");
 	}
 
+	fclose(file);
 
+
+	file = fopen("strat.txt", "wt");
+	simulationToStrategy(&strategy->simulation, file);
 	fclose(file);
 }
 

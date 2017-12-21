@@ -32,6 +32,15 @@ int main() {
 	initMap(&maps[2], -4800.0, 25.0, 0.0);
 	initMap(&maps[3], -67500.0, 200.0, 0.0);
 
+	/*
+	initMap(&maps[0], -9500.0, 60.0, 0.0);
+	initMap(&maps[1], -6100.0, 45.0, 0.0);
+	initMap(&maps[2], -16000.0, 65.0, 0.0);
+	initMap(&maps[3], -45000.0, 130.0, 0.0);
+	*/
+
+	generateTrackData(SPACE_STEP);
+
 	//Init random first generation
 	Generation_ptr currentGeneration = initRandomGeneration(POPULATION_SIZE);
 	//Init empty next generation
@@ -75,7 +84,7 @@ int main() {
 
 		//Perform crossover
 		timer = getTime();
-		crossOver(currentGeneration, nextGeneration, rankSelection, singlePointCrossover);
+		crossOver(currentGeneration, nextGeneration, fitnessProportionalSelection, singlePointCrossover);
 		crossoverTime = getTimeElapsed(timer);
 
 		//Perform mutations
@@ -101,7 +110,7 @@ int main() {
 
 			//Print time %
 			printf("ft %0.3lf   st %0.3lf   ut %0.3lf   et %0.3lf   ct %0.3lf   mt %0.3lf\n",
-					fitnessTime / generationTime,
+					fitnessTime,
 					sortTime / generationTime,
 					statTime / generationTime,
 					elitismTime / generationTime,
@@ -143,6 +152,8 @@ int main() {
 
 	disposeGeneration(currentGeneration);
 	disposeGeneration(nextGeneration);
+
+	disposeTrackData();
 
 	return 0;
 }
