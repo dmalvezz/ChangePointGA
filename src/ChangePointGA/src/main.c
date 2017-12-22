@@ -110,7 +110,7 @@ int main() {
 
 			//Print time %
 			printf("ft %0.3lf   st %0.3lf   ut %0.3lf   et %0.3lf   ct %0.3lf   mt %0.3lf\n",
-					fitnessTime,
+					fitnessTime / generationTime,
 					sortTime / generationTime,
 					statTime / generationTime,
 					elitismTime / generationTime,
