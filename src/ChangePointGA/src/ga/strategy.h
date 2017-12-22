@@ -40,8 +40,8 @@ void initStrategy(Strategy_ptr strategy, int spaceStep);
 //Print to stdout
 void printStrategy(Strategy_ptr strategy);
 
-//Save strategy to csv file
-void strategyToCsv(Strategy_ptr strategy, const char* fileName);
+//Save strategy to csv, bin and strat file
+void strategyToFile(Strategy_ptr strategy, const char* fileName);
 
 //Compare function used by sort
 int compareStrategyFitness(const void* elem1, const void* elem2);

@@ -11,8 +11,6 @@
 #ifndef SIMULATION_H_
 #define SIMULATION_H_
 
-//Use 2017 driver
-#define POWERTRAIN_2017
 
 //Use escorpio3
 #define ESCORPIOEVO3

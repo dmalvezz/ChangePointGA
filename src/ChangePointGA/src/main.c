@@ -14,13 +14,14 @@
 #include <time.h>
 #include <omp.h>
 
+#include "ga/ga.h"
 #include "utils/sysutils.h"
 
 //Debug define
 //#define CHECK_GENERATIONS
+//#define CHECK_BEST
 #include "test.h"
 
-#include "ga/ga.h"
 
 int main() {
 	//Init random
@@ -39,18 +40,25 @@ int main() {
 	initMap(&maps[3], -45000.0, 130.0, 0.0);
 	*/
 
+	//Init track samples
 	generateTrackData(SPACE_STEP);
+
+#ifdef CHECK_BEST
+	testStrategy();
+	return 0;
+#endif
 
 	//Init random first generation
 	Generation_ptr currentGeneration = initRandomGeneration(POPULATION_SIZE);
 	//Init empty next generation
 	Generation_ptr nextGeneration = initEmptyGeneration(POPULATION_SIZE);
 
+	//Timers
 	unsigned long long generationTimer, timer;
 	unsigned long int generationCount = 0;
 	double generationTime, fitnessTime, sortTime, statTime, elitismTime, crossoverTime, mutationTime;
 
-	//for(int gen = 0; gen < 3; gen++){
+	//Loop
 	while(1){
 		//Start timer
 		generationTimer = getTime();
@@ -95,6 +103,7 @@ int main() {
 		mutation(nextGeneration, changeRandomChangePointAction, CHANGE_POINT_ACT_MUTATION_RATE);
 		mutationTime = getTimeElapsed(timer);
 
+		//Prints
 		if(generationCount % 10 == 0){
 			//Get time
 			generationTime = getTimeElapsed(generationTimer);
@@ -108,9 +117,9 @@ int main() {
 					(float)currentGeneration->statistics.invalidCount / currentGeneration->count
 					);
 
-			//Print time %
+			//Print time
 			printf("ft %0.3lf   st %0.3lf   ut %0.3lf   et %0.3lf   ct %0.3lf   mt %0.3lf\n",
-					fitnessTime,
+					fitnessTime / generationTime,
 					sortTime / generationTime,
 					statTime / generationTime,
 					elitismTime / generationTime,
@@ -121,18 +130,22 @@ int main() {
 			printf("==============================\n");
 		}
 
-		//Check stop
+		//Check commands
 		if(kbhit()){
 			char c = getchar();
+
+			//Save
 			if(c == 's'){
-				strategyToCsv(&currentGeneration->individuals[0], "best.csv");
+				strategyToFile(&currentGeneration->individuals[0], "best.csv");
 			}
 
+			//End
 			if(c == 'e'){
 				printf("Stop\n");
 				break;
 			}
 
+			//Pause
 			if(c == 'p'){
 				printf("Press a key to resume...");
 				while (getchar() == '\n');
@@ -144,15 +157,14 @@ int main() {
 		generationCount++;
 	}
 
-	FILE* bestStrategyFile = fopen("str.bin", "wb");
-	fwrite(&currentGeneration->individuals[0], sizeof(Strategy), 1 , bestStrategyFile);
-	fclose(bestStrategyFile);
+	//Save strategy
+	strategyToFile(&currentGeneration->individuals[0], "best.csv");
 
-	strategyToCsv(&currentGeneration->individuals[0], "best.csv");
-
+	//Dispose generation
 	disposeGeneration(currentGeneration);
 	disposeGeneration(nextGeneration);
 
+	//Dispose track samples
 	disposeTrackData();
 
 	return 0;

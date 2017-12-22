@@ -7,15 +7,6 @@
 
 #include "simulation.h"
 
-float getMotorMattrito (float Speed) {
-	// Da misure di laboratorio
-	float ret = 0;
-	ret += 0.0046; // Base
-	ret += Speed*TransmissionRatio*0.00016;
-	return 0.00986; //old
-	return ret;
-}
-
 float getPower (Simulation_ptr simulation, float Ftraction, float Speed, float dt) {
 	float MotorPd = 0;
 	float ret;
@@ -32,7 +23,6 @@ float getPower (Simulation_ptr simulation, float Ftraction, float Speed, float d
 		//************
 
 		// Motor Model
-		MotorMattrito = getMotorMattrito(MotorSpeed);
 		float MotorVoltage = (MotorSpeed+(MotorSTG*MotorTorque))/MotorSC;
 		float MotorCurrent;
 		float MotDeltaR = MotorR *( ( (1+simulation->Twindings*alpha_cu) / (1+25.0*alpha_cu) ) -1 );
@@ -50,24 +40,15 @@ float getPower (Simulation_ptr simulation, float Ftraction, float Speed, float d
 		MotorPd = MotorVoltage*MotorCurrent - MotorSpeed*MotorTorque;
 
 		// Driver Model
-#ifndef POWERTRAIN_2017
-		float DriverVoltage = MotorVoltage+(MotorCurrent*DriverReq);
-		if (DriverVoltage<0) DriverVoltage = 0;
-		float DriverCurrent;
-		if(MotorCurrent>0)
-			DriverCurrent = MotorCurrent + DriverIq;
-		else
-			DriverCurrent = 0;
-		// ************
-		ret = (DriverVoltage*DriverCurrent);
-#else
-		float eff = MotorVoltage*MotorCurrent / (MotorVoltage*MotorCurrent + DRV17_Pq + DRV17_req*MotorCurrent*MotorCurrent + DRV17_ki*MotorCurrent + DRV17_kv*MotorVoltage);
+#ifdef POWERTRAIN_FLAT
+		ret  = Ftraction*Speed/ POWERTRAIN_FLAT_EFF;
+#endif
+
+#ifndef POWERTRAIN_FLAT
+		float eff = MotorVoltage*MotorCurrent / (MotorVoltage*MotorCurrent + DRV_Pq + DRV_req*MotorCurrent*MotorCurrent + DRV_ki*MotorCurrent + DRV_kv*MotorVoltage);
 		if (eff < 0.6) eff = 0.6;
 		if (eff > 0.99) eff = 0.99;
 		ret = (MotorVoltage*MotorCurrent)/eff;
-#endif
-#ifdef POWERTRAIN_FLAT
-		ret  = Ftraction*Speed/ POWERTRAIN_FLAT_EFF;
 #endif
 	}
 	else // Ftraction<0
@@ -86,7 +67,6 @@ float getPower (Simulation_ptr simulation, float Ftraction, float Speed, float d
 		//************
 
 		// Motor Model
-		MotorMattrito = getMotorMattrito(MotorSpeed);
 		float MotorVoltage = (MotorSpeed+(MotorSTG*MotorTorque))/MotorSC;
 		float MotorCurrent;
 		float MotDeltaR = MotorR *( ( (1+simulation->Twindings*alpha_cu) / (1+25.0*alpha_cu) ) -1 );
@@ -96,14 +76,15 @@ float getPower (Simulation_ptr simulation, float Ftraction, float Speed, float d
 		MotorPd = MotorVoltage*MotorCurrent - MotorSpeed*MotorTorque;
 
 		// Driver Model
-		float DriverVoltage = MotorVoltage+(MotorCurrent*DriverReq);
-		if (DriverVoltage<0) DriverVoltage = 0;
-		float DriverCurrent;
-			DriverCurrent = MotorCurrent + DriverIq;
-
-		ret = (DriverVoltage*DriverCurrent);
 #ifdef POWERTRAIN_FLAT
-		ret = Ftraction*Speed * POWERTRAIN_FLAT_EFF;
+		ret  = Ftraction*Speed/ POWERTRAIN_FLAT_EFF;
+#endif
+
+#ifndef POWERTRAIN_FLAT
+		float eff = MotorVoltage*MotorCurrent / (MotorVoltage*MotorCurrent + DRV_Pq + DRV_req*MotorCurrent*MotorCurrent + DRV_ki*MotorCurrent + DRV_kv*MotorVoltage);
+		if (eff < 0.6) eff = 0.6;
+		if (eff > 0.99) eff = 0.99;
+		ret = (MotorVoltage*MotorCurrent)/eff;
 #endif
 	}
 

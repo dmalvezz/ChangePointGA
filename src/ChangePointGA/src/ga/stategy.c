@@ -35,7 +35,7 @@ void printStrategy(Strategy_ptr strategy){
 	printf("\n");
 }
 
-void strategyToCsv(Strategy_ptr strategy, const char* fileName){
+void strategyToFile(Strategy_ptr strategy, const char* fileName){
 	FILE* file = fopen(fileName, "wt");
 
 	simulationToCsv(&strategy->simulation, file);
@@ -51,7 +51,12 @@ void strategyToCsv(Strategy_ptr strategy, const char* fileName){
 
 	fclose(file);
 
+	//Bin file
+	FILE* bestStrategyFile = fopen("str.bin", "wb");
+	fwrite(strategy, sizeof(Strategy), 1, bestStrategyFile);
+	fclose(bestStrategyFile);
 
+	//Strat file
 	file = fopen("strat.txt", "wt");
 	simulationToStrategy(&strategy->simulation, file);
 	fclose(file);
