@@ -56,11 +56,6 @@ void strategyToCsv(Strategy_ptr strategy, const char* fileName){
 	simulationToStrategy(&strategy->simulation, file);
 	fclose(file);
 
-	file = fopen("cp.txt", "wt");
-	for(int i = 0; strategy->size; i++){
-		fprintf(file, "%d,", strategy->points[i]);
-	}
-	fclose(file);
 }
 
 

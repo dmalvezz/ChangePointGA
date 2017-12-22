@@ -74,14 +74,10 @@ static int checkGeneration(Generation_ptr generation){
 }
 
 static void testStrategy(){
-	Strategy str, temp;
+	Strategy str;
 	FILE* bestStrategyFile = fopen("str.bin", "rb");
-	fread(&temp, sizeof(Strategy), 1, bestStrategyFile);
+	fread(&str, sizeof(Strategy), 1, bestStrategyFile);
 	fclose(bestStrategyFile);
-
-
-	str.size = temp.size;
-	for(int i = 0; i < str.size; i++)str.points[i] = temp.points[i];
 
 	printf("energy %f \n", str.simulation.energy);
 

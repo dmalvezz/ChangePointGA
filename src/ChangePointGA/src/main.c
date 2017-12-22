@@ -41,10 +41,6 @@ int main() {
 
 	generateTrackData(SPACE_STEP);
 
-
-	testStrategy();
-	return 0;
-
 	//Init random first generation
 	Generation_ptr currentGeneration = initRandomGeneration(POPULATION_SIZE);
 	//Init empty next generation
@@ -125,10 +121,6 @@ int main() {
 			printf("==============================\n");
 		}
 
-		//Next generation
-		swap(currentGeneration, nextGeneration);
-		generationCount++;
-
 		//Check stop
 		if(kbhit()){
 			char c = getchar();
@@ -146,6 +138,10 @@ int main() {
 				while (getchar() == '\n');
 			}
 		}
+
+		//Next generation
+		swap(currentGeneration, nextGeneration);
+		generationCount++;
 	}
 
 	FILE* bestStrategyFile = fopen("str.bin", "wb");
