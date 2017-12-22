@@ -25,7 +25,7 @@
 
 typedef struct Strategy{
 	int size;									//Num of change points used
-	//int lastChange;								//Last change point changed
+	//int lastChange;							//Last change point changed
 	float fitness;								//Strategy fitness
 	ChangePoint points[MAX_CHANGE_POINT];		//Change points
 	Simulation simulation;						//Simulation
@@ -42,7 +42,6 @@ void printStrategy(Strategy_ptr strategy);
 
 //Save strategy to csv file
 void strategyToCsv(Strategy_ptr strategy, const char* fileName);
-
 
 //Compare function used by sort
 int compareStrategyFitness(const void* elem1, const void* elem2);

@@ -3,9 +3,6 @@
 //****************************************************//
 
 #include <math.h>
-
-
-
 #include "powertrain/powertrain.h"
 
 

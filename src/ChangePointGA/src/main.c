@@ -41,6 +41,10 @@ int main() {
 
 	generateTrackData(SPACE_STEP);
 
+
+	testStrategy();
+	return 0;
+
 	//Init random first generation
 	Generation_ptr currentGeneration = initRandomGeneration(POPULATION_SIZE);
 	//Init empty next generation
