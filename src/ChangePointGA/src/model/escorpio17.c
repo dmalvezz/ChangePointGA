@@ -90,8 +90,8 @@ float getPower (Simulation_ptr simulation, float Ftraction, float Speed, float d
 		float MotorVoltage = (MotorSpeed+(MotorSTG*MotorTorque))/MotorSC;
 		float MotorCurrent;
 		float MotDeltaR = MotorR *( ( (1+simulation->Twindings*alpha_cu) / (1+25.0*alpha_cu) ) -1 );
-			MotorCurrent = (MotorMattrito+MotorTorque)/MotorTC;
-			MotorVoltage += MotDeltaR*MotorCurrent*MotorCurrent;
+		MotorCurrent = (MotorMattrito+MotorTorque)/MotorTC;
+		MotorVoltage += MotDeltaR*MotorCurrent*MotorCurrent;
 
 		MotorPd = MotorVoltage*MotorCurrent - MotorSpeed*MotorTorque;
 
@@ -220,7 +220,7 @@ float getForceTyres(float Speed, float TrackRadiusInv){
 
 	// Ricerca iterativa
 	// Determino iterativamente il miglior angolo beta che individua la posizione del centro di rotazione
-	float betamax = asin(VehicleXg*TrackRadiusInv);
+	//float betamax = asin(VehicleXg*TrackRadiusInv);
 
 	float Slipo, Slipi, Slipr, e;
 	float Fyr, Fyi, Fyo;

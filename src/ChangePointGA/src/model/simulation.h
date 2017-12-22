@@ -11,9 +11,20 @@
 #ifndef SIMULATION_H_
 #define SIMULATION_H_
 
+//Use 2017 driver
 #define POWERTRAIN_2017
+
+//Use escorpio3
 #define ESCORPIOEVO3
+
+//Motor comparative energy consumption
 //#define POWERTRAIN_FLAT
+
+//Motors list
+//#define RE40_24V
+//#define RE40_48V
+#define RE50_24V
+//#define RE50_36V
 
 #include "escorpio17.h"
 #include "londontrack18.h"
