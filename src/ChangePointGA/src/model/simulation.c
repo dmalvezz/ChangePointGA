@@ -37,6 +37,8 @@ SimulationResult simulate(Simulation_ptr simulation, float startPosition, float 
 		simulation->selectedMap = 0;
 	}
 
+	//printf("pos %f action %d map %d\n", startPosition, action, simulation->selectedMap);
+
 	int startIndex = startPosition / SPACE_STEP;
 	int simStep = (endPosition - startPosition) / SPACE_STEP;
 	float radius, slope, fTraction, fSlope, fAero, fTyres, fResistent, fTot, a, delta, dt, dE;

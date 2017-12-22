@@ -121,10 +121,6 @@ int main() {
 			printf("==============================\n");
 		}
 
-		//Next generation
-		swap(currentGeneration, nextGeneration);
-		generationCount++;
-
 		//Check stop
 		if(kbhit()){
 			char c = getchar();
@@ -142,6 +138,10 @@ int main() {
 				while (getchar() == '\n');
 			}
 		}
+
+		//Next generation
+		swap(currentGeneration, nextGeneration);
+		generationCount++;
 	}
 
 	FILE* bestStrategyFile = fopen("str.bin", "wb");
