@@ -15,6 +15,8 @@ Generation_ptr initEmptyGeneration(int size){
 	generation->size = size;
 	generation->individuals = (Strategy_ptr)malloc(size * sizeof(Strategy));
 
+	generation->statistics.best.fitness = INFINITY;
+
 	return generation;
 }
 
@@ -28,6 +30,8 @@ Generation_ptr initRandomGeneration(int size){
 	for(int i = 0; i < size; i++){
 		initStrategy(&generation->individuals[i], SPACE_STEP);
 	}
+
+	generation->statistics.best.fitness = INFINITY;
 
 	return generation;
 }
@@ -46,12 +50,19 @@ void printGeneration(Generation_ptr generation){
 
 
 
-void evalGenerationFitness(Generation_ptr generation, float startVelocity, int startMap){
+void evalGenerationFitness(Generation_ptr generation, float startVelocity, int startMap, FitnessFunction fitnessFunction){
 	#pragma omp parallel
 	{
 		#pragma omp for
 		for(int i = 0; i < generation->size; i++){
-			evalStrategyFitness(&generation->individuals[i], startVelocity, startMap);
+			//Simulate the strategy
+			simulateStrategy(&generation->individuals[i], startVelocity, startMap);
+
+			//Similarity factor with previous best
+			generation->individuals[i].similarity = evalStrategySimilarity(&generation->individuals[i], &generation->statistics.best);
+
+			//Update fitness
+			generation->individuals[i].fitness = fitnessFunction(&generation->individuals[i]);
 		}
 	}
 }
@@ -67,6 +78,7 @@ void updateGenerationStatistics(Generation_ptr generation){
 	generation->statistics.fitnessAvg = 0;
 
 	generation->statistics.lengthAvg = 0;
+	generation->statistics.similarityAvg = 0;
 
 	generation->statistics.invalidCount = 0;
 
@@ -78,11 +90,18 @@ void updateGenerationStatistics(Generation_ptr generation){
 		if(generation->individuals[i].simulation.result != SIM_OK){
 			generation->statistics.invalidCount++;
 		}
+		else{
+			generation->statistics.similarityAvg += generation->individuals[i].similarity;
+		}
 	}
 
 	generation->statistics.fitnessAvg /= generation->size;
 	generation->statistics.lengthAvg /= generation->size;
+	generation->statistics.similarityAvg /= (generation->size - generation->statistics.invalidCount);
 
+	if(generation->individuals[0].fitness < generation->statistics.best.fitness){
+		memcpy(&generation->statistics.best, &generation->individuals[0], sizeof(Strategy));
+	}
 }
 
 

@@ -19,14 +19,17 @@
 
 
 typedef struct Statistics{
+	int invalidCount;
+
 	float fitnessMax;
 	float fitnessMin;
 	float fitnessMedian;
 	float fitnessAvg;
 
 	float lengthAvg;
+	float similarityAvg;
 
-	int invalidCount;
+	Strategy best;
 }Statistics;
 
 typedef struct Generation{
@@ -38,7 +41,8 @@ typedef struct Generation{
 
 typedef Generation* Generation_ptr;
 
-typedef int (*SelectionFunction)(Generation_ptr);
+typedef float (*FitnessFunction)(Strategy_ptr strategy);
+typedef int (*SelectionFunction)(Generation_ptr generation);
 typedef void (*CrossoverFunction)(Strategy_ptr parent1, Strategy_ptr parent2, Strategy_ptr child1, Strategy_ptr child2, int cut);
 typedef void (*MutationFunction)(Strategy_ptr strategy);
 
@@ -58,8 +62,15 @@ void printGeneration(Generation_ptr generation);
 
 
 /*****Fitness eval functions*****/
+//Pure energy based fitness
+float energyFitness(Strategy_ptr strategy);
+
+//Energy and time fitness
+float energyTimeFitness(Strategy_ptr strategy);
+
+
 //Eval fitness for all individuals
-void evalGenerationFitness(Generation_ptr generation, float startVelocity, int startMap);
+void evalGenerationFitness(Generation_ptr generation, float startVelocity, int startMap, FitnessFunction fitness);
 
 //Sort individual by fitness value
 void sortGenerationByFitness(Generation_ptr generation);

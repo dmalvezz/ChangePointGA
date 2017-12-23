@@ -27,6 +27,7 @@ typedef struct Strategy{
 	int size;									//Num of change points used
 	//int lastChange;							//Last change point changed
 	float fitness;								//Strategy fitness
+	float similarity;							//Strategy similarity factor
 	ChangePoint points[MAX_CHANGE_POINT];		//Change points
 	Simulation simulation;						//Simulation
 }Strategy;
@@ -57,6 +58,9 @@ void addChangePoint(Strategy_ptr strategy, int position);
 void removeChangePoint(Strategy_ptr strategy, int index);
 
 //Run simulation
-void evalStrategyFitness(Strategy_ptr strategy, float startVelocity, int startMap);
+void simulateStrategy(Strategy_ptr strategy, float startVelocity, int startMap);
+
+//Eval similarity factor
+float evalStrategySimilarity(Strategy_ptr str1, Strategy_ptr str2);
 
 #endif

@@ -110,7 +110,7 @@ void removeChangePoint(Strategy_ptr strategy, int index){
 	strategy->size--;
 }
 
-void evalStrategyFitness(Strategy_ptr strategy, float startVelocity, int startMap){
+void simulateStrategy(Strategy_ptr strategy, float startVelocity, int startMap){
 	int i = 0;
 	initSimulation(&strategy->simulation, startVelocity, startMap);
 
@@ -140,7 +140,30 @@ void evalStrategyFitness(Strategy_ptr strategy, float startVelocity, int startMa
 				);
 	}
 
-	strategy->fitness = strategy->simulation.energy + pow(strategy->simulation.time - (TRACK_LENGTH / MIN_AVG_SPEED), 4);
+}
+
+float evalStrategySimilarity(Strategy_ptr str1, Strategy_ptr str2){
+	float factor;
+	float scalar = 0, l1 = 0, l2 = 0;
+
+	if(str1->simulation.result == SIM_OK && str2->simulation.result == SIM_OK){
+
+		for(int i = 0; i < SIM_STEP_COUNT; i++){
+			scalar += str1->simulation.steps[i].map * str2->simulation.steps[i].map;
+			l1 += str1->simulation.steps[i].map * str1->simulation.steps[i].map;
+			l2 += str2->simulation.steps[i].map * str2->simulation.steps[i].map;
+		}
+
+		//Cosine measure
+		factor = scalar / (sqrt(l1) * sqrt(l2));
+
+		//Jacquard measure
+		//factor = scalar / (l1 + l2 - scalar);
+
+		return factor;
+	}
+
+	return INFINITY;
 }
 
 

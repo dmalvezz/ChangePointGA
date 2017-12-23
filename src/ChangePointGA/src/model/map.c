@@ -21,11 +21,6 @@ void initMap(Map_ptr map, float a0, float a1, float a2){
 float getMapForce(Map_ptr map, float velocity){
 	float torque;
 
-	// Wheel Model
-	//float WheelSpeed  = velocity * 2 / WheelDiameter;
-	// Transmission Model
-	//float MotorSpeed = WheelSpeed / TransmissionRatio;
-
 	float rpm = velocity / TransmissionRatio * 60 / (M_PI * WheelDiameter);
 
 	//rpm = a0 + a1 * torque[mNm] + a2 * torque[mNm] ^ 2

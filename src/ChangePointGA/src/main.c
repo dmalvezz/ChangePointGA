@@ -53,9 +53,11 @@ int main() {
 	//Init empty next generation
 	Generation_ptr nextGeneration = initEmptyGeneration(POPULATION_SIZE);
 
+	//Counter
+	unsigned long int generationCount = 0;
+
 	//Timers
 	unsigned long long generationTimer, timer;
-	unsigned long int generationCount = 0;
 	double generationTime, fitnessTime, sortTime, statTime, elitismTime, crossoverTime, mutationTime;
 
 	//Loop
@@ -72,7 +74,7 @@ int main() {
 
 		//Eval fitness
 		timer = getTime();
-		evalGenerationFitness(currentGeneration, START_VELOCITY, START_MAP);
+		evalGenerationFitness(currentGeneration, START_VELOCITY, START_MAP, energyTimeFitness);
 		fitnessTime = getTimeElapsed(timer);
 
 		//Sort individual by fitness
@@ -109,12 +111,13 @@ int main() {
 			generationTime = getTimeElapsed(generationTimer);
 
 			//Print stats
-			printf("Gen %lu   fmin %.2f   fmed %.2f   lavg %d   inv %.2f\n",
+			printf("Gen %lu   fmin %.2f   fmed %.2f   lavg %d   inv %.2f   sim %.2f\n",
 					generationCount,
 					currentGeneration->statistics.fitnessMin,
 					currentGeneration->statistics.fitnessMedian,
 					(int)currentGeneration->statistics.lengthAvg,
-					(float)currentGeneration->statistics.invalidCount / currentGeneration->count
+					(float)currentGeneration->statistics.invalidCount / currentGeneration->count,
+					currentGeneration->statistics.similarityAvg
 					);
 
 			//Print time
