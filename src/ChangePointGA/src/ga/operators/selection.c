@@ -7,17 +7,25 @@
 
 #include "../generation.h"
 
-#define MIN_TOURNAMENT_ROUNDS	5
-#define MAX_TOURNAMENT_ROUNDS	10
+#define MIN_TOURNAMENT_ROUNDS	1
+#define MAX_TOURNAMENT_ROUNDS	3
 
-#define RANK_START_PROBABILITY	0.33
+#define RANK_START_PROBABILITY	0.33f
 
 
 void elitism(Generation_ptr currentGeneration, Generation_ptr nextGeneration, float elitismPercentage){
 	int count = currentGeneration->size * elitismPercentage;
 
 	nextGeneration->count = count;
-	memcpy(nextGeneration->individuals, currentGeneration->individuals, count * sizeof(Strategy));
+
+	//Keep best in the generation
+	if(currentGeneration->individuals[0].simulation.energy < currentGeneration->statistics.best.simulation.energy){
+		memcpy(&nextGeneration->individuals[0], &currentGeneration->statistics.best, sizeof(Strategy));
+		memcpy(&nextGeneration->individuals[1], currentGeneration->individuals, (count - 1) * sizeof(Strategy));
+	}
+	else{
+		memcpy(nextGeneration->individuals, currentGeneration->individuals, count * sizeof(Strategy));
+	}
 }
 
 

@@ -16,6 +16,8 @@ Generation_ptr initEmptyGeneration(int size){
 	generation->individuals = (Strategy_ptr)malloc(size * sizeof(Strategy));
 
 	generation->statistics.best.fitness = INFINITY;
+	generation->statistics.best.simulation.energy = INFINITY;
+	generation->statistics.best.simulation.time = INFINITY;
 
 	return generation;
 }
@@ -32,6 +34,8 @@ Generation_ptr initRandomGeneration(int size){
 	}
 
 	generation->statistics.best.fitness = INFINITY;
+	generation->statistics.best.simulation.energy = INFINITY;
+	generation->statistics.best.simulation.time = INFINITY;
 
 	return generation;
 }
@@ -62,7 +66,7 @@ void evalGenerationFitness(Generation_ptr generation, float startVelocity, int s
 			generation->individuals[i].similarity = evalStrategySimilarity(&generation->individuals[i], &generation->statistics.best);
 
 			//Update fitness
-			generation->individuals[i].fitness = fitnessFunction(&generation->individuals[i]);
+			generation->individuals[i].fitness = fitnessFunction(generation, &generation->individuals[i]);
 		}
 	}
 }
@@ -99,7 +103,8 @@ void updateGenerationStatistics(Generation_ptr generation){
 	generation->statistics.lengthAvg /= generation->size;
 	generation->statistics.similarityAvg /= (generation->size - generation->statistics.invalidCount);
 
-	if(generation->individuals[0].fitness < generation->statistics.best.fitness){
+	if(generation->individuals[0].simulation.result == SIM_OK &&
+			generation->individuals[0].simulation.energy < generation->statistics.best.simulation.energy){
 		memcpy(&generation->statistics.best, &generation->individuals[0], sizeof(Strategy));
 	}
 }

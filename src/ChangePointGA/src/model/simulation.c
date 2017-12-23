@@ -108,9 +108,11 @@ SimulationResult simulate(Simulation_ptr simulation, float startPosition, float 
 			simRes = SIM_VEL_NEG;
 		}
 
+#ifndef KEEP_TIME_INVALID
 		if(simulation->time > TRACK_LENGTH / MIN_AVG_SPEED){
 			simRes = SIM_TIME_MAX;
 		}
+#endif
 
 		if(simRes != SIM_OK){
 			simulation->time = INFINITY;

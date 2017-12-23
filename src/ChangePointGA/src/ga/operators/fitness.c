@@ -8,12 +8,17 @@
 #include "../generation.h"
 
 
-//Pure energy based fitness
-float energyFitness(Strategy_ptr strategy){
+float energyFitness(Generation_ptr generation, Strategy_ptr strategy){
 	return strategy->simulation.energy;
 }
 
-//Energy and time fitness
-float energyTimeFitness(Strategy_ptr strategy){
-	return strategy->fitness = strategy->simulation.energy + pow(strategy->simulation.time - (TRACK_LENGTH / MIN_AVG_SPEED), 4);
+float energyTimeFitness(Generation_ptr generation, Strategy_ptr strategy){
+	return strategy->simulation.energy + pow(strategy->simulation.time - (TRACK_LENGTH / MIN_AVG_SPEED), 4);
+}
+
+float energyDiversityFitness(Generation_ptr generation, Strategy_ptr strategy){
+	float x = strategy->simulation.energy / generation->statistics.best.simulation.energy;
+	float y = strategy->similarity;
+
+	return pow(x, 2) + pow(y, 4);
 }

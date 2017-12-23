@@ -110,6 +110,13 @@ int main() {
 			//Get time
 			generationTime = getTimeElapsed(generationTimer);
 
+			//Print best
+			printf("Best energy %.2f   time %.2f/%.2f\n",
+					currentGeneration->individuals[0].simulation.energy,
+					currentGeneration->individuals[0].simulation.time,
+					(float)TRACK_LENGTH / MIN_AVG_SPEED
+					);
+
 			//Print stats
 			printf("Gen %lu   fmin %.2f   fmed %.2f   lavg %d   inv %.2f   sim %.2f\n",
 					generationCount,
@@ -139,7 +146,7 @@ int main() {
 
 			//Save
 			if(c == 's'){
-				strategyToFile(&currentGeneration->individuals[0], "best.csv");
+				strategyToFile(&currentGeneration->statistics.best, "best.csv");
 			}
 
 			//End
@@ -161,7 +168,7 @@ int main() {
 	}
 
 	//Save strategy
-	strategyToFile(&currentGeneration->individuals[0], "best.csv");
+	strategyToFile(&currentGeneration->statistics.best, "best.csv");
 
 	//Dispose generation
 	disposeGeneration(currentGeneration);
