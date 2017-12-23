@@ -1,3 +1,0 @@
-1) Le simulazioni si lanciano eseguendo il file exe presente in una delle cartelle qui sopra.
-2) Lanciare un numero di simulazioni contemporanee pari al numero dei propri CORE fisici o uno in meno
-3) Le simulazioni terminano quando compare "Premere un tasto per continuare..."

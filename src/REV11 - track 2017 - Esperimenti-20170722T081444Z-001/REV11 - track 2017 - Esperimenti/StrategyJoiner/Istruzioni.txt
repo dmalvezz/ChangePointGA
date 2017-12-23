@@ -1,2 +1,0 @@
-->incollare le cartelle Lastlap, firstlap, lap 
--> eseguire

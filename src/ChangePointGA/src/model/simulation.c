@@ -61,13 +61,21 @@ SimulationResult simulate(Simulation_ptr simulation, float startPosition, float 
 
 		a = fTot / VehicleInertialMass;
 
-		delta = simulation->velocity * simulation->velocity + 2 * a * SPACE_STEP;
+		//If a = 0 use costant velocity
+		if(!isZero(a)){
+			delta = simulation->velocity * simulation->velocity + 2 * a * SPACE_STEP;
 
-		if(delta < 0){
-			simRes = SIM_DELTA_ERR;
+			if(delta < 0){
+				simRes = SIM_DELTA_ERR;
+			}
+
+			dt = (sqrt(delta) - simulation->velocity) / a;
 		}
+		else{
+			delta = -1;
 
-		dt = (sqrt(delta) - simulation->velocity) / a;
+			dt = SPACE_STEP / simulation->velocity;
+		}
 
 		if(dt < 0){
 			simRes = SIM_DT_NEG;

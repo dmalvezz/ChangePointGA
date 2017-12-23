@@ -1,7 +1,0 @@
-TotalEnergy:  81100.5 J - 6.500000 m/s
-TotalEnergy:  80864.9 J - 6.600000 m/s
-TotalEnergy:  82691.1 J - 6.700000 m/s
-TotalEnergy:  83211.1 J - 6.800000 m/s
-TotalEnergy:  83551.1 J - 6.900000 m/s
-TotalEnergy:  84112.9 J - 7.000000 m/s
-TotalEnergy:  84334.3 J - 7.100000 m/s

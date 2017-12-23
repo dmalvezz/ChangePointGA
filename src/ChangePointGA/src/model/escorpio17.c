@@ -276,6 +276,10 @@ float getForceTyres(float Speed, float TrackRadiusInv){
 	// Ho finalmente trovato il beta giusto
 
 	TractiveForce = Fxr + Fxo*cos(angleo) + Fxi*cos(anglei) + Fyo*sin(angleo) + Fyi*sin(anglei) - Fc*sin(beta);
+	// Introduce now cornering factor correction
+	float straightTractiveForce = Fzi*Cri + Fzo*Cro + Fzr*Crr;
+
+	TractiveForce = TractiveForce + (TractiveForce - straightTractiveForce)*(TyresCorneringCorrFactor - 1) * 2;
 	//float TractiveForceb; // Tractive perpendicolare a Fc
 	//TractiveForceb = Fxr*cos(beta) + Fxo*cos(angleo-beta) + Fxi*cos(anglei-beta)+ Fyo*sin(anglei-beta) + Fyi*sin(anglei-beta) - Fyr*sin(beta);
 
@@ -290,6 +294,7 @@ float getForceTyres(float Speed, float TrackRadiusInv){
 	// Aero Drag on tyres    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	//TractiveForceb += (0.0153*Speed*Speed - 0.0124*Speed)*0.5;
 	TractiveForce += (0.00765*Speed*Speed - 0.0062*Speed);
+
 	return TractiveForce;
 }
 

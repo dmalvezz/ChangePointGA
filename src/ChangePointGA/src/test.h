@@ -20,7 +20,7 @@ static void testTrackData(){
 		initStrategy(&str, SPACE_STEP);
 
 		timer = getTime();
-		evalStrategyFitness(&str, START_VELOCITY, START_MAP);
+		evalStrategyFitness(&str, START_VELOCITY, START_MAP, energyTimeFitness);
 		simTime = getTimeElapsed(timer);
 
 		if(str.simulation.result != SIM_OK){
@@ -81,12 +81,12 @@ static void testStrategy(){
 
 	printf("energy %f \n", str.simulation.energy);
 
-	evalStrategyFitness(&str, START_VELOCITY, START_MAP);
+	simulateStrategy(&str, START_VELOCITY, START_MAP);
 
 	printf("sim res %d \n", str.simulation.result);
 	printf("energy %f \n", str.simulation.energy);
 
-	strategyToCsv(&str, "test.csv");
+	strategyToFile(&str, "test.csv");
 
 }
 
