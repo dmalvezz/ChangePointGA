@@ -20,25 +20,18 @@
 //Debug define
 //#define CHECK_GENERATIONS
 //#define CHECK_BEST
+#define SAVE_STATISTICS
 #include "test.h"
 
+
+void execCommands(Generation_ptr currentGeneration, int* loop);
 
 int main() {
 	//Init random
 	randInit();
 
-	//Init maps
-	initMap(&maps[0], -4800.0, 45.0, 0.0);
-	initMap(&maps[1], -4800.0, 40.0, 0.0);
-	initMap(&maps[2], -4800.0, 25.0, 0.0);
-	initMap(&maps[3], -67500.0, 200.0, 0.0);
-
-	/*
-	initMap(&maps[0], -9500.0, 60.0, 0.0);
-	initMap(&maps[1], -6100.0, 45.0, 0.0);
-	initMap(&maps[2], -16000.0, 65.0, 0.0);
-	initMap(&maps[3], -45000.0, 130.0, 0.0);
-	*/
+	//Init mapset
+	initMapset();
 
 	//Init track samples
 	generateTrackData(SPACE_STEP);
@@ -57,11 +50,17 @@ int main() {
 	unsigned long int generationCount = 0;
 
 	//Timers
+	int loop = 1;
 	unsigned long long generationTimer, timer;
 	double generationTime, fitnessTime, sortTime, statTime, elitismTime, crossoverTime, mutationTime;
 
+#ifdef SAVE_STATISTICS
+	FILE* statisticsFile = fopen("statistics.csv", "wt");
+	fprintf(statisticsFile, "generation, energyBest,fitnessBest, fitnessMin, fitnessMedian, lenghtAvg, similarityAvg, %%invalid\n");
+#endif
+
 	//Loop
-	while(1){
+	while(loop){
 		//Start timer
 		generationTimer = getTime();
 
@@ -85,9 +84,12 @@ int main() {
 		//Calculate the statistics
 		timer = getTime();
 		updateGenerationStatistics(currentGeneration);
+#ifdef SAVE_STATISTICS
+		statisticsToFile(currentGeneration, generationCount, statisticsFile);
+#endif
 		statTime = getTimeElapsed(timer);
 
-		//Perform elitsm selection
+		//Perform elitism selection
 		timer = getTime();
 		elitism(currentGeneration, nextGeneration, ELITISM_PERCENTAGE);
 		elitismTime = getTimeElapsed(timer);
@@ -138,37 +140,27 @@ int main() {
 					);
 			printf("Total time %lf\n", generationTime);
 			printf("==============================\n");
+
+		#ifdef SAVE_STATISTICS
+			fflush(statisticsFile);
+		#endif
 		}
 
 		//Check commands
-		if(kbhit()){
-			char c = getchar();
-
-			//Save
-			if(c == 's'){
-				strategyToFile(&currentGeneration->statistics.best, "best.csv");
-			}
-
-			//End
-			if(c == 'e'){
-				printf("Stop\n");
-				break;
-			}
-
-			//Pause
-			if(c == 'p'){
-				printf("Press a key to resume...");
-				while (getchar() == '\n');
-			}
-		}
+		execCommands(currentGeneration, &loop);
 
 		//Next generation
 		swap(currentGeneration, nextGeneration);
 		generationCount++;
 	}
 
-	//Save strategy
+	//Save strategy and generation
 	strategyToFile(&currentGeneration->statistics.best, "best.csv");
+	generationToFile(currentGeneration, "generation.bin");
+	saveSimulationParams("simparam.txt");
+#ifdef SAVE_STATISTICS
+	fclose(statisticsFile);
+#endif
 
 	//Dispose generation
 	disposeGeneration(currentGeneration);
@@ -178,5 +170,40 @@ int main() {
 	disposeTrackData();
 
 	return 0;
+}
+
+
+void execCommands(Generation_ptr currentGeneration, int* loop){
+	if(kbhit()){
+		char key = getchar();
+
+		switch (key){
+
+			case 's':
+				//Save
+				strategyToFile(&currentGeneration->statistics.best, "best.csv");
+				generationToFile(currentGeneration, "generation.bin");
+				saveSimulationParams("simparam.txt");
+				break;
+
+			case 'e':
+				//End
+				(*loop) = 0;
+				printf("Stop\n");
+				break;
+
+			case 'p':
+				//Pause
+				printf("Press a key to resume...");
+				while (getchar() == '\n');
+				break;
+
+			case 'l':
+				//Load
+
+
+				break;
+		}
+	}
 }
 

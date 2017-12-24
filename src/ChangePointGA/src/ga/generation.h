@@ -59,6 +59,11 @@ void disposeGeneration(Generation_ptr generation);
 //Print population individuals
 void printGeneration(Generation_ptr generation);
 
+//Save the generation to file
+void generationToFile(Generation_ptr generation, const char* filename);
+
+//Save statistics to file
+void statisticsToFile(Generation_ptr generation, unsigned long int generationCount, FILE* file);
 
 
 /*****Fitness eval functions*****/

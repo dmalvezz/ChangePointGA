@@ -18,9 +18,9 @@
 //#define POWERTRAIN_FLAT
 
 //Motors list
-//#define RE40_24V
+#define RE40_24V
 //#define RE40_48V
-#define RE50_24V
+//#define RE50_24V
 //#define RE50_36V
 
 //#define KEEP_TIME_INVALID
@@ -44,7 +44,7 @@
 	#define MIN_AVG_SPEED 7.0
 #endif
 
-#define START_VELOCITY	6.4
+#define START_VELOCITY	7.0
 #define START_MAP		1
 #define MAP_COUNT		4
 
@@ -119,6 +119,9 @@ extern Map maps[MAP_COUNT];
 //Init a simulation
 void initSimulation(Simulation_ptr simulation, float startVelocity, int startMap);
 
+//Init the mapset
+void initMapset();
+
 //Simulate
 SimulationResult simulate(Simulation_ptr simulation, float startPosition, float endPosition, Action action);
 
@@ -157,6 +160,10 @@ void simulationToCsv(Simulation_ptr simulation, FILE* file);
 
 //Save simulation traction force on csv
 void simulationToStrategy(Simulation_ptr simulation, FILE* file);
+
+//Export simulation params
+void saveSimulationParams(const char* fileName);
+
 
 
 #endif /* SIMULATION_H_ */

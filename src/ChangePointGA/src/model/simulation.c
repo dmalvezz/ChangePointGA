@@ -21,6 +21,51 @@ void initSimulation(Simulation_ptr simulation, float startVelocity, int startMap
 	simulation->energy = 0;
 }
 
+void initMapset(){
+#ifdef RE50_24V
+	initMap(&maps[0], -4800.0, 100.0, 0.0);
+	initMap(&maps[1], -9000.0, 100.0, 0.0);
+	initMap(&maps[2], -14000.0, 100.0, 0.0);
+	initMap(&maps[3], -4800.0, 45.0, 0.0);
+
+	/*
+	initMap(&maps[0], -4800.0, 45.0, 0.0);
+	initMap(&maps[1], -4800.0, 40.0, 0.0);
+	initMap(&maps[2], -4800.0, 25.0, 0.0);
+	initMap(&maps[3], -67500.0, 200.0, 0.0);
+	*/
+
+	/*
+	initMap(&maps[0], -9500.0, 60.0, 0.0);
+	initMap(&maps[1], -6100.0, 45.0, 0.0);
+	initMap(&maps[2], -16000.0, 65.0, 0.0);
+	initMap(&maps[3], -45000.0, 130.0, 0.0);
+	*/
+#endif
+
+#ifdef RE50_36V
+	initMap(&maps[0], -100000, 1000.0, 0.0);
+	initMap(&maps[1], -9800, 100.0, 0.0);
+	initMap(&maps[2], -5600.0, 40.0, 0.0);
+	initMap(&maps[3], -4800.0, 45.0, 0.0);
+#endif
+
+#ifdef RE40_48V
+	initMap(&maps[0], -60000, 1000.0, 0.0);
+	initMap(&maps[1], -6000, 130.0, 0.0);
+	initMap(&maps[2], -9000, 130.0, 0.0);
+	initMap(&maps[3], -9800, 100.0, 0.0);
+#endif
+
+#ifdef RE40_24V
+	initMap(&maps[0], -48000, 1000.0, 0.0);
+	initMap(&maps[1], -70000, 1000.0, 0.0);
+	initMap(&maps[2], -14000, 200.0, 0.0);
+	initMap(&maps[3], -11000, 130.0, 0.0);
+#endif
+
+}
+
 SimulationResult simulate(Simulation_ptr simulation, float startPosition, float endPosition, Action action){
 
 	if(action == ACTION_PLUS){
@@ -185,3 +230,18 @@ void simulationToStrategy(Simulation_ptr simulation, FILE* file){
 		fprintf(file, "%f,", simulation->steps[i].ftraction);
 	}
 }
+
+void saveSimulationParams(const char* fileName){
+	FILE* file = fopen(fileName, "wt");
+
+	fprintf(file, "Motor: %s\n", MOTOR_NAME);
+	fprintf(file, "Trasmission: %f\n", 1.0 / TransmissionRatio);
+	fprintf(file, "Start vel: %f\n", START_VELOCITY);
+	fprintf(file, "Start map: %d\n", START_MAP);
+	for(int i = 0; i < MAP_COUNT; i++){
+		fprintf(file, "Map%d   a0: %f   a1: %f   a2: %f\n", i, maps[i].a0, maps[i].a1, maps[i].a2);
+	}
+
+	fclose(file);
+}
+

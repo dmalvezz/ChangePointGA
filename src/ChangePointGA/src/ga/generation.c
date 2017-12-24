@@ -52,6 +52,28 @@ void printGeneration(Generation_ptr generation){
 	}
 }
 
+void generationToFile(Generation_ptr generation, const char* fileName){
+	FILE* file = fopen(fileName, "wt");
+
+	fwrite(generation->individuals, sizeof(Strategy), generation->count, file);
+
+	fclose(file);
+}
+
+void statisticsToFile(Generation_ptr generation, unsigned long int generationCount, FILE* file){
+	fprintf(file, "%lu, %f, %f, %f, %f, %f, %f, %f\n",
+			generationCount,
+			generation->statistics.best.simulation.energy,
+			generation->statistics.best.fitness,
+			generation->statistics.fitnessMin,
+			generation->statistics.fitnessMedian,
+			generation->statistics.lengthAvg,
+			generation->statistics.similarityAvg,
+			(float)generation->statistics.invalidCount / generation->count
+	);
+
+}
+
 
 
 void evalGenerationFitness(Generation_ptr generation, float startVelocity, int startMap, FitnessFunction fitnessFunction){

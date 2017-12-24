@@ -9,6 +9,8 @@
 #define MODEL_POWERTRAIN_POWERTRAIN_H_
 
 #ifdef RE40_24V
+	#define MOTOR_NAME	"RE40_24V"
+
 	//Modello elettrico driver
 	#define DRV_Pq 		1.183
 	#define DRV_ki 		-0.04425
@@ -24,7 +26,7 @@
 	#define alpha_cu   0.00426
 
 	//Modello termico
-	float RthCaseAmbient = 4.7; // K/W
+	static float RthCaseAmbient = 4.7; // K/W
 	#define RthWindingCase 1.9 // K/W
 	#define CthWinding     ((71.1/RthWindingCase)  /2.0) // J/K est
 	#define CthCase        ((383.0/RthCaseAmbient) /2.0) // J/K est
@@ -38,6 +40,8 @@
 #endif
 
 #ifdef RE40_48V
+	#define MOTOR_NAME	"RE40_48V"
+
 	//Modello elettrico driver
 	#define DRV_Pq 		1.183
 	#define DRV_ki 		-0.04425
@@ -53,7 +57,7 @@
 	#define alpha_cu   0.00426
 
 	//Modello termico
-	float RthCaseAmbient = 4.7; // K/W
+	static float RthCaseAmbient = 4.7; // K/W
 	#define RthWindingCase 1.9 // K/W
 	#define CthWinding     ((71.1/RthWindingCase)  /2.0) // J/K est
 	#define CthCase        ((383.0/RthCaseAmbient) /2.0) // J/K est
@@ -67,6 +71,8 @@
 #endif
 
 #ifdef RE50_24V
+	#define MOTOR_NAME	"RE50_24V"
+
 	//Modello elettrico driver
 	#define DRV_Pq 		1.183
 	#define DRV_ki 		-0.04425
@@ -96,6 +102,8 @@
 #endif
 
 #ifdef RE50_36V
+	#define MOTOR_NAME	"RE50_36V"
+
 	//Modello elettrico driver
 	#define DRV_Pq 		1.183
 	#define DRV_ki 		-0.04425
