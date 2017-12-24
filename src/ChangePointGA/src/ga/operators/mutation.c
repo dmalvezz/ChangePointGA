@@ -90,14 +90,18 @@ void changeRandomChangePointAction(Strategy_ptr strategy){
 	*/
 }
 
-void mutation(Generation_ptr nextGeneration, MutationFunction mutationFunction, float mutationRate){
+int mutation(Generation_ptr nextGeneration, MutationFunction mutationFunction, float mutationRate){
 	float r;
+	int mutationCount = 0;
 	for(int i = 0; i < nextGeneration->count; i++){
 		r = randFloat(0, 1);
 		if(r < mutationRate){
 			mutationFunction(&nextGeneration->individuals[i]);
+
+			mutationCount++;
 		}
 	}
 
+	return mutationCount;
 }
 

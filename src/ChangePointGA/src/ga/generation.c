@@ -15,6 +15,8 @@ Generation_ptr initEmptyGeneration(int size){
 	generation->size = size;
 	generation->individuals = (Strategy_ptr)malloc(size * sizeof(Strategy));
 
+	generation->statistics.lastChange = 0;
+
 	generation->statistics.best.fitness = INFINITY;
 	generation->statistics.best.simulation.energy = INFINITY;
 	generation->statistics.best.simulation.time = INFINITY;
@@ -32,6 +34,8 @@ Generation_ptr initRandomGeneration(int size){
 	for(int i = 0; i < size; i++){
 		initStrategy(&generation->individuals[i], SPACE_STEP);
 	}
+
+	generation->statistics.lastChange = 0;
 
 	generation->statistics.best.fitness = INFINITY;
 	generation->statistics.best.simulation.energy = INFINITY;
@@ -94,7 +98,7 @@ void evalGenerationFitness(Generation_ptr generation, float startVelocity, int s
 }
 
 void sortGenerationByFitness(Generation_ptr generation){
-	qsort(generation->individuals, generation->size, sizeof(Strategy), compareStrategyFitness);
+	qsort(generation->individuals, generation->count, sizeof(Strategy), compareStrategyFitness);
 }
 
 void updateGenerationStatistics(Generation_ptr generation){
@@ -128,6 +132,11 @@ void updateGenerationStatistics(Generation_ptr generation){
 	if(generation->individuals[0].simulation.result == SIM_OK &&
 			generation->individuals[0].simulation.energy < generation->statistics.best.simulation.energy){
 		memcpy(&generation->statistics.best, &generation->individuals[0], sizeof(Strategy));
+
+		generation->statistics.lastChange = 0;
+	}
+	else{
+		generation->statistics.lastChange++;
 	}
 }
 

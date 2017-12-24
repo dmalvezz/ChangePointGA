@@ -20,6 +20,7 @@
 
 typedef struct Statistics{
 	int invalidCount;
+	unsigned long int lastChange;
 
 	float fitnessMax;
 	float fitnessMin;
@@ -109,7 +110,7 @@ int rankSelection(Generation_ptr generation);
 void singlePointCrossover(Strategy_ptr parent1, Strategy_ptr parent2, Strategy_ptr child1, Strategy_ptr child2, int cut);
 
 //Apply crossover to current generation and save it in next generation
-void crossOver(Generation_ptr currentGeneration, Generation_ptr nextGeneration, SelectionFunction selection, CrossoverFunction crossover);
+int crossOver(Generation_ptr currentGeneration, Generation_ptr nextGeneration, SelectionFunction selection, CrossoverFunction crossover);
 
 
 
@@ -127,7 +128,7 @@ void moveRandomChangePoint(Strategy_ptr strategy);
 void changeRandomChangePointAction(Strategy_ptr strategy);
 
 //Apply mutation to the next generation
-void mutation(Generation_ptr nextGeneration, MutationFunction mutationFunction, float mutationRate);
+int mutation(Generation_ptr nextGeneration, MutationFunction mutationFunction, float mutationRate);
 
 
 #endif

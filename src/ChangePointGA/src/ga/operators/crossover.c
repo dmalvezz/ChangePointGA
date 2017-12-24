@@ -47,10 +47,12 @@ void singlePointCrossover(Strategy_ptr parent1, Strategy_ptr parent2, Strategy_p
 
 }
 
-void crossOver(Generation_ptr currentGeneration, Generation_ptr nextGeneration,
+int crossOver(Generation_ptr currentGeneration, Generation_ptr nextGeneration,
 		SelectionFunction selectionFunction, CrossoverFunction crossoverFunction){
 	int parentIndex1, parentIndex2;
 	int cut = randFloat(0, TRACK_LENGTH) / SPACE_STEP;
+
+	int childCount = 0;
 
 	while(nextGeneration->count < currentGeneration->size){
 		parentIndex1 = selectionFunction(currentGeneration);
@@ -63,7 +65,9 @@ void crossOver(Generation_ptr currentGeneration, Generation_ptr nextGeneration,
 				cut);
 
 		nextGeneration->count += 2;
+		childCount += 2;
 	}
 
+	return childCount;
 }
 

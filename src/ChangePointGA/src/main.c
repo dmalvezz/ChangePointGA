@@ -53,6 +53,7 @@ int main() {
 	int loop = 1;
 	unsigned long long generationTimer, timer;
 	double generationTime, fitnessTime, sortTime, statTime, elitismTime, crossoverTime, mutationTime;
+	int childCount = 0, mutationCount = 0;
 
 #ifdef SAVE_STATISTICS
 	FILE* statisticsFile = fopen("statistics.csv", "wt");
@@ -73,7 +74,7 @@ int main() {
 
 		//Eval fitness
 		timer = getTime();
-		evalGenerationFitness(currentGeneration, START_VELOCITY, START_MAP, energyTimeFitness);
+		evalGenerationFitness(currentGeneration, START_VELOCITY, START_MAP, energyFitness);
 		fitnessTime = getTimeElapsed(timer);
 
 		//Sort individual by fitness
@@ -89,48 +90,60 @@ int main() {
 #endif
 		statTime = getTimeElapsed(timer);
 
-		//Perform elitism selection
-		timer = getTime();
-		elitism(currentGeneration, nextGeneration, ELITISM_PERCENTAGE);
-		elitismTime = getTimeElapsed(timer);
-
 		//Perform crossover
 		timer = getTime();
-		crossOver(currentGeneration, nextGeneration, fitnessProportionalSelection, singlePointCrossover);
+		//childCount = crossOver(currentGeneration, nextGeneration, fitnessProportionalSelection, singlePointCrossover);
+		childCount = crossOver(currentGeneration, nextGeneration, tournamentSelection, singlePointCrossover);
+		//childCount = crossOver(currentGeneration, nextGeneration, rankSelection, singlePointCrossover);
 		crossoverTime = getTimeElapsed(timer);
 
 		//Perform mutations
 		timer = getTime();
-		mutation(nextGeneration, addRandomChangePoint, 			ADD_POINT_MUTATION_RATE);
-		mutation(nextGeneration, removeRandomChangePoint, 		REMOVE_POINT_MUTATION_RATE);
-		mutation(nextGeneration, moveRandomChangePoint, 		CHANGE_POINT_POS_MUTATION_RATE);
-		mutation(nextGeneration, changeRandomChangePointAction, CHANGE_POINT_ACT_MUTATION_RATE);
+		mutationCount = 0;
+		mutationCount += mutation(nextGeneration, addRandomChangePoint, 			ADD_POINT_MUTATION_RATE);
+		mutationCount += mutation(nextGeneration, removeRandomChangePoint, 		REMOVE_POINT_MUTATION_RATE);
+		mutationCount += mutation(nextGeneration, moveRandomChangePoint, 		CHANGE_POINT_POS_MUTATION_RATE);
+		mutationCount += mutation(nextGeneration, changeRandomChangePointAction, CHANGE_POINT_ACT_MUTATION_RATE);
 		mutationTime = getTimeElapsed(timer);
+
+		//Perform elitism selection
+		timer = getTime();
+		elitism(currentGeneration, nextGeneration, ELITISM_PERCENTAGE);
+		elitismTime = getTimeElapsed(timer);
 
 		//Prints
 		if(generationCount % 10 == 0){
 			//Get time
 			generationTime = getTimeElapsed(generationTimer);
 
+			//Print generation info
+			printf("Gen %lu   individuals %d/%d   child %d   mutations %d\n",
+					generationCount,
+					currentGeneration->count,
+					currentGeneration->size,
+					childCount,
+					mutationCount
+					);
+
 			//Print best
 			printf("Best energy %.2f   time %.2f/%.2f\n",
-					currentGeneration->individuals[0].simulation.energy,
-					currentGeneration->individuals[0].simulation.time,
+					currentGeneration->statistics.best.simulation.energy,
+					currentGeneration->statistics.best.simulation.time,
 					(float)TRACK_LENGTH / MIN_AVG_SPEED
 					);
 
 			//Print stats
-			printf("Gen %lu   fmin %.2f   fmed %.2f   lavg %d   inv %.2f   sim %.2f\n",
-					generationCount,
+			printf("Stats fmin %.2f   fmed %.2f   lavg %d   inv %.2f   sim %.2f   lch %lu\n",
 					currentGeneration->statistics.fitnessMin,
 					currentGeneration->statistics.fitnessMedian,
 					(int)currentGeneration->statistics.lengthAvg,
 					(float)currentGeneration->statistics.invalidCount / currentGeneration->count,
-					currentGeneration->statistics.similarityAvg
+					currentGeneration->statistics.similarityAvg,
+					currentGeneration->statistics.lastChange
 					);
 
 			//Print time
-			printf("ft %0.3lf   st %0.3lf   ut %0.3lf   et %0.3lf   ct %0.3lf   mt %0.3lf\n",
+			printf("Time ft %0.3lf   st %0.3lf   ut %0.3lf   et %0.3lf   ct %0.3lf   mt %0.3lf\n",
 					fitnessTime / generationTime,
 					sortTime / generationTime,
 					statTime / generationTime,
@@ -151,6 +164,7 @@ int main() {
 
 		//Next generation
 		swap(currentGeneration, nextGeneration);
+		nextGeneration->count = 0;
 		generationCount++;
 	}
 

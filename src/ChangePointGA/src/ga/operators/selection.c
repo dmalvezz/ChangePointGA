@@ -16,16 +16,17 @@
 void elitism(Generation_ptr currentGeneration, Generation_ptr nextGeneration, float elitismPercentage){
 	int count = currentGeneration->size * elitismPercentage;
 
-	nextGeneration->count = count;
-
+	//nextGeneration->count = count;
 	//Keep best in the generation
+	/*
 	if(currentGeneration->individuals[0].simulation.energy < currentGeneration->statistics.best.simulation.energy){
 		memcpy(&nextGeneration->individuals[0], &currentGeneration->statistics.best, sizeof(Strategy));
 		memcpy(&nextGeneration->individuals[1], currentGeneration->individuals, (count - 1) * sizeof(Strategy));
 	}
 	else{
+	*/
 		memcpy(nextGeneration->individuals, currentGeneration->individuals, count * sizeof(Strategy));
-	}
+	//}
 }
 
 
