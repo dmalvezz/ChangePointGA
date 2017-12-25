@@ -9,7 +9,11 @@
 
 void addRandomChangePoint(Strategy_ptr strategy){
 	if(strategy->size < MAX_CHANGE_POINT){
-		int r = randInt(0, strategy->size);
+		//int r = randInt(0, strategy->size);
+
+		int randPos = randInt(0, TRACK_LENGTH / SPACE_STEP);
+		int r = getChangePointNearAt(strategy, randPos) + 1;
+		printf("add %d %d\n", randPos, r);
 
 		addElement(strategy->points, r, strategy->size, sizeof(ChangePoint));
 
@@ -20,10 +24,6 @@ void addRandomChangePoint(Strategy_ptr strategy){
 			strategy->points[r].positionIndex = randInt(strategy->points[r - 1].positionIndex , TRACK_LENGTH / SPACE_STEP);
 		}
 		else {
-			while(strategy->points[r - 1].positionIndex == strategy->points[r + 1].positionIndex){
-				r = randInt(1, strategy->size - 2);
-			}
-
 			strategy->points[r].positionIndex = randInt(strategy->points[r - 1].positionIndex, strategy->points[r + 1].positionIndex);
 		}
 
@@ -56,18 +56,17 @@ void removeRandomChangePoint(Strategy_ptr strategy){
 }
 
 void moveRandomChangePoint(Strategy_ptr strategy){
-	int r = randInt(0, strategy->size - 1);
+	//int r = randInt(0, strategy->size - 1);
+	int randPos = randInt(0, TRACK_LENGTH / SPACE_STEP);
+	int r = getChangePointNearAt(strategy, randPos);
 
-	if(r == 0){
+	if(r <= 0){
 		strategy->points[0].positionIndex = randInt(0, strategy->points[1].positionIndex);
 	}
 	else if(r == strategy->size - 1){
 		strategy->points[r].positionIndex = randInt(strategy->points[r - 1].positionIndex , TRACK_LENGTH / SPACE_STEP);
 	}
 	else {
-		while(strategy->points[r - 1].positionIndex == strategy->points[r + 1].positionIndex){
-			r = randInt(1, strategy->size - 2);
-		}
 		strategy->points[r].positionIndex = randInt(strategy->points[r - 1].positionIndex, strategy->points[r + 1].positionIndex);
 	}
 
@@ -91,11 +90,13 @@ void changeRandomChangePointAction(Strategy_ptr strategy){
 }
 
 int mutation(Generation_ptr nextGeneration, MutationFunction mutationFunction, float mutationRate){
-	float r;
 	int mutationCount = 0;
+	float r;
+
 	for(int i = 0; i < nextGeneration->count; i++){
 		r = randFloat(0, 1);
 		if(r < mutationRate){
+			//Apply mutation
 			mutationFunction(&nextGeneration->individuals[i]);
 
 			mutationCount++;

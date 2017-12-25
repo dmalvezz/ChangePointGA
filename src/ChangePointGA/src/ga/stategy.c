@@ -80,6 +80,7 @@ int getChangePointNearAt(Strategy_ptr strategy, int position){
 	int m = (sx + dx) / 2;
 
 	if(strategy->points[0].positionIndex > position){
+		//The value is before the first change point
 		return -1;
 	}
 
@@ -91,11 +92,17 @@ int getChangePointNearAt(Strategy_ptr strategy, int position){
 		 dx = m - 1;
 	  }
 	  else{
-		  return m;
+		  break;
 	  }
 
 	  m = (sx + dx) / 2;
 	}
+
+	//Search for the last change point with position <= the searched position
+	while(m < strategy->size - 1 && strategy->points[m].positionIndex == strategy->points[m + 1].positionIndex){
+		m++;
+	}
+
 
 	return m;
 }

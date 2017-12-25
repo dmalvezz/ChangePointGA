@@ -20,7 +20,7 @@ static void testTrackData(){
 		initStrategy(&str, SPACE_STEP);
 
 		timer = getTime();
-		evalStrategyFitness(&str, START_VELOCITY, START_MAP, energyTimeFitness);
+		simulateStrategy(&str, START_VELOCITY, START_MAP);
 		simTime = getTimeElapsed(timer);
 
 		if(str.simulation.result != SIM_OK){

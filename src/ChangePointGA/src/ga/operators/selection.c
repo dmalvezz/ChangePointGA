@@ -10,7 +10,7 @@
 #define MIN_TOURNAMENT_ROUNDS	1
 #define MAX_TOURNAMENT_ROUNDS	3
 
-#define RANK_START_PROBABILITY	0.33f
+#define RANK_START_PROBABILITY	0.05f
 
 
 void elitism(Generation_ptr currentGeneration, Generation_ptr nextGeneration, float elitismPercentage){
@@ -32,10 +32,12 @@ void elitism(Generation_ptr currentGeneration, Generation_ptr nextGeneration, fl
 
 int fitnessProportionalSelection(Generation_ptr generation){
 	int i = 0;
+	int validCount = generation->size - generation->statistics.invalidCount;
 	float r = randFloat(0, 1);
 	float p = 0;
-	while(i < generation->size && p <= r){
-		p += 1.0f / (generation->individuals[i].fitness / (generation->statistics.fitnessAvg * generation->size));
+
+	while(i < validCount && p <= r){
+		p +=  (1.0 / generation->individuals[i].fitness) / generation->statistics.fitnessSumInverse;
 		i++;
 	}
 
@@ -46,6 +48,7 @@ int tournamentSelection(Generation_ptr generation){
 	int min = generation->size - 1;
 	int round = randInt(MIN_TOURNAMENT_ROUNDS, MAX_TOURNAMENT_ROUNDS);
 	int r;
+
 	for(int i = 0; i < round; i++){
 		r = randInt(0, generation->size - 1);
 

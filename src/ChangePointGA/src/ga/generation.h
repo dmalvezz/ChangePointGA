@@ -26,6 +26,7 @@ typedef struct Statistics{
 	float fitnessMin;
 	float fitnessMedian;
 	float fitnessAvg;
+	float fitnessSumInverse;
 
 	float lengthAvg;
 	float similarityAvg;
@@ -61,7 +62,10 @@ void disposeGeneration(Generation_ptr generation);
 void printGeneration(Generation_ptr generation);
 
 //Save the generation to file
-void generationToFile(Generation_ptr generation, const char* filename);
+void generationToFile(Generation_ptr generation, const char* fileName);
+
+//Load the generation from file
+void generationFromFile(Generation_ptr generation, const char* fileName);
 
 //Save statistics to file
 void statisticsToFile(Generation_ptr generation, unsigned long int generationCount, FILE* file);

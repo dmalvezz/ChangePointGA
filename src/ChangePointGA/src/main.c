@@ -23,8 +23,12 @@
 #define SAVE_STATISTICS
 #include "test.h"
 
+#define BEST_FILE			"best.csv"
+#define GENERATION_FILE		"generation.bin"
+#define SIMULATION_FILE		"simparam.txt"
+#define STATISTICS_FILE		"statistics.csv"
 
-void execCommands(Generation_ptr currentGeneration, int* loop);
+void execCommands(Generation_ptr currentGeneration, Generation_ptr nextGeneration, int* loop);
 
 int main() {
 	//Init random
@@ -56,8 +60,8 @@ int main() {
 	int childCount = 0, mutationCount = 0;
 
 #ifdef SAVE_STATISTICS
-	FILE* statisticsFile = fopen("statistics.csv", "wt");
-	fprintf(statisticsFile, "generation, energyBest,fitnessBest, fitnessMin, fitnessMedian, lenghtAvg, similarityAvg, %%invalid\n");
+	FILE* statisticsFile = fopen(STATISTICS_FILE, "wt");
+	fprintf(statisticsFile, "generation, energyBest,fitnessBest, fitnessMin, fitnessMedian, lenghtAvg, similarityAvg, %%invalid, lastChange\n");
 #endif
 
 	//Loop
@@ -74,7 +78,7 @@ int main() {
 
 		//Eval fitness
 		timer = getTime();
-		evalGenerationFitness(currentGeneration, START_VELOCITY, START_MAP, energyFitness);
+		evalGenerationFitness(currentGeneration, START_VELOCITY, START_MAP, energyTimeFitness);
 		fitnessTime = getTimeElapsed(timer);
 
 		//Sort individual by fitness
@@ -90,17 +94,24 @@ int main() {
 #endif
 		statTime = getTimeElapsed(timer);
 
+		if (currentGeneration->statistics.invalidCount / currentGeneration->size > INVALID_THRESHOLD
+				|| currentGeneration->statistics.lastChange > MAX_LAST_CHANGE) {
+
+			//Add new valid random strategy
+
+		}
+
 		//Perform crossover
 		timer = getTime();
-		//childCount = crossOver(currentGeneration, nextGeneration, fitnessProportionalSelection, singlePointCrossover);
-		childCount = crossOver(currentGeneration, nextGeneration, tournamentSelection, singlePointCrossover);
+		childCount = crossOver(currentGeneration, nextGeneration, fitnessProportionalSelection, singlePointCrossover);
+		//childCount = crossOver(currentGeneration, nextGeneration, tournamentSelection, singlePointCrossover);
 		//childCount = crossOver(currentGeneration, nextGeneration, rankSelection, singlePointCrossover);
 		crossoverTime = getTimeElapsed(timer);
 
 		//Perform mutations
 		timer = getTime();
 		mutationCount = 0;
-		mutationCount += mutation(nextGeneration, addRandomChangePoint, 			ADD_POINT_MUTATION_RATE);
+		mutationCount += mutation(nextGeneration, addRandomChangePoint, 		ADD_POINT_MUTATION_RATE);
 		mutationCount += mutation(nextGeneration, removeRandomChangePoint, 		REMOVE_POINT_MUTATION_RATE);
 		mutationCount += mutation(nextGeneration, moveRandomChangePoint, 		CHANGE_POINT_POS_MUTATION_RATE);
 		mutationCount += mutation(nextGeneration, changeRandomChangePointAction, CHANGE_POINT_ACT_MUTATION_RATE);
@@ -133,7 +144,7 @@ int main() {
 					);
 
 			//Print stats
-			printf("Stats fmin %.2f   fmed %.2f   lavg %d   inv %.2f   sim %.2f   lch %lu\n",
+			printf("Stat fmin %.2f   fmed %.2f   lavg %d   inv %.2f   sim %.2f   lch %lu\n",
 					currentGeneration->statistics.fitnessMin,
 					currentGeneration->statistics.fitnessMedian,
 					(int)currentGeneration->statistics.lengthAvg,
@@ -160,18 +171,18 @@ int main() {
 		}
 
 		//Check commands
-		execCommands(currentGeneration, &loop);
+		execCommands(currentGeneration, nextGeneration, &loop);
 
 		//Next generation
-		swap(currentGeneration, nextGeneration);
+		swap(currentGeneration->individuals, nextGeneration->individuals);
 		nextGeneration->count = 0;
 		generationCount++;
 	}
 
 	//Save strategy and generation
-	strategyToFile(&currentGeneration->statistics.best, "best.csv");
-	generationToFile(currentGeneration, "generation.bin");
-	saveSimulationParams("simparam.txt");
+	strategyToFile(&currentGeneration->statistics.best, BEST_FILE);
+	generationToFile(currentGeneration, GENERATION_FILE);
+	saveSimulationParams(SIMULATION_FILE);
 #ifdef SAVE_STATISTICS
 	fclose(statisticsFile);
 #endif
@@ -187,7 +198,7 @@ int main() {
 }
 
 
-void execCommands(Generation_ptr currentGeneration, int* loop){
+void execCommands(Generation_ptr currentGeneration, Generation_ptr nextGeneration, int* loop){
 	if(kbhit()){
 		char key = getchar();
 
@@ -195,9 +206,10 @@ void execCommands(Generation_ptr currentGeneration, int* loop){
 
 			case 's':
 				//Save
-				strategyToFile(&currentGeneration->statistics.best, "best.csv");
-				generationToFile(currentGeneration, "generation.bin");
-				saveSimulationParams("simparam.txt");
+				printf("Saving...\n");
+				strategyToFile(&currentGeneration->statistics.best, BEST_FILE);
+				generationToFile(currentGeneration, GENERATION_FILE);
+				saveSimulationParams(SIMULATION_FILE);
 				break;
 
 			case 'e':
@@ -208,14 +220,14 @@ void execCommands(Generation_ptr currentGeneration, int* loop){
 
 			case 'p':
 				//Pause
-				printf("Press a key to resume...");
+				printf("Press a key to resume...\n");
 				while (getchar() == '\n');
 				break;
 
 			case 'l':
 				//Load
-
-
+				printf("Loading generation from file...\n");
+				generationFromFile(nextGeneration, GENERATION_FILE);
 				break;
 		}
 	}

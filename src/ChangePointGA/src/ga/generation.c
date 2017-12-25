@@ -57,15 +57,27 @@ void printGeneration(Generation_ptr generation){
 }
 
 void generationToFile(Generation_ptr generation, const char* fileName){
-	FILE* file = fopen(fileName, "wt");
+	FILE* file = fopen(fileName, "wb");
 
 	fwrite(generation->individuals, sizeof(Strategy), generation->count, file);
 
 	fclose(file);
 }
 
+void generationFromFile(Generation_ptr generation, const char* fileName){
+	FILE* file = fopen(fileName, "rb");
+
+	generation->count = 0;
+	while(fread(&generation->individuals[generation->count], sizeof(Strategy), 1, file) > 0){
+		generation->count++;
+	}
+
+	fclose(file);
+}
+
+
 void statisticsToFile(Generation_ptr generation, unsigned long int generationCount, FILE* file){
-	fprintf(file, "%lu, %f, %f, %f, %f, %f, %f, %f\n",
+	fprintf(file, "%lu, %f, %f, %f, %f, %f, %f, %f, %lu\n",
 			generationCount,
 			generation->statistics.best.simulation.energy,
 			generation->statistics.best.fitness,
@@ -73,7 +85,8 @@ void statisticsToFile(Generation_ptr generation, unsigned long int generationCou
 			generation->statistics.fitnessMedian,
 			generation->statistics.lengthAvg,
 			generation->statistics.similarityAvg,
-			(float)generation->statistics.invalidCount / generation->count
+			(float)generation->statistics.invalidCount / generation->count,
+			generation->statistics.lastChange
 	);
 
 }
@@ -102,33 +115,39 @@ void sortGenerationByFitness(Generation_ptr generation){
 }
 
 void updateGenerationStatistics(Generation_ptr generation){
+	//Init
 	generation->statistics.fitnessMin = generation->individuals[0].fitness;
 	generation->statistics.fitnessMax = generation->individuals[generation->size - 1].fitness;
 	generation->statistics.fitnessMedian = generation->individuals[generation->size / 2].fitness;
 	generation->statistics.fitnessAvg = 0;
+	generation->statistics.fitnessSumInverse = 0;
+
 
 	generation->statistics.lengthAvg = 0;
 	generation->statistics.similarityAvg = 0;
 
 	generation->statistics.invalidCount = 0;
 
+	//Sum up
 	for(int i = 0; i < generation->size; i++){
-		generation->statistics.fitnessAvg += generation->individuals[i].fitness;
-
 		generation->statistics.lengthAvg += generation->individuals[i].size;
 
 		if(generation->individuals[i].simulation.result != SIM_OK){
 			generation->statistics.invalidCount++;
 		}
 		else{
+			generation->statistics.fitnessAvg += generation->individuals[i].fitness;
+			generation->statistics.fitnessSumInverse += 1.0 / generation->individuals[i].fitness;
 			generation->statistics.similarityAvg += generation->individuals[i].similarity;
 		}
 	}
 
-	generation->statistics.fitnessAvg /= generation->size;
+	//Avgs
+	generation->statistics.fitnessAvg /= (generation->size - generation->statistics.invalidCount);
 	generation->statistics.lengthAvg /= generation->size;
 	generation->statistics.similarityAvg /= (generation->size - generation->statistics.invalidCount);
 
+	//Save best
 	if(generation->individuals[0].simulation.result == SIM_OK &&
 			generation->individuals[0].simulation.energy < generation->statistics.best.simulation.energy){
 		memcpy(&generation->statistics.best, &generation->individuals[0], sizeof(Strategy));
