@@ -20,7 +20,7 @@
 #include "../utils/mathutils.h"
 
 #define MIN_CHANGE_POINT 	3
-#define MAX_CHANGE_POINT 	10
+#define MAX_CHANGE_POINT 	120
 
 
 typedef struct Strategy{
@@ -36,31 +36,31 @@ typedef Strategy* Strategy_ptr;
 
 
 //Init strategy with random size and random change points
-void initStrategy(Strategy_ptr strategy, int spaceStep);
+extern void initStrategy(Strategy_ptr strategy, int spaceStep);
 
 //Print to stdout
-void printStrategy(Strategy_ptr strategy);
+extern void printStrategy(Strategy_ptr strategy);
 
 //Save strategy to csv, bin and strat file
-void strategyToFile(Strategy_ptr strategy, const char* fileName);
+extern void strategyToFile(Strategy_ptr strategy, const char* fileName);
 
 //Compare function used by sort
-int compareStrategyFitness(const void* elem1, const void* elem2);
+extern int compareStrategyFitness(const void* elem1, const void* elem2);
 
 //Get the index of changePoint nearest to the given position
-int getChangePointNearAt(Strategy_ptr strategy, int position);
+extern int getChangePointNearAt(Strategy_ptr strategy, int position);
 
 
 //New random change point at position
-void addChangePoint(Strategy_ptr strategy, int position);
+extern void addChangePoint(Strategy_ptr strategy, int position);
 
 //Remove change point at index
-void removeChangePoint(Strategy_ptr strategy, int index);
+extern void removeChangePoint(Strategy_ptr strategy, int index);
 
 //Run simulation
-void simulateStrategy(Strategy_ptr strategy, float startVelocity, int startMap);
+extern void simulateStrategy(Strategy_ptr strategy, float startVelocity, int startMap);
 
 //Eval similarity factor
-float evalStrategySimilarity(Strategy_ptr str1, Strategy_ptr str2);
+extern float evalStrategySimilarity(Strategy_ptr str1, Strategy_ptr str2);
 
 #endif

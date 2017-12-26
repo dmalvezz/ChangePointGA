@@ -15,190 +15,58 @@
 #include <omp.h>
 
 #include "ga/ga.h"
-#include "utils/sysutils.h"
+
 
 //Debug define
 //#define CHECK_GENERATIONS
 //#define CHECK_BEST
-#define SAVE_STATISTICS
 #include "test.h"
 
-#define BEST_FILE			"best.csv"
-#define GENERATION_FILE		"generation.bin"
-#define SIMULATION_FILE		"simparam.txt"
-#define STATISTICS_FILE		"statistics.csv"
 
-void execCommands(Generation_ptr currentGeneration, Generation_ptr nextGeneration, int* loop);
+void execCommands(GA* ga, int* loop);
 
 int main() {
-	//Init random
-	randInit();
-
-	//Init mapset
-	initMapset();
-
-	//Init track samples
-	generateTrackData(SPACE_STEP);
-
-#ifdef CHECK_BEST
-	testStrategy();
-	return 0;
-#endif
-
-	//Init random first generation
-	Generation_ptr currentGeneration = initRandomGeneration(POPULATION_SIZE);
-	//Init empty next generation
-	Generation_ptr nextGeneration = initEmptyGeneration(POPULATION_SIZE);
-
-	//Counter
-	unsigned long int generationCount = 0;
-
-	//Timers
 	int loop = 1;
-	unsigned long long generationTimer, timer;
-	double generationTime, fitnessTime, sortTime, statTime, elitismTime, crossoverTime, mutationTime;
-	int childCount = 0, mutationCount = 0;
 
 #ifdef SAVE_STATISTICS
 	FILE* statisticsFile = fopen(STATISTICS_FILE, "wt");
 	fprintf(statisticsFile, "generation, energyBest,fitnessBest, fitnessMin, fitnessMedian, lenghtAvg, similarityAvg, %%invalid, lastChange\n");
 #endif
 
+	GA ga;
+	initGA(&ga);
+
 	//Loop
 	while(loop){
-		//Start timer
-		generationTimer = getTime();
-
-		//Test
-		#ifdef CHECK_GENERATIONS
-			if(!checkGeneration(currentGeneration)){
-				exit(1);
-			}
-		#endif
-
-		//Eval fitness
-		timer = getTime();
-		evalGenerationFitness(currentGeneration, START_VELOCITY, START_MAP, energyTimeFitness);
-		fitnessTime = getTimeElapsed(timer);
-
-		//Sort individual by fitness
-		timer = getTime();
-		sortGenerationByFitness(currentGeneration);
-		sortTime = getTimeElapsed(timer);
-
-		//Calculate the statistics
-		timer = getTime();
-		updateGenerationStatistics(currentGeneration);
-#ifdef SAVE_STATISTICS
-		statisticsToFile(currentGeneration, generationCount, statisticsFile);
-#endif
-		statTime = getTimeElapsed(timer);
-
-		if (currentGeneration->statistics.invalidCount / currentGeneration->size > INVALID_THRESHOLD
-				|| currentGeneration->statistics.lastChange > MAX_LAST_CHANGE) {
-
-			//Add new valid random strategy
-
-		}
-
-		//Perform crossover
-		timer = getTime();
-		childCount = crossOver(currentGeneration, nextGeneration, fitnessProportionalSelection, singlePointCrossover);
-		//childCount = crossOver(currentGeneration, nextGeneration, tournamentSelection, singlePointCrossover);
-		//childCount = crossOver(currentGeneration, nextGeneration, rankSelection, singlePointCrossover);
-		crossoverTime = getTimeElapsed(timer);
-
-		//Perform mutations
-		timer = getTime();
-		mutationCount = 0;
-		mutationCount += mutation(nextGeneration, addRandomChangePoint, 		ADD_POINT_MUTATION_RATE);
-		mutationCount += mutation(nextGeneration, removeRandomChangePoint, 		REMOVE_POINT_MUTATION_RATE);
-		mutationCount += mutation(nextGeneration, moveRandomChangePoint, 		CHANGE_POINT_POS_MUTATION_RATE);
-		mutationCount += mutation(nextGeneration, changeRandomChangePointAction, CHANGE_POINT_ACT_MUTATION_RATE);
-		mutationTime = getTimeElapsed(timer);
-
-		//Perform elitism selection
-		timer = getTime();
-		elitism(currentGeneration, nextGeneration, ELITISM_PERCENTAGE);
-		elitismTime = getTimeElapsed(timer);
-
-		//Prints
-		if(generationCount % 10 == 0){
-			//Get time
-			generationTime = getTimeElapsed(generationTimer);
-
-			//Print generation info
-			printf("Gen %lu   individuals %d/%d   child %d   mutations %d\n",
-					generationCount,
-					currentGeneration->count,
-					currentGeneration->size,
-					childCount,
-					mutationCount
-					);
-
-			//Print best
-			printf("Best energy %.2f   time %.2f/%.2f\n",
-					currentGeneration->statistics.best.simulation.energy,
-					currentGeneration->statistics.best.simulation.time,
-					(float)TRACK_LENGTH / MIN_AVG_SPEED
-					);
-
-			//Print stats
-			printf("Stat fmin %.2f   fmed %.2f   lavg %d   inv %.2f   sim %.2f   lch %lu\n",
-					currentGeneration->statistics.fitnessMin,
-					currentGeneration->statistics.fitnessMedian,
-					(int)currentGeneration->statistics.lengthAvg,
-					(float)currentGeneration->statistics.invalidCount / currentGeneration->count,
-					currentGeneration->statistics.similarityAvg,
-					currentGeneration->statistics.lastChange
-					);
-
-			//Print time
-			printf("Time ft %0.3lf   st %0.3lf   ut %0.3lf   et %0.3lf   ct %0.3lf   mt %0.3lf\n",
-					fitnessTime / generationTime,
-					sortTime / generationTime,
-					statTime / generationTime,
-					elitismTime / generationTime,
-					crossoverTime / generationTime,
-					mutationTime / generationTime
-					);
-			printf("Total time %lf\n", generationTime);
-			printf("==============================\n");
-
-		#ifdef SAVE_STATISTICS
-			fflush(statisticsFile);
-		#endif
-		}
+		//Apply genetics
+		genetic(&ga);
 
 		//Check commands
-		execCommands(currentGeneration, nextGeneration, &loop);
+		execCommands(&ga, &loop);
 
-		//Next generation
-		swap(currentGeneration->individuals, nextGeneration->individuals);
-		nextGeneration->count = 0;
-		generationCount++;
+		//Save statistic
+		#ifdef SAVE_STATISTICS
+			statisticsToFile(ga.currentGeneration, ga.generationCount, statisticsFile);
+		#endif
 	}
 
 	//Save strategy and generation
-	strategyToFile(&currentGeneration->statistics.best, BEST_FILE);
-	generationToFile(currentGeneration, GENERATION_FILE);
+	strategyToFile(&ga.currentGeneration->statistics.best, BEST_FILE);
+	generationToFile(ga.currentGeneration, GENERATION_FILE);
 	saveSimulationParams(SIMULATION_FILE);
+
+	disposeGA(&ga);
+
 #ifdef SAVE_STATISTICS
 	fclose(statisticsFile);
 #endif
 
-	//Dispose generation
-	disposeGeneration(currentGeneration);
-	disposeGeneration(nextGeneration);
-
-	//Dispose track samples
-	disposeTrackData();
 
 	return 0;
 }
 
 
-void execCommands(Generation_ptr currentGeneration, Generation_ptr nextGeneration, int* loop){
+void execCommands(GA* ga, int* loop){
 	if(kbhit()){
 		char key = getchar();
 
@@ -207,8 +75,8 @@ void execCommands(Generation_ptr currentGeneration, Generation_ptr nextGeneratio
 			case 's':
 				//Save
 				printf("Saving...\n");
-				strategyToFile(&currentGeneration->statistics.best, BEST_FILE);
-				generationToFile(currentGeneration, GENERATION_FILE);
+				strategyToFile(&ga->currentGeneration->statistics.best, BEST_FILE);
+				generationToFile(ga->currentGeneration, GENERATION_FILE);
 				saveSimulationParams(SIMULATION_FILE);
 				break;
 
@@ -227,7 +95,7 @@ void execCommands(Generation_ptr currentGeneration, Generation_ptr nextGeneratio
 			case 'l':
 				//Load
 				printf("Loading generation from file...\n");
-				generationFromFile(nextGeneration, GENERATION_FILE);
+				generationFromFile(ga->currentGeneration, GENERATION_FILE);
 				break;
 		}
 	}

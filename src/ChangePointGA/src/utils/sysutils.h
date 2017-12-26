@@ -43,7 +43,7 @@ static int kbhit(void){
   return 0;
 }
 
-unsigned long long getTime(){
+static unsigned long long getTime(){
     struct timespec t;
     int r;
 
@@ -56,7 +56,7 @@ unsigned long long getTime(){
     return (unsigned long long) t.tv_sec * SECONDS + t.tv_nsec;
 }
 
-double getTimeElapsed(unsigned long long start){
+static double getTimeElapsed(unsigned long long start){
 	unsigned long long end = getTime();
 	return (double)(end - start) / SECONDS;
 }

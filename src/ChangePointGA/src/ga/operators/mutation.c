@@ -10,10 +10,8 @@
 void addRandomChangePoint(Strategy_ptr strategy){
 	if(strategy->size < MAX_CHANGE_POINT){
 		//int r = randInt(0, strategy->size);
-
 		int randPos = randInt(0, TRACK_LENGTH / SPACE_STEP);
 		int r = getChangePointNearAt(strategy, randPos) + 1;
-		printf("add %d %d\n", randPos, r);
 
 		addElement(strategy->points, r, strategy->size, sizeof(ChangePoint));
 

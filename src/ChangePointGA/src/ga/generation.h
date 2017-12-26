@@ -50,89 +50,94 @@ typedef void (*MutationFunction)(Strategy_ptr strategy);
 
 /*****Init functions*****/
 //Initialize a empty population
-Generation_ptr initEmptyGeneration(int size);
+extern Generation_ptr initEmptyGeneration(int size);
 
 //Initialize a random population
-Generation_ptr initRandomGeneration(int size);
+extern Generation_ptr initRandomGeneration(int size);
 
 //Dispose generation
-void disposeGeneration(Generation_ptr generation);
+extern void disposeGeneration(Generation_ptr generation);
 
 //Print population individuals
-void printGeneration(Generation_ptr generation);
+extern void printGeneration(Generation_ptr generation);
 
 //Save the generation to file
-void generationToFile(Generation_ptr generation, const char* fileName);
+extern void generationToFile(Generation_ptr generation, const char* fileName);
 
 //Load the generation from file
-void generationFromFile(Generation_ptr generation, const char* fileName);
+extern void generationFromFile(Generation_ptr generation, const char* fileName);
 
 //Save statistics to file
-void statisticsToFile(Generation_ptr generation, unsigned long int generationCount, FILE* file);
+extern void statisticsToFile(Generation_ptr generation, unsigned long int generationCount, FILE* file);
 
 
 /*****Fitness eval functions*****/
 //Pure energy based fitness
-float energyFitness(Generation_ptr generation, Strategy_ptr strategy);
+extern float energyFitness(Generation_ptr generation, Strategy_ptr strategy);
 
 //Energy and time fitness
-float energyTimeFitness(Generation_ptr generation, Strategy_ptr strategy);
+extern float energyTimeFitness(Generation_ptr generation, Strategy_ptr strategy);
 
 //Energy and diversity fitness
-float energyDiversityFitness(Generation_ptr generation, Strategy_ptr strategy);
+extern float energyDiversityFitness(Generation_ptr generation, Strategy_ptr strategy);
 
 
 //Eval fitness for all individuals
-void evalGenerationFitness(Generation_ptr generation, float startVelocity, int startMap, FitnessFunction fitness);
+extern void evalGenerationFitness(Generation_ptr generation, float startVelocity, int startMap, FitnessFunction fitness);
 
 //Sort individual by fitness value
-void sortGenerationByFitness(Generation_ptr generation);
+extern void sortGenerationByFitness(Generation_ptr generation);
 
 //Calculate population statistics
-void updateGenerationStatistics(Generation_ptr generation);
+extern void updateGenerationStatistics(Generation_ptr generation);
 
 
 
 /*****Selection eval functions*****/
-//Copy individual from current generation to the next generation
+//Copy best individual from current generation to the next generation
 //The individual must be sorted by fitness asc and statistics update
-void elitism(Generation_ptr currentGeneration, Generation_ptr nextGeneration, float elitismPercentage);
+extern void elitism(Generation_ptr currentGeneration, Generation_ptr nextGeneration, float elitismPercentage);
+
+//Copy individual with fitness nearest to U(fitmin,fitmax) from current generation to the next generation
+//The individual must be sorted by fitness asc and statistics update
+extern void FUSS(Generation_ptr currentGeneration, Generation_ptr nextGeneration);
+
 
 //Select an individuals with fitness proportional method
 //The statistics must be updated
-int fitnessProportionalSelection(Generation_ptr generation);
+extern int fitnessProportionalSelection(Generation_ptr generation);
 
 //Select an individuals with tournament selection
-int tournamentSelection(Generation_ptr generation);
+extern int tournamentSelection(Generation_ptr generation);
 
 //Select an individuals with rank selection
-int rankSelection(Generation_ptr generation);
+extern int rankSelection(Generation_ptr generation);
 
 
 /*****Crossover functions*****/
 //Apply single point crossover and create 2 children
-void singlePointCrossover(Strategy_ptr parent1, Strategy_ptr parent2, Strategy_ptr child1, Strategy_ptr child2, int cut);
+extern void singlePointCrossover(Strategy_ptr parent1, Strategy_ptr parent2, Strategy_ptr child1, Strategy_ptr child2, int cut);
 
 //Apply crossover to current generation and save it in next generation
-int crossOver(Generation_ptr currentGeneration, Generation_ptr nextGeneration, SelectionFunction selection, CrossoverFunction crossover);
+extern int crossOver(Generation_ptr currentGeneration, Generation_ptr nextGeneration, SelectionFunction selection, CrossoverFunction crossover);
 
 
 
 /*****Mutation function*****/
 //Add new random change point
-void addRandomChangePoint(Strategy_ptr strategy);
+extern void addRandomChangePoint(Strategy_ptr strategy);
 
 //Remove a random change point
-void removeRandomChangePoint(Strategy_ptr strategy);
+extern void removeRandomChangePoint(Strategy_ptr strategy);
 
 //Move random change point position
-void moveRandomChangePoint(Strategy_ptr strategy);
+extern void moveRandomChangePoint(Strategy_ptr strategy);
 
 //Change random change point action
-void changeRandomChangePointAction(Strategy_ptr strategy);
+extern void changeRandomChangePointAction(Strategy_ptr strategy);
 
 //Apply mutation to the next generation
-int mutation(Generation_ptr nextGeneration, MutationFunction mutationFunction, float mutationRate);
+extern int mutation(Generation_ptr nextGeneration, MutationFunction mutationFunction, float mutationRate);
 
 
 #endif

@@ -50,7 +50,9 @@ void disposeGeneration(Generation_ptr generation){
 }
 
 void printGeneration(Generation_ptr generation){
+	printf("Generation\n");
 	for(int i = 0; i < generation->size; i++){
+		printf("fitness %f\n", generation->individuals[i].fitness);
 		printStrategy(&generation->individuals[i]);
 		printf("\n");
 	}

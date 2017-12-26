@@ -23,7 +23,7 @@
 //#define RE50_24V
 //#define RE50_36V
 
-#define KEEP_TIME_INVALID
+//#define KEEP_TIME_INVALID
 
 #include "escorpio17.h"
 #include "londontrack18.h"
@@ -107,62 +107,62 @@ typedef struct Map{
 typedef Map* Map_ptr;
 
 //Init a map
-void initMap(Map_ptr map, float a0, float a1, float a2);
+extern void initMap(Map_ptr map, float a0, float a1, float a2);
 
 //Get the accelleration
-float getMapForce(Map_ptr map, float velocity);
+extern float getMapForce(Map_ptr map, float velocity);
 
 extern Map maps[MAP_COUNT];
 
 
 
 //Init a simulation
-void initSimulation(Simulation_ptr simulation, float startVelocity, int startMap);
+extern void initSimulation(Simulation_ptr simulation, float startVelocity, int startMap);
 
 //Init the mapset
-void initMapset();
+extern void initMapset();
 
 //Simulate
 SimulationResult simulate(Simulation_ptr simulation, float startPosition, float endPosition, Action action);
 
 //Print simulation
-void printSimulation(Simulation_ptr simulation);
+extern void printSimulation(Simulation_ptr simulation);
 
 //Get motor power
-float getPower (Simulation_ptr simulation, float Ftraction, float Speed, float dt);
+extern float getPower (Simulation_ptr simulation, float Ftraction, float Speed, float dt);
 
 //Get motor attrito
-float getMotorMattrito(float Speed);
+extern float getMotorMattrito(float Speed);
 
 //Bearings model
-float getForcebearings();
+extern float getForcebearings();
 
 //Slope resistance
-float getForceSlope(float TrackSlope);
+extern float getForceSlope(float TrackSlope);
 
 //Aerodynamic drag
-float getForceAero(float Speed, float TrackRadiusInv);
+extern float getForceAero(float Speed, float TrackRadiusInv);
 
 //Tricycle model
-float getForceTyres(float Speed, float TrackRadiusInv);
+extern float getForceTyres(float Speed, float TrackRadiusInv);
 
 //Total resistance force
-float getForceResistent(float Speed, float TrackSlope, float TrackRadiusInv);
+extern float getForceResistent(float Speed, float TrackSlope, float TrackRadiusInv);
 
 //Get traction force
-float getForceTraction(float Speed, int map);
+extern float getForceTraction(float Speed, int map);
 
 //Get max traction force
-float getMaxForceTraction(float Speed);
+extern float getMaxForceTraction(float Speed);
 
 //Save simulation steps on csv
-void simulationToCsv(Simulation_ptr simulation, FILE* file);
+extern void simulationToCsv(Simulation_ptr simulation, FILE* file);
 
 //Save simulation traction force on csv
-void simulationToStrategy(Simulation_ptr simulation, FILE* file);
+extern void simulationToStrategy(Simulation_ptr simulation, FILE* file);
 
 //Export simulation params
-void saveSimulationParams(const char* fileName);
+extern void saveSimulationParams(const char* fileName);
 
 
 

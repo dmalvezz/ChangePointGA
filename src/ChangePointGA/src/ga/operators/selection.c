@@ -14,7 +14,7 @@
 
 
 void elitism(Generation_ptr currentGeneration, Generation_ptr nextGeneration, float elitismPercentage){
-	int count = currentGeneration->size * elitismPercentage;
+	int count = max(1, currentGeneration->size * elitismPercentage);
 
 	//nextGeneration->count = count;
 	//Keep best in the generation
@@ -28,6 +28,39 @@ void elitism(Generation_ptr currentGeneration, Generation_ptr nextGeneration, fl
 		memcpy(nextGeneration->individuals, currentGeneration->individuals, count * sizeof(Strategy));
 	//}
 }
+
+void FUSS(Generation_ptr currentGeneration, Generation_ptr nextGeneration){
+	//Individual to be replaced
+	int r = randInt(1, nextGeneration->size - 1);
+
+	int validCount = currentGeneration->size - currentGeneration->statistics.invalidCount;
+	//Fitness to keep
+	float fitness = randFloat(currentGeneration->individuals[0].fitness, currentGeneration->individuals[validCount - 1].fitness);
+
+	//Binary search
+	int sx = 0;
+	int dx = validCount - 1;
+	int m = (sx + dx) / 2;
+
+
+	while (sx <= dx) {
+		m = (sx + dx) / 2;
+		if (currentGeneration->individuals[m].fitness < fitness){
+			sx = m + 1;
+		}
+		else if (currentGeneration->individuals[m].fitness > fitness){
+			dx = m - 1;
+		}
+		else{
+			break;
+		}
+	}
+
+	//Replace
+	memcpy(&nextGeneration->individuals[r], &currentGeneration->individuals[m], sizeof(Strategy));
+
+}
+
 
 
 int fitnessProportionalSelection(Generation_ptr generation){
