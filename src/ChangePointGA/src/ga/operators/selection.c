@@ -42,7 +42,6 @@ void FUSS(Generation_ptr currentGeneration, Generation_ptr nextGeneration){
 	int dx = validCount - 1;
 	int m = (sx + dx) / 2;
 
-
 	while (sx <= dx) {
 		m = (sx + dx) / 2;
 		if (currentGeneration->individuals[m].fitness < fitness){

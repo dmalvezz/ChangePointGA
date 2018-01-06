@@ -10,6 +10,7 @@
 
 #include "ga/ga.h"
 
+
 static void testTrackData(){
 	Strategy str;
 	float totTime = 0 ;

@@ -36,7 +36,7 @@
 
 	//Trasmissione
 	#define TransmissionEff   	0.99
-	#define TransmissionRatio 	(1 / 40.0)    //RE40 48V new ratio
+	#define TransmissionRatio 	(1 / 25.0)    //RE40 48V new ratio
 #endif
 
 #ifdef RE40_48V

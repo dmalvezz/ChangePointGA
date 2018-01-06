@@ -82,6 +82,8 @@ SimulationResult simulate(Simulation_ptr simulation, float startPosition, float 
 		simulation->selectedMap = 0;
 	}
 
+	//printf("Action %d %f Map %d\n", action, startPosition, simulation->selectedMap);
+
 	int startIndex = startPosition / SPACE_STEP;
 	int simStep = (endPosition - startPosition) / SPACE_STEP;
 	float radius, slope, fTraction, fSlope, fAero, fTyres, fResistent, fTot, a, delta, dt, dE;
@@ -166,13 +168,6 @@ SimulationResult simulate(Simulation_ptr simulation, float startPosition, float 
 		}
 	}
 
-	if(simulation->velocity < START_VELOCITY){
-		simulation->time = INFINITY;
-		simulation->energy = INFINITY;
-		return SIM_END_VEL;
-	}
-
-
 	return SIM_OK;
 }
 
@@ -204,7 +199,7 @@ void simulationToCsv(Simulation_ptr simulation, FILE* file){
 	fprintf(file, "sim result, %d\n", simulation->result);
 	fprintf(file, "total time, %f\n", simulation->time);
 	fprintf(file, "total energy, %f\n", simulation->energy);
-	fprintf(file, "map,x,slope,radius,v,ft,fslope,faero,ftyres,fres,ftot,a,dt,dE\n");
+	fprintf(file, "map,x,slope,radius,vi,ft,fslope,faero,ftyres,fres,ftot,a,dt,dE\n");
 	for(int i = 0; i < SIM_STEP_COUNT; i++){
 			fprintf(file, "%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
 				simulation->steps[i].map,

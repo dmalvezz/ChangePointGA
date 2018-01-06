@@ -18,12 +18,12 @@
 //#define POWERTRAIN_FLAT
 
 //Motors list
-#define RE40_24V
+//#define RE40_24V
 //#define RE40_48V
-//#define RE50_24V
+#define RE50_24V
 //#define RE50_36V
 
-//#define KEEP_TIME_INVALID
+#define KEEP_TIME_INVALID
 
 #include "escorpio17.h"
 #include "londontrack18.h"
@@ -45,7 +45,7 @@
 #endif
 
 #define START_VELOCITY	7.0
-#define START_MAP		1
+#define START_MAP		0
 #define MAP_COUNT		4
 
 typedef enum SimulationResult{

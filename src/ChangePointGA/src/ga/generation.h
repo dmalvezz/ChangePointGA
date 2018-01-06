@@ -136,6 +136,9 @@ extern void moveRandomChangePoint(Strategy_ptr strategy);
 //Change random change point action
 extern void changeRandomChangePointAction(Strategy_ptr strategy);
 
+//Remove change points which generate spikes in map profile
+extern void filterStrategy(Strategy_ptr strategy);
+
 //Apply mutation to the next generation
 extern int mutation(Generation_ptr nextGeneration, MutationFunction mutationFunction, float mutationRate);
 

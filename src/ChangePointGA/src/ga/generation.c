@@ -79,12 +79,14 @@ void generationFromFile(Generation_ptr generation, const char* fileName){
 
 
 void statisticsToFile(Generation_ptr generation, unsigned long int generationCount, FILE* file){
-	fprintf(file, "%lu, %f, %f, %f, %f, %f, %f, %f, %lu\n",
+	fprintf(file, "%lu, %f, %f, %f, %f, %f, %f, %f, %f, %f, %lu\n",
 			generationCount,
 			generation->statistics.best.simulation.energy,
 			generation->statistics.best.fitness,
 			generation->statistics.fitnessMin,
+			generation->statistics.fitnessMax,
 			generation->statistics.fitnessMedian,
+			generation->statistics.fitnessAvg,
 			generation->statistics.lengthAvg,
 			generation->statistics.similarityAvg,
 			(float)generation->statistics.invalidCount / generation->count,
@@ -118,12 +120,8 @@ void sortGenerationByFitness(Generation_ptr generation){
 
 void updateGenerationStatistics(Generation_ptr generation){
 	//Init
-	generation->statistics.fitnessMin = generation->individuals[0].fitness;
-	generation->statistics.fitnessMax = generation->individuals[generation->size - 1].fitness;
-	generation->statistics.fitnessMedian = generation->individuals[generation->size / 2].fitness;
 	generation->statistics.fitnessAvg = 0;
 	generation->statistics.fitnessSumInverse = 0;
-
 
 	generation->statistics.lengthAvg = 0;
 	generation->statistics.similarityAvg = 0;
@@ -143,6 +141,11 @@ void updateGenerationStatistics(Generation_ptr generation){
 			generation->statistics.similarityAvg += generation->individuals[i].similarity;
 		}
 	}
+
+	//Min/Max
+	generation->statistics.fitnessMin = generation->individuals[0].fitness;
+	generation->statistics.fitnessMax = generation->individuals[generation->size - generation->statistics.invalidCount - 1].fitness;
+	generation->statistics.fitnessMedian = generation->individuals[(generation->size - generation->statistics.invalidCount) / 2].fitness;
 
 	//Avgs
 	generation->statistics.fitnessAvg /= (generation->size - generation->statistics.invalidCount);

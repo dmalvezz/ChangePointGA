@@ -79,7 +79,7 @@ int getChangePointNearAt(Strategy_ptr strategy, int position){
 	int dx = strategy->size - 1;
 	int m = (sx + dx) / 2;
 
-	if(strategy->points[0].positionIndex > position){
+	if(strategy->size <= 0 || strategy->points[0].positionIndex > position){
 		//The value is before the first change point
 		return -1;
 	}
@@ -143,8 +143,17 @@ void simulateStrategy(Strategy_ptr strategy, float startVelocity, int startMap){
 		strategy->simulation.result = simulate(&strategy->simulation,
 				strategy->points[strategy->size - 1].positionIndex * SPACE_STEP,
 				TRACK_LENGTH,
-				strategy->points[0].action
+				strategy->points[strategy->size - 1].action
 				);
+
+		//Check if last velocity is >= than the start velocity
+		//Just for general lap
+		if(strategy->simulation.result == SIM_OK
+				&& strategy->simulation.velocity < START_VELOCITY){
+			strategy->simulation.time = INFINITY;
+			strategy->simulation.energy = INFINITY;
+			strategy->simulation.result = SIM_END_VEL;
+		}
 	}
 
 }
