@@ -118,7 +118,6 @@ void filterStrategy(Strategy_ptr strategy){
 
 	}
 
-	/*
 	//Remove spikes
 	for(int i = 1; i < strategy->size; i++){
 		if(strategy->points[i - 1].action != strategy->points[i].action &&
@@ -129,7 +128,6 @@ void filterStrategy(Strategy_ptr strategy){
 			i = i - 2;
 		}
 	}
-*/
 
 }
 

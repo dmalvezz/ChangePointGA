@@ -36,21 +36,6 @@ int main() {
 	GA ga;
 	initGA(&ga);
 
-	//Test filter
-	generationFromFile(ga.currentGeneration, GENERATION_FILE);
-	printf("best size %d\n", ga.currentGeneration->individuals[0].size);
-
-	simulateStrategy(&ga.currentGeneration->individuals[0], START_VELOCITY, START_MAP);
-	strategyToFile(&ga.currentGeneration->individuals[0], "best.csv");
-
-	//filterStrategy(&ga.currentGeneration->individuals[0]);
-	//printf("filtered best size %d\n", ga.currentGeneration->individuals[0].size);
-	//printStrategy(&ga.currentGeneration->individuals[0]);
-
-	//simulateStrategy(&ga.currentGeneration->individuals[0], START_VELOCITY, START_MAP);
-	//strategyToFile(&ga.currentGeneration->individuals[0], "filtered.csv");
-	return 0;
-
 	//Loop
 	while(loop){
 		//Apply genetics

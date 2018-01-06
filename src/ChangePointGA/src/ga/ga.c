@@ -74,6 +74,7 @@ void genetic(GA* ga){
 	mutationCount += mutation(ga->nextGeneration, removeRandomChangePoint, 		 REMOVE_POINT_MUTATION_RATE);
 	mutationCount += mutation(ga->nextGeneration, moveRandomChangePoint, 		 CHANGE_POINT_POS_MUTATION_RATE);
 	mutationCount += mutation(ga->nextGeneration, changeRandomChangePointAction, CHANGE_POINT_ACT_MUTATION_RATE);
+	mutationCount += mutation(ga->nextGeneration, filterStrategy, 				 FILTER_MUTATION_RATE);
 	mutationTime = getTimeElapsed(timer);
 
 	//Perform elitism selection
