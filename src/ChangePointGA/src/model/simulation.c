@@ -156,7 +156,7 @@ SimulationResult simulate(Simulation_ptr simulation, float startPosition, float 
 		}
 
 #ifndef KEEP_TIME_INVALID
-		if(simulation->time > TRACK_LENGTH / MIN_AVG_SPEED){
+		if(simulation->time > TRACK_END_POINT / MIN_AVG_SPEED){
 			simRes = SIM_TIME_MAX;
 		}
 #endif

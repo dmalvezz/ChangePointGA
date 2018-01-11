@@ -20,7 +20,7 @@
 #include "../utils/mathutils.h"
 
 #define MIN_CHANGE_POINT 	3
-#define MAX_CHANGE_POINT 	100
+#define MAX_CHANGE_POINT 	200
 
 
 typedef struct Strategy{

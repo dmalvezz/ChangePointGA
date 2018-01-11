@@ -12,7 +12,7 @@ void initStrategy(Strategy_ptr strategy, int spaceStep){
 	strategy->size = randInt(MIN_CHANGE_POINT, MAX_CHANGE_POINT);
 
 	float positionIndexMin, positionIndexMax;
-	float changePointStep = (float)TRACK_LENGTH / strategy->size;
+	float changePointStep = (float)TRACK_END_POINT / strategy->size;
 
 	for(int i = 0; i < strategy->size; i++){
 		positionIndexMin = changePointStep * i;
@@ -119,6 +119,8 @@ void removeChangePoint(Strategy_ptr strategy, int index){
 
 void simulateStrategy(Strategy_ptr strategy, float startVelocity, int startMap){
 	int i = 0;
+
+	//Init simulation
 	initSimulation(&strategy->simulation, startVelocity, startMap);
 
 	//Simulate from start to first change point
@@ -142,9 +144,14 @@ void simulateStrategy(Strategy_ptr strategy, float startVelocity, int startMap){
 		//Simulate from last change point to track end
 		strategy->simulation.result = simulate(&strategy->simulation,
 				strategy->points[strategy->size - 1].positionIndex * SPACE_STEP,
-				TRACK_LENGTH,
+				TRACK_END_POINT,
 				strategy->points[strategy->size - 1].action
 				);
+
+		//Get double energy penalty if started lap with gas on and ended lap with gas on
+		if (strategy->simulation.selectedMap != 0 && strategy->simulation.steps[0].map != 0) {
+			strategy->simulation.energy -= MotorStartPenalty;
+		}
 
 		//Check if last velocity is >= than the start velocity
 		//Just for general lap

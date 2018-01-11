@@ -27,7 +27,6 @@ static float getTrackSlopeLinInt(float position) {
 
 	float slope = SLOPE_DATA[i+1] * coeff + SLOPE_DATA[i] * (1 - coeff);
 
-	//TODO: i + 1 % TRACK_DATA_LENGTH
 	return slope * M_PI / 180.0;
 }
 
@@ -40,7 +39,6 @@ static float getTrackRadiusLinInt(float position) {
 
 	float radius = fabs(RADIUS_DATA[i+1]) * coeff + fabs(RADIUS_DATA[i]) * (1 - coeff);
 
-	//TODO: i + 1 % TRACK_DATA_LENGTH
 	return radius;
 }
 
@@ -65,12 +63,18 @@ void disposeTrackData(){
 
 
 float getTrackSlope(float position, float spaceStep){
-	int index = floor(position / spaceStep);
+	float relativePosition = position - ((int)(position / TRACK_LENGTH) * TRACK_LENGTH);
+
+	int index = floor(relativePosition / spaceStep);
+
 	return TRACK_SLOPE[index];
 }
 
 float getTrackRadius(float position, float spaceStep){
-	int index = floor(position / spaceStep);
+	float relativePosition = position - ((int)(position / TRACK_LENGTH) * TRACK_LENGTH);
+
+	int index = floor(relativePosition / spaceStep);
+
 	return TRACK_RADIUS[index];
 }
 

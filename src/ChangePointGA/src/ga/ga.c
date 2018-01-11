@@ -107,7 +107,7 @@ void genetic(GA* ga){
 		printf("Best energy %.2f   time %.2f/%.2f\n",
 				ga->currentGeneration->statistics.best.simulation.energy,
 				ga->currentGeneration->statistics.best.simulation.time,
-				(float)TRACK_LENGTH / MIN_AVG_SPEED
+				(float)TRACK_END_POINT / MIN_AVG_SPEED
 				);
 
 		//Print stats
@@ -122,12 +122,12 @@ void genetic(GA* ga){
 
 		//Print time
 		printf("Time ft %0.3lf   st %0.3lf   ut %0.3lf   et %0.3lf   ct %0.3lf   mt %0.3lf\n",
-				fitnessTime / generationTime,
-				sortTime / generationTime,
-				statTime / generationTime,
-				elitismTime / generationTime,
-				crossoverTime / generationTime,
-				mutationTime / generationTime
+				fitnessTime,
+				sortTime,
+				statTime,
+				elitismTime,
+				crossoverTime,
+				mutationTime
 				);
 		printf("Total time %lf\n", generationTime);
 		printf("==============================\n");

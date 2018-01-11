@@ -44,14 +44,14 @@ int main() {
 	//Init track samples
 	generateTrackData(SPACE_STEP);
 
+	//Init GA
 	GA ga;
-	initGA(&ga, rankSelection, singlePointCrossover, energyFitness);
+	initGA(&ga, fitnessProportionalSelection, singlePointCrossover, energyFitness);
 	addMutation(&ga, addRandomChangePoint, 			ADD_POINT_MUTATION_RATE);
 	addMutation(&ga, removeRandomChangePoint, 		REMOVE_POINT_MUTATION_RATE);
-	addMutation(&ga, moveRandomChangePoint, 			CHANGE_POS_MUTATION_RATE);
-	addMutation(&ga, changeRandomChangePointAction, 	CHANGE_ACT_MUTATION_RATE);
+	addMutation(&ga, moveRandomChangePoint, 		CHANGE_POS_MUTATION_RATE);
+	addMutation(&ga, changeRandomChangePointAction, CHANGE_ACT_MUTATION_RATE);
 	addMutation(&ga, filterStrategy, 				FILTER_MUTATION_RATE);
-
 
 	/*
 	generationFromFile(ga.currentGeneration, GENERATION_FILE);
@@ -73,10 +73,12 @@ int main() {
 		#ifdef SAVE_STATISTICS
 			statisticsToFile(ga.currentGeneration, ga.generationCount, statisticsFile);
 		#endif
+
 	}
 
 	//Save strategy and generation
 	strategyToFile(&ga.currentGeneration->statistics.best, BEST_FILE);
+	//strategyToFile(&ga.currentGeneration->individuals[0], BEST_FILE);
 	generationToFile(ga.currentGeneration, GENERATION_FILE);
 	saveSimulationParams(SIMULATION_FILE);
 

@@ -33,7 +33,10 @@
 #include "../utils/mathutils.h"
 
 #define SPACE_STEP	1.0
-#define SIM_STEP_COUNT	(TRACK_LENGTH / (int)SPACE_STEP)
+#define LAP_COUNT	2
+#define TRACK_START_POINT	0
+#define TRACK_END_POINT		(TRACK_LENGTH * LAP_COUNT)
+#define SIM_STEP_COUNT	(TRACK_END_POINT / (int)SPACE_STEP)
 
 //#define FIRST_LAP
 #ifdef FIRST_LAP

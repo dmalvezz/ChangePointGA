@@ -9,7 +9,7 @@
 
 void addRandomChangePoint(Strategy_ptr strategy){
 	if(strategy->size < MAX_CHANGE_POINT){
-		int randPos = randInt(0, TRACK_LENGTH / SPACE_STEP);
+		int randPos = randInt(0, TRACK_END_POINT / SPACE_STEP);
 		int r = getChangePointNearAt(strategy, randPos) + 1;
 
 		addElement(strategy->points, r, strategy->size, sizeof(ChangePoint));
@@ -18,7 +18,7 @@ void addRandomChangePoint(Strategy_ptr strategy){
 			strategy->points[0].positionIndex = randInt(0, strategy->points[1].positionIndex);
 		}
 		else if(r == strategy->size){
-			strategy->points[r].positionIndex = randInt(strategy->points[r - 1].positionIndex , TRACK_LENGTH / SPACE_STEP);
+			strategy->points[r].positionIndex = randInt(strategy->points[r - 1].positionIndex , TRACK_END_POINT / SPACE_STEP);
 		}
 		else {
 			strategy->points[r].positionIndex = randInt(strategy->points[r - 1].positionIndex, strategy->points[r + 1].positionIndex);
@@ -53,14 +53,14 @@ void removeRandomChangePoint(Strategy_ptr strategy){
 }
 
 void moveRandomChangePoint(Strategy_ptr strategy){
-	int randPos = randInt(0, TRACK_LENGTH / SPACE_STEP);
+	int randPos = randInt(0, TRACK_END_POINT / SPACE_STEP);
 	int r = getChangePointNearAt(strategy, randPos);
 
 	if(r <= 0){
 		strategy->points[0].positionIndex = randInt(0, strategy->points[1].positionIndex);
 	}
 	else if(r == strategy->size - 1){
-		strategy->points[r].positionIndex = randInt(strategy->points[r - 1].positionIndex , TRACK_LENGTH / SPACE_STEP);
+		strategy->points[r].positionIndex = randInt(strategy->points[r - 1].positionIndex , TRACK_END_POINT / SPACE_STEP);
 	}
 	else {
 		strategy->points[r].positionIndex = randInt(strategy->points[r - 1].positionIndex, strategy->points[r + 1].positionIndex);
