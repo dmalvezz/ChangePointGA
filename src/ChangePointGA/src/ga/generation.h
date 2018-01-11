@@ -100,7 +100,10 @@ extern void elitism(Generation_ptr currentGeneration, Generation_ptr nextGenerat
 
 //Copy individual with fitness nearest to U(fitmin,fitmax) from current generation to the next generation
 //The individual must be sorted by fitness asc and statistics update
-extern void FUSS(Generation_ptr currentGeneration, Generation_ptr nextGeneration);
+extern int FUSS(Generation_ptr currentGeneration, Generation_ptr nextGeneration);
+
+//Apply spike filter and FUSS
+extern void filteredFUSS(Generation_ptr currentGeneration, Generation_ptr nextGeneration);
 
 
 //Select an individuals with fitness proportional method

@@ -13,7 +13,7 @@ float energyFitness(Generation_ptr generation, Strategy_ptr strategy){
 }
 
 float energyTimeFitness(Generation_ptr generation, Strategy_ptr strategy){
-	return strategy->simulation.energy + pow(strategy->simulation.time - (TRACK_LENGTH / MIN_AVG_SPEED), 4);
+	return strategy->simulation.energy + pow(strategy->simulation.time - (TRACK_LENGTH / MIN_AVG_SPEED), 10);
 }
 
 float energyDiversityFitness(Generation_ptr generation, Strategy_ptr strategy){

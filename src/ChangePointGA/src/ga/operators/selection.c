@@ -29,7 +29,7 @@ void elitism(Generation_ptr currentGeneration, Generation_ptr nextGeneration, fl
 	//}
 }
 
-void FUSS(Generation_ptr currentGeneration, Generation_ptr nextGeneration){
+int FUSS(Generation_ptr currentGeneration, Generation_ptr nextGeneration){
 	//Individual to be replaced
 	int r = randInt(1, nextGeneration->size - 1);
 
@@ -58,8 +58,15 @@ void FUSS(Generation_ptr currentGeneration, Generation_ptr nextGeneration){
 	//Replace
 	memcpy(&nextGeneration->individuals[r], &currentGeneration->individuals[m], sizeof(Strategy));
 
+	//Return individual index in next generation
+	return r;
 }
 
+void filteredFUSS(Generation_ptr currentGeneration, Generation_ptr nextGeneration){
+	int r = FUSS(currentGeneration, nextGeneration);
+
+	filterStrategy(&nextGeneration->individuals[r]);
+}
 
 
 int fitnessProportionalSelection(Generation_ptr generation){

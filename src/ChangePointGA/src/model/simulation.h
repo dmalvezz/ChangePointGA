@@ -23,7 +23,7 @@
 //#define RE50_24V
 #define RE50_36V
 
-#define KEEP_TIME_INVALID
+//#define KEEP_TIME_INVALID
 
 #include "escorpio17.h"
 #include "londontrack18.h"

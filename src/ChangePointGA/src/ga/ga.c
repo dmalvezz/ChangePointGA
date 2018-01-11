@@ -7,28 +7,34 @@
 
 #include "ga.h"
 
-void initGA(GA* ga){
-	//Init random
-	randInit();
+void initGA(GA* ga, SelectionFunction selectionFunction, CrossoverFunction crossoverFunction, FitnessFunction fitnessFunction){
+	//Counter
+	ga->generationCount = 0;
 
-	//Init mapset
-	initMapset();
+	//Mutations
+	ga->mutationCount = 0;
 
-	//Init track samples
-	generateTrackData(SPACE_STEP);
+	//Other function
+	ga->selectionFunction = selectionFunction;
+	ga->crossoverFunction = crossoverFunction;
+	ga->fitnessFunction = fitnessFunction;
 
 	//Init random first generation
 	ga->currentGeneration = initRandomGeneration(POPULATION_SIZE);
 	//Init empty next generation
 	ga->nextGeneration = initEmptyGeneration(POPULATION_SIZE);
+}
 
-	//Counter
-	ga->generationCount = 0;
-
-
+void addMutation(GA* ga, MutationFunction mutation, float rate){
+	if(ga->mutationCount < MAX_MUTATION_COUNT){
+		ga->mutationRates[ga->mutationCount] = rate;
+		ga->mutationsFunction[ga->mutationCount] = mutation;
+		ga->mutationCount++;
+	}
 }
 
 void genetic(GA* ga){
+	//Counters
 	int childCount = 0, mutationCount = 0;
 
 	//Timers
@@ -40,7 +46,7 @@ void genetic(GA* ga){
 
 	//Eval fitness
 	timer = getTime();
-	evalGenerationFitness(ga->currentGeneration, START_VELOCITY, START_MAP, energyFitness);
+	evalGenerationFitness(ga->currentGeneration, START_VELOCITY, START_MAP, ga->fitnessFunction);
 	fitnessTime = getTimeElapsed(timer);
 
 	//Sort individual by fitness
@@ -62,25 +68,25 @@ void genetic(GA* ga){
 
 	//Perform crossover
 	timer = getTime();
-	childCount = crossOver(ga->currentGeneration, ga->nextGeneration, fitnessProportionalSelection, singlePointCrossover);
-	//childCount = crossOver(ga->currentGeneration, ga->nextGeneration, tournamentSelection, singlePointCrossover);
-	//childCount = crossOver(ga->currentGeneration, ga->nextGeneration, rankSelection, singlePointCrossover);
+	childCount = crossOver(ga->currentGeneration, ga->nextGeneration, ga->selectionFunction, ga->crossoverFunction);
 	crossoverTime = getTimeElapsed(timer);
 
 	//Perform mutations
 	timer = getTime();
-	mutationCount = 0;
-	mutationCount += mutation(ga->nextGeneration, addRandomChangePoint, 		 ADD_POINT_MUTATION_RATE);
-	mutationCount += mutation(ga->nextGeneration, removeRandomChangePoint, 		 REMOVE_POINT_MUTATION_RATE);
-	mutationCount += mutation(ga->nextGeneration, moveRandomChangePoint, 		 CHANGE_POINT_POS_MUTATION_RATE);
-	mutationCount += mutation(ga->nextGeneration, changeRandomChangePointAction, CHANGE_POINT_ACT_MUTATION_RATE);
-	mutationCount += mutation(ga->nextGeneration, filterStrategy, 				 FILTER_MUTATION_RATE);
+	for(int i = 0; i < ga->mutationCount; i++){
+		mutationCount += mutation(ga->nextGeneration, ga->mutationsFunction[i], ga->mutationRates[i]);
+	}
 	mutationTime = getTimeElapsed(timer);
 
 	//Perform elitism selection
 	timer = getTime();
 	elitism(ga->currentGeneration, ga->nextGeneration, ELITISM_PERCENTAGE);
 	FUSS(ga->currentGeneration, ga->nextGeneration);
+	/*
+	if(ga->generationCount % 100 == 0){
+		filterStrategy(&ga->nextGeneration->individuals[0]);
+	}
+	*/
 	elitismTime = getTimeElapsed(timer);
 
 	//Prints
@@ -133,13 +139,11 @@ void genetic(GA* ga){
 	swap(ga->currentGeneration->individuals, ga->nextGeneration->individuals);
 	ga->nextGeneration->count = 0;
 	ga->generationCount++;
+
 }
 
 void disposeGA(GA* ga){
 	//Dispose generation
 	disposeGeneration(ga->currentGeneration);
 	disposeGeneration(ga->nextGeneration);
-
-	//Dispose track samples
-	disposeTrackData();
 }
