@@ -17,7 +17,6 @@
 
 Command* commandList = NULL;
 
-
 void initConsole(){
 	//Create argv bufer
 	initArgv();
@@ -26,6 +25,8 @@ void initConsole(){
 
 	//Register all commands
 	registerCommand("setmutrate", setMutationRate);
+	registerCommand("plotsim", plotSimulation);
+
 }
 
 void printConsoleMenu(){

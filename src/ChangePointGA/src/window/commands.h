@@ -11,6 +11,7 @@
 #include <ctype.h>
 
 #include "../ga/ga.h"
+#include "../utils/gnuplot/gnuplot_i.h"
 #include "../utils/uthash/uthash.h"
 
 #define CMD_SIZE		32
@@ -35,5 +36,19 @@ extern void initArgv();
 extern void disposeArgv();
 
 //Set the mutation rate of a specific mutation function
-extern int setMutationRate(GA*, char** argv, int argc);
+extern int setMutationRate(GA* ga, char** argv, int argc);
 
+//Set the fitness function
+extern int setFitnessFunction(GA* ga, char** argv, int argc);
+
+//Set the selection function
+extern int setSelectionFunction(GA* ga, char** argv, int argc);
+
+//Filter a strategy
+extern int applyFilterToStrategy(GA* ga, char** argv, int argc);
+
+//Plot simulation
+extern int plotSimulation(GA* ga, char** argv, int argc);
+
+//Plot statistics
+extern int plosStatistic(GA* ga, char** argv, int argc);

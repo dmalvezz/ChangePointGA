@@ -9,6 +9,7 @@ RM := rm -rf
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include src/window/subdir.mk
+-include src/utils/gnuplot/subdir.mk
 -include src/model/subdir.mk
 -include src/ga/operators/subdir.mk
 -include src/ga/subdir.mk

@@ -82,3 +82,58 @@ int setMutationRate(GA* ga, char** argv, int argc){
 
 	return 0;
 }
+
+
+int plotSimulation(GA* ga, char** argv, int argc){
+	//Default params
+	int simIndex = -1;
+
+	//Parsing
+	int c;
+	char* end;
+
+	while ((c = getopt(argc, argv, "i:")) != -1){
+		switch (c) {
+			case 'i':
+				simIndex = strtol(optarg, &end, 10);
+
+				if(simIndex < 0 || simIndex > ga->currentGeneration->count - 1){
+					sprintf(errorBuffer, "Invalid index %d", simIndex);
+					return 1;
+				}
+
+				break;
+
+			default:
+				if (optopt == 'i'){
+					sprintf(errorBuffer, "Option -%c requires an argument", optopt);
+				}
+				else if (isprint(optopt)){
+					sprintf(errorBuffer, "Unknown option `-%c'", optopt);
+				}
+				else{
+					sprintf(errorBuffer, "Unknown option character `\\x%x'", optopt);
+				}
+
+				return 1;
+		}
+	}
+
+	if(argc < 1 || simIndex == -1){
+		sprintf(errorBuffer, "Missing parameters");
+		return 1;
+	}
+	else{
+		double points[SIM_STEP_COUNT];
+		gnuplot_ctrl* handle = gnuplot_init();
+		gnuplot_setstyle(handle, "lines") ;
+		gnuplot_set_xlabel(handle, "Track pos");
+		gnuplot_set_xlabel(handle, "Map");
+		for (int i = 0 ; i < SIM_STEP_COUNT; i++) {
+			points[i] = ga->currentGeneration->individuals[simIndex].simulation.steps[i].map;
+		}
+		gnuplot_plot_x(handle, points, SIM_STEP_COUNT, "Map");
+
+	}
+	return 0;
+}

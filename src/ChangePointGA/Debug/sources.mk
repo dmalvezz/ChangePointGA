@@ -17,5 +17,6 @@ src/ga \
 src/ga/operators \
 src \
 src/model \
+src/utils/gnuplot \
 src/window \
 
