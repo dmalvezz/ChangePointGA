@@ -1,8 +1,11 @@
 /*
- * powertrain.h
- *
- *  Created on: Dec 22, 2017
- *      Author: davide
+ ============================================================================
+ Name        : powertrain.h
+ Author      : Davide Malvezzi
+ Version     : 1.0
+ Copyright   :
+ Description : Power train configuration
+ ============================================================================
  */
 
 #ifndef MODEL_POWERTRAIN_POWERTRAIN_H_

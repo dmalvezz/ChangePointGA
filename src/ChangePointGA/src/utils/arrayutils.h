@@ -4,7 +4,7 @@
  Author      : Davide Malvezzi
  Version     : 1.0
  Copyright   :
- Description :Array utils functions
+ Description : Array utils functions
  ============================================================================
  */
 

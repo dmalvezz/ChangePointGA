@@ -14,19 +14,20 @@ typedef struct functionReg{
 	UT_hash_handle hh;
 }functionReg;
 
-static functionReg* functions = NULL;
+static functionReg* functionsList = NULL;
 
 static void registerFunctions(void* functionPointer, const char* name){
 	functionReg* reg = (functionReg*)malloc(sizeof(functionReg));
 	reg->key = functionPointer;
 	strcpy(reg->name, name);
-	HASH_ADD_PTR(functions, key, reg);
+	HASH_ADD_PTR(functionsList, key, reg);
 }
 
 static void findFunction(void* functionPointer, functionReg** reg){
 	void* ptr = (void*)functionPointer;
-	HASH_FIND_PTR(functions, &ptr, (*reg));
+	HASH_FIND_PTR(functionsList, &ptr, (*reg));
 }
+
 
 void initGA(GA* ga, SelectionFunction selectionFunction, CrossoverFunction crossoverFunction, FitnessFunction fitnessFunction){
 	//Counter
@@ -125,11 +126,6 @@ void genetic(GA* ga){
 	timer = getTime();
 	elitism(ga->currentGeneration, ga->nextGeneration, ELITISM_PERCENTAGE);
 	FUSS(ga->currentGeneration, ga->nextGeneration);
-	/*
-	if(ga->generationCount % 100 == 0){
-		filterStrategy(&ga->nextGeneration->individuals[0]);
-	}
-	*/
 	elitismTime = getTimeElapsed(timer);
 
 	//Prints
@@ -137,9 +133,12 @@ void genetic(GA* ga){
 		//Get time
 		generationTime = getTimeElapsed(generationTimer);
 
+		int row = 0;
 		wclear(gaOutputWindow);
+		box(gaOutputWindow,0,0);
 		//Print generation info
-		wprintw(gaOutputWindow, "Gen %lu   individuals %d/%d   child %d   mutations %d\n",
+		mvwprintw(gaOutputWindow, row++, 1, "GA output");
+		mvwprintw(gaOutputWindow, row++, 1, "Gen %lu   individuals %d/%d   child %d   mutations %d",
 				ga->generationCount,
 				ga->currentGeneration->count,
 				ga->currentGeneration->size,
@@ -148,14 +147,14 @@ void genetic(GA* ga){
 				);
 
 		//Print best
-		wprintw(gaOutputWindow, "Best energy %.2f   time %.2f/%.2f\n",
+		mvwprintw(gaOutputWindow, row++, 1, "Best energy %.2f   time %.2f/%.2f",
 				ga->currentGeneration->statistics.best.simulation.energy,
 				ga->currentGeneration->statistics.best.simulation.time,
 				(float)TRACK_END_POINT / MIN_AVG_SPEED
 				);
 
 		//Print stats
-		wprintw(gaOutputWindow, "Stat fmin %.2f   fmed %.2f   lavg %d   inv %.2f   sim %.2f   lch %lu\n",
+		mvwprintw(gaOutputWindow, row++, 1, "Stat fmin %.2f   fmed %.2f   lavg %d   inv %.2f   sim %.2f   lch %lu",
 				ga->currentGeneration->statistics.fitnessMin,
 				ga->currentGeneration->statistics.fitnessMedian,
 				(int)ga->currentGeneration->statistics.lengthAvg,
@@ -165,7 +164,7 @@ void genetic(GA* ga){
 				);
 
 		//Print time
-		wprintw(gaOutputWindow, "Time ft %0.3lf   st %0.3lf   ut %0.3lf   et %0.3lf   ct %0.3lf   mt %0.3lf\n",
+		mvwprintw(gaOutputWindow, row++, 1, "Time ft %0.3lf   st %0.3lf   ut %0.3lf   et %0.3lf   ct %0.3lf   mt %0.3lf",
 				fitnessTime,
 				sortTime,
 				statTime,
@@ -173,8 +172,7 @@ void genetic(GA* ga){
 				crossoverTime,
 				mutationTime
 				);
-		wprintw(gaOutputWindow, "Total time %lf\n", generationTime);
-		wprintw(gaOutputWindow, "==========================================================================================\n");
+		mvwprintw(gaOutputWindow, row++, 1, "Total time %lf", generationTime);
 		wrefresh(gaOutputWindow);
 
 	}
@@ -190,14 +188,16 @@ void disposeGA(GA* ga){
 	//Dispose generation
 	disposeGeneration(ga->currentGeneration);
 	disposeGeneration(ga->nextGeneration);
+
+	//Dispose hash
+	HASH_CLEAR(hh, functionsList);
 }
 
 void printGAParams(GA* ga){
-	functionReg reg;
-	functionReg* regPtr = &reg;
+	functionReg* regPtr;
 
 	wclear(gaParamWindow);
-	box(gaParamWindow,0,0);
+	box(gaParamWindow, 0, 0);
 
 	int row = 0;
 	mvwprintw(gaParamWindow, row++, 1, "GA params");

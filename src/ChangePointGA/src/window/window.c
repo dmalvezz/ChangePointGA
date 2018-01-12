@@ -17,8 +17,9 @@ void initWindows(){
 	noecho();
 	nodelay(stdscr, TRUE);
 	keypad(stdscr, TRUE);
+	curs_set(0);
 
-	gaOutputWindow = newwin(6, COLS, 0, 0);
+	gaOutputWindow = newwin(8, COLS, 0, 0);
 	gaParamWindow = newwin(LINES - 9, COLS / 2, 8, 0);
 	simParamWindow = newwin(LINES - 9, COLS / 2, 8, COLS / 2);
 	commandWindow = newwin(1, COLS, LINES - 1, 0);

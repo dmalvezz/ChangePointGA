@@ -4,14 +4,17 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../src/window/commands.c \
 ../src/window/console.c \
 ../src/window/window.c 
 
 OBJS += \
+./src/window/commands.o \
 ./src/window/console.o \
 ./src/window/window.o 
 
 C_DEPS += \
+./src/window/commands.d \
 ./src/window/console.d \
 ./src/window/window.d 
 
