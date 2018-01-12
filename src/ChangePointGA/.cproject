@@ -33,6 +33,7 @@
 							<tool command="gcc -fopenmp" id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.284485776" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug">
 								<option id="gnu.c.link.option.libs.487512311" name="Libraries (-l)" superClass="gnu.c.link.option.libs" useByScannerDiscovery="false" valueType="libs">
 									<listOptionValue builtIn="false" value="m"/>
+									<listOptionValue builtIn="false" value="ncurses"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.845868176" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>

@@ -6,6 +6,27 @@
  */
 
 #include "ga.h"
+#include "../utils/uthash/uthash.h"
+
+typedef struct functionReg{
+	void* key;
+	char name[16];
+	UT_hash_handle hh;
+}functionReg;
+
+static functionReg* functions = NULL;
+
+static void registerFunctions(void* functionPointer, const char* name){
+	functionReg* reg = (functionReg*)malloc(sizeof(functionReg));
+	reg->key = functionPointer;
+	strcpy(reg->name, name);
+	HASH_ADD_PTR(functions, key, reg);
+}
+
+static void findFunction(void* functionPointer, functionReg** reg){
+	void* ptr = (void*)functionPointer;
+	HASH_FIND_PTR(functions, &ptr, (*reg));
+}
 
 void initGA(GA* ga, SelectionFunction selectionFunction, CrossoverFunction crossoverFunction, FitnessFunction fitnessFunction){
 	//Counter
@@ -23,6 +44,28 @@ void initGA(GA* ga, SelectionFunction selectionFunction, CrossoverFunction cross
 	ga->currentGeneration = initRandomGeneration(POPULATION_SIZE);
 	//Init empty next generation
 	ga->nextGeneration = initEmptyGeneration(POPULATION_SIZE);
+
+	//Selection functions
+	registerFunctions(fitnessProportionalSelection, "fitProp");
+	registerFunctions(rankSelection, "rank");
+	registerFunctions(tournamentSelection, "tournament");
+
+
+	//Fitness functions
+	registerFunctions(energyFitness, "energy");
+	registerFunctions(energyTimeFitness, "energy+time");
+	registerFunctions(energyDiversityFitness, "energy+div");
+
+	//Crossover functions
+	registerFunctions(singlePointCrossover, "singlePoint");
+
+	//Mutation functions
+	registerFunctions(addRandomChangePoint, "addRandom");
+	registerFunctions(removeRandomChangePoint, "removeRandom");
+	registerFunctions(moveRandomChangePoint, "moveRandom");
+	registerFunctions(changeRandomChangePointAction, "changeRandom");
+	registerFunctions(filterStrategy, "filter");
+
 }
 
 void addMutation(GA* ga, MutationFunction mutation, float rate){
@@ -94,8 +137,9 @@ void genetic(GA* ga){
 		//Get time
 		generationTime = getTimeElapsed(generationTimer);
 
+		wclear(gaOutputWindow);
 		//Print generation info
-		printf("Gen %lu   individuals %d/%d   child %d   mutations %d\n",
+		wprintw(gaOutputWindow, "Gen %lu   individuals %d/%d   child %d   mutations %d\n",
 				ga->generationCount,
 				ga->currentGeneration->count,
 				ga->currentGeneration->size,
@@ -104,14 +148,14 @@ void genetic(GA* ga){
 				);
 
 		//Print best
-		printf("Best energy %.2f   time %.2f/%.2f\n",
+		wprintw(gaOutputWindow, "Best energy %.2f   time %.2f/%.2f\n",
 				ga->currentGeneration->statistics.best.simulation.energy,
 				ga->currentGeneration->statistics.best.simulation.time,
 				(float)TRACK_END_POINT / MIN_AVG_SPEED
 				);
 
 		//Print stats
-		printf("Stat fmin %.2f   fmed %.2f   lavg %d   inv %.2f   sim %.2f   lch %lu\n",
+		wprintw(gaOutputWindow, "Stat fmin %.2f   fmed %.2f   lavg %d   inv %.2f   sim %.2f   lch %lu\n",
 				ga->currentGeneration->statistics.fitnessMin,
 				ga->currentGeneration->statistics.fitnessMedian,
 				(int)ga->currentGeneration->statistics.lengthAvg,
@@ -121,7 +165,7 @@ void genetic(GA* ga){
 				);
 
 		//Print time
-		printf("Time ft %0.3lf   st %0.3lf   ut %0.3lf   et %0.3lf   ct %0.3lf   mt %0.3lf\n",
+		wprintw(gaOutputWindow, "Time ft %0.3lf   st %0.3lf   ut %0.3lf   et %0.3lf   ct %0.3lf   mt %0.3lf\n",
 				fitnessTime,
 				sortTime,
 				statTime,
@@ -129,9 +173,9 @@ void genetic(GA* ga){
 				crossoverTime,
 				mutationTime
 				);
-		printf("Total time %lf\n", generationTime);
-		printf("==============================\n");
-
+		wprintw(gaOutputWindow, "Total time %lf\n", generationTime);
+		wprintw(gaOutputWindow, "==========================================================================================\n");
+		wrefresh(gaOutputWindow);
 
 	}
 
@@ -146,4 +190,32 @@ void disposeGA(GA* ga){
 	//Dispose generation
 	disposeGeneration(ga->currentGeneration);
 	disposeGeneration(ga->nextGeneration);
+}
+
+void printGAParams(GA* ga){
+	functionReg reg;
+	functionReg* regPtr = &reg;
+
+	wclear(gaParamWindow);
+	box(gaParamWindow,0,0);
+
+	int row = 0;
+	mvwprintw(gaParamWindow, row++, 1, "GA params");
+
+	findFunction(ga->fitnessFunction, &regPtr);
+	mvwprintw(gaParamWindow, row++, 1, "Fitness: %s", regPtr->name);
+
+	findFunction(ga->selectionFunction, &regPtr);
+	mvwprintw(gaParamWindow, row++, 1, "Selection: %s", regPtr->name);
+
+	findFunction(ga->crossoverFunction, &regPtr);
+	mvwprintw(gaParamWindow, row++, 1, "Crossover: %s", regPtr->name);
+
+	mvwprintw(gaParamWindow, row++, 1, "Mutations:");
+	for(int i = 0; i < ga->mutationCount; i++){
+		findFunction(ga->mutationsFunction[i], &regPtr);
+		mvwprintw(gaParamWindow, row++, 1, " - %-20s   %-10.2f", regPtr->name, ga->mutationRates[i]);
+	}
+
+	wrefresh(gaParamWindow);
 }

@@ -9,8 +9,6 @@
  */
 
 #include <math.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <time.h>
 #include <omp.h>
 
@@ -21,9 +19,8 @@
 //#define CHECK_GENERATIONS
 //#define CHECK_BEST
 #include "test.h"
+#include "window/console.h"
 
-
-void execCommands(GA* ga, int* loop);
 
 int main() {
 	//Loop flag
@@ -34,6 +31,10 @@ int main() {
 	FILE* statisticsFile = fopen(STATISTICS_FILE, "wt");
 	fprintf(statisticsFile, "generation, energyBest, fitnessBest, fitnessMin, fitnessMax, fitnessMedian, fitnessAvg, lenghtAvg, similarityAvg, %%invalid, lastChange\n");
 #endif
+
+	//Init windows
+	initWindows();
+	initConsole();
 
 	//Init random
 	randInit();
@@ -52,6 +53,7 @@ int main() {
 	addMutation(&ga, moveRandomChangePoint, 		CHANGE_POS_MUTATION_RATE);
 	addMutation(&ga, changeRandomChangePointAction, CHANGE_ACT_MUTATION_RATE);
 	addMutation(&ga, filterStrategy, 				FILTER_MUTATION_RATE);
+	printGAParams(&ga);
 
 	/*
 	generationFromFile(ga.currentGeneration, GENERATION_FILE);
@@ -61,19 +63,19 @@ int main() {
 	return 0;
 	*/
 
+
+	printSimulationParams();
 	//Loop
 	while(loop){
 		//Apply genetics
 		genetic(&ga);
-
-		//Check commands
-		execCommands(&ga, &loop);
 
 		//Save statistic
 		#ifdef SAVE_STATISTICS
 			statisticsToFile(ga.currentGeneration, ga.generationCount, statisticsFile);
 		#endif
 
+		updateConsole(&ga, &loop);
 	}
 
 	//Save strategy and generation
@@ -93,42 +95,11 @@ int main() {
 	fclose(statisticsFile);
 #endif
 
+	//Dispose windows
+	disposeConsole();
+	disposeWindows();
+
 	return 0;
 }
 
-
-void execCommands(GA* ga, int* loop){
-	if(kbhit()){
-		char key = getchar();
-
-		switch (key){
-
-			case 's':
-				//Save
-				printf("Saving...\n");
-				strategyToFile(&ga->currentGeneration->statistics.best, BEST_FILE);
-				generationToFile(ga->currentGeneration, GENERATION_FILE);
-				saveSimulationParams(SIMULATION_FILE);
-				break;
-
-			case 'e':
-				//End
-				(*loop) = 0;
-				printf("Stop\n");
-				break;
-
-			case 'p':
-				//Pause
-				printf("Press a key to resume...\n");
-				while (getchar() == '\n');
-				break;
-
-			case 'l':
-				//Load
-				printf("Loading generation from file...\n");
-				generationFromFile(ga->currentGeneration, GENERATION_FILE);
-				break;
-		}
-	}
-}
 

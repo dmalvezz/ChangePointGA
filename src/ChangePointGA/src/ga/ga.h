@@ -12,6 +12,7 @@
 #define GA_H_
 
 #include "generation.h"
+#include "../window/window.h"
 #include "../utils/sysutils.h"
 
 #define POPULATION_SIZE		200
@@ -23,7 +24,7 @@
 #define REMOVE_POINT_MUTATION_RATE 		0.15f
 #define CHANGE_POS_MUTATION_RATE 		0.15f
 #define CHANGE_ACT_MUTATION_RATE		0.15f
-#define FILTER_MUTATION_RATE			0.05f
+#define FILTER_MUTATION_RATE			0.0f
 
 #define INVALID_THRESHOLD 	0.40
 #define MAX_LAST_CHANGE		1000
@@ -66,5 +67,8 @@ extern void genetic(GA* ga);
 
 //Dispose GA struct
 extern void disposeGA(GA* ga);
+
+//Print GA params
+extern void printGAParams(GA* ga);
 
 #endif

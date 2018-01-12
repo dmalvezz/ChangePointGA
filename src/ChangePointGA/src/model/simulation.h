@@ -30,6 +30,7 @@
 
 #include <math.h>
 #include "../ga/changepoint.h"
+#include "../window/window.h"
 #include "../utils/mathutils.h"
 
 #define SPACE_STEP	1.0
@@ -167,6 +168,8 @@ extern void simulationToStrategy(Simulation_ptr simulation, FILE* file);
 //Export simulation params
 extern void saveSimulationParams(const char* fileName);
 
+//Print simulation params
+extern void printSimulationParams();
 
 
 #endif /* SIMULATION_H_ */

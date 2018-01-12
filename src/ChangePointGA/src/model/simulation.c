@@ -240,3 +240,19 @@ void saveSimulationParams(const char* fileName){
 	fclose(file);
 }
 
+void printSimulationParams(){
+	int row = 0;
+	wclear(simParamWindow);
+	box(simParamWindow,0,0);
+	mvwprintw(simParamWindow, row++, 1, "Simulation params");
+	mvwprintw(simParamWindow, row++, 1, "Motor: %s", MOTOR_NAME);
+	mvwprintw(simParamWindow, row++, 1, "Trasmission: %.2f", 1.0 / TransmissionRatio);
+	mvwprintw(simParamWindow, row++, 1, "Start vel: %.2f", START_VELOCITY);
+	mvwprintw(simParamWindow, row++, 1, "Start map: %d", START_MAP);
+	for(int i = 0; i < MAP_COUNT; i++){
+		mvwprintw(simParamWindow, row++, 1, "Map%d", i);
+		mvwprintw(simParamWindow, row++, 1, "   a0:%.2f  a1:%.2f  a2:%.2f", maps[i].a0, maps[i].a1, maps[i].a2);
+	}
+	wrefresh(simParamWindow);
+}
+

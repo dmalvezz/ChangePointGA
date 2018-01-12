@@ -17,7 +17,7 @@
 
 #define SECONDS 1000000000
 
-
+/*
 static int kbhit(void){
   struct termios oldt, newt;
   int ch;
@@ -42,6 +42,7 @@ static int kbhit(void){
 
   return 0;
 }
+*/
 
 static unsigned long long getTime(){
     struct timespec t;
