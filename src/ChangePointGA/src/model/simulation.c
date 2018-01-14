@@ -156,7 +156,7 @@ SimulationResult simulate(Simulation_ptr simulation, float startPosition, float 
 		}
 
 #ifndef KEEP_TIME_INVALID
-		if(simulation->time > TRACK_END_POINT / MIN_AVG_SPEED){
+		if(simulation->time > MAX_TIME){
 			simRes = SIM_TIME_MAX;
 		}
 #endif
@@ -241,18 +241,34 @@ void saveSimulationParams(const char* fileName){
 }
 
 void printSimulationParams(){
+	char simFlags[8];
+	int flagsCount = 0;
 	int row = 0;
 	wclear(simParamWindow);
 	box(simParamWindow,0,0);
-	mvwprintw(simParamWindow, row++, 1, "Simulation params");
-	mvwprintw(simParamWindow, row++, 1, "Motor: %s", MOTOR_NAME);
-	mvwprintw(simParamWindow, row++, 1, "Trasmission: %.2f", 1.0 / TransmissionRatio);
-	mvwprintw(simParamWindow, row++, 1, "Start vel: %.2f", START_VELOCITY);
-	mvwprintw(simParamWindow, row++, 1, "Start map: %d", START_MAP);
+
+#ifdef FAST_SIM
+	simFlags[flagsCount++] = 'F';
+#endif
+
+#ifdef KEEP_TIME_INVALID
+	simFlags[flagsCount++] = 'K';
+#endif
+
+	simFlags[flagsCount]= '\0';
+	mvwprintw(simParamWindow, row++, 1, "Simulation params(%s)", simFlags);
+	mvwprintw(simParamWindow, row++, 1, "Motor: %s   Transmission: %.2f", MOTOR_NAME, 1.0 / TransmissionRatio);
+	mvwprintw(simParamWindow, row++, 1, "Laps: %d           Start map: %d", LAP_COUNT, START_MAP);
+	mvwprintw(simParamWindow, row++, 1, "Start vel: %.2f   End vel: %.2f", START_VELOCITY, END_VELOCITY);
+
+	/*
 	for(int i = 0; i < MAP_COUNT; i++){
 		mvwprintw(simParamWindow, row++, 1, "Map%d", i);
 		mvwprintw(simParamWindow, row++, 1, "   a0:%.2f  a1:%.2f  a2:%.2f", maps[i].a0, maps[i].a1, maps[i].a2);
 	}
+	*/
+
+
 	wrefresh(simParamWindow);
 }
 

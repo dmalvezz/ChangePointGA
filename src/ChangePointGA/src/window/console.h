@@ -16,8 +16,6 @@
 #include "../ga/ga.h"
 #include "../utils/uthash/uthash.h"
 
-extern Command* commandList;
-
 //Init the console
 extern void initConsole();
 

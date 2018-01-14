@@ -12,6 +12,8 @@
 #include <time.h>
 #include <omp.h>
 
+//Use ncurses windows
+#define USE_WINDOWS
 
 #include "ga/ga.h"
 
@@ -32,9 +34,11 @@ int main() {
 	fprintf(statisticsFile, "generation, energyBest, fitnessBest, fitnessMin, fitnessMax, fitnessMedian, fitnessAvg, lenghtAvg, similarityAvg, %%invalid, lastChange\n");
 #endif
 
+#ifdef USE_WINDOWS
 	//Init windows
 	initWindows();
 	initConsole();
+#endif
 
 	//Init random
 	randInit();
@@ -53,8 +57,9 @@ int main() {
 	addMutation(&ga, moveRandomChangePoint, 		CHANGE_POS_MUTATION_RATE);
 	addMutation(&ga, changeRandomChangePointAction, CHANGE_ACT_MUTATION_RATE);
 	addMutation(&ga, filterStrategy, 				FILTER_MUTATION_RATE);
+#ifdef USE_WINDOWS
 	printGAParams(&ga);
-
+#endif
 	/*
 	generationFromFile(ga.currentGeneration, GENERATION_FILE);
 	filterStrategy(&ga.currentGeneration->individuals[0]);
@@ -75,7 +80,9 @@ int main() {
 			statisticsToFile(ga.currentGeneration, ga.generationCount, statisticsFile);
 		#endif
 
-		updateConsole(&ga, &loop);
+		#ifdef USE_WINDOWS
+			updateConsole(&ga, &loop);
+		#endif
 	}
 
 	//Save strategy and generation
@@ -95,9 +102,11 @@ int main() {
 	fclose(statisticsFile);
 #endif
 
+#ifdef USE_WINDOWS
 	//Dispose windows
 	disposeConsole();
 	disposeWindows();
+#endif
 
 	return 0;
 }

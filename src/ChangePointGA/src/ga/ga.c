@@ -133,6 +133,7 @@ void genetic(GA* ga){
 		//Get time
 		generationTime = getTimeElapsed(generationTimer);
 
+//#ifdef USE_WINDOWS
 		int row = 0;
 		wclear(gaOutputWindow);
 		box(gaOutputWindow,0,0);
@@ -147,10 +148,11 @@ void genetic(GA* ga){
 				);
 
 		//Print best
-		mvwprintw(gaOutputWindow, row++, 1, "Best energy %.2f   time %.2f/%.2f",
+		mvwprintw(gaOutputWindow, row++, 1, "Best fitness %.2f   energy %.2f   time %.2f/%.2f",
+				ga->currentGeneration->statistics.best.fitness,
 				ga->currentGeneration->statistics.best.simulation.energy,
 				ga->currentGeneration->statistics.best.simulation.time,
-				(float)TRACK_END_POINT / MIN_AVG_SPEED
+				MAX_TIME
 				);
 
 		//Print stats
@@ -174,6 +176,7 @@ void genetic(GA* ga){
 				);
 		mvwprintw(gaOutputWindow, row++, 1, "Total time %lf", generationTime);
 		wrefresh(gaOutputWindow);
+//#endif
 
 	}
 
@@ -214,7 +217,7 @@ void printGAParams(GA* ga){
 	mvwprintw(gaParamWindow, row++, 1, "Mutations:");
 	for(int i = 0; i < ga->mutationCount; i++){
 		findFunction(ga->mutationsFunction[i], &regPtr);
-		mvwprintw(gaParamWindow, row++, 1, " - %-20s   %-10.2f", regPtr->name, ga->mutationRates[i]);
+		mvwprintw(gaParamWindow, row++, 1, " %d) %-20s   %-10.2f", i, regPtr->name, ga->mutationRates[i]);
 	}
 
 	wrefresh(gaParamWindow);

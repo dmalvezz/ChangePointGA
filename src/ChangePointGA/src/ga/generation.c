@@ -154,7 +154,7 @@ void updateGenerationStatistics(Generation_ptr generation){
 
 	//Save best
 	if(generation->individuals[0].simulation.result == SIM_OK &&
-			generation->individuals[0].simulation.energy < generation->statistics.best.simulation.energy){
+			generation->individuals[0].fitness < generation->statistics.best.fitness){
 		memcpy(&generation->statistics.best, &generation->individuals[0], sizeof(Strategy));
 
 		generation->statistics.lastChange = 0;

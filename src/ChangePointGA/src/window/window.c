@@ -7,7 +7,7 @@
 
 #include "window.h"
 
-WINDOW *gaOutputWindow = NULL, *gaParamWindow = NULL, *simParamWindow = NULL, *commandWindow = NULL;
+WINDOW *gaOutputWindow = NULL, *gaParamWindow = NULL, *simParamWindow = NULL, *commandWindow = NULL, *explorerWindow = NULL;
 
 void initWindows(){
 	//ncurses init
@@ -19,14 +19,22 @@ void initWindows(){
 	keypad(stdscr, TRUE);
 	curs_set(0);
 
-	gaOutputWindow = newwin(8, COLS, 0, 0);
-	gaParamWindow = newwin(LINES - 9, COLS / 2, 8, 0);
-	simParamWindow = newwin(LINES - 9, COLS / 2, 8, COLS / 2);
+	gaOutputWindow = newwin(7, COLS, 0, 0);
+	gaParamWindow = newwin(11, COLS / 2, 7, 0);
+	simParamWindow = newwin(5, COLS / 2, LINES-6, 0);
+	explorerWindow = newwin(16, COLS / 2, 7, COLS / 2);
 	commandWindow = newwin(1, COLS, LINES - 1, 0);
 	refresh();
 
+	box(gaOutputWindow, 0, 0);
+	box(gaParamWindow, 0, 0);
+	box(simParamWindow, 0, 0);
+	box(explorerWindow, 0, 0);
+
+	wrefresh(gaOutputWindow);
 	wrefresh(gaParamWindow);
 	wrefresh(simParamWindow);
+	wrefresh(explorerWindow);
 }
 
 void disposeWindows(){

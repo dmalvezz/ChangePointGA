@@ -83,6 +83,63 @@ int setMutationRate(GA* ga, char** argv, int argc){
 	return 0;
 }
 
+int setFitnessFunction(GA* ga, char** argv, int argc){
+
+	return 0;
+}
+
+int setSelectionFunction(GA* ga, char** argv, int argc){
+
+	return 0;
+}
+
+int applyFilterToStrategy(GA* ga, char** argv, int argc){
+	//Default params
+	int simIndex = -1;
+
+	//Parsing
+	int c;
+	char* end;
+
+	while ((c = getopt(argc, argv, "i:")) != -1){
+		switch (c) {
+			case 'i':
+				simIndex = strtol(optarg, &end, 10);
+
+				if(simIndex < 0 || simIndex > ga->currentGeneration->count - 1){
+					sprintf(errorBuffer, "Invalid index %d", simIndex);
+					return 1;
+				}
+
+				break;
+
+			default:
+				if (optopt == 'i'){
+					sprintf(errorBuffer, "Option -%c requires an argument", optopt);
+				}
+				else if (isprint(optopt)){
+					sprintf(errorBuffer, "Unknown option `-%c'", optopt);
+				}
+				else{
+					sprintf(errorBuffer, "Unknown option character `\\x%x'", optopt);
+				}
+
+				return 1;
+		}
+	}
+
+	if(argc < 1 || simIndex == -1){
+		sprintf(errorBuffer, "Missing parameters");
+		return 1;
+	}
+	else{
+		filterStrategy(&ga->currentGeneration->individuals[simIndex]);
+		evalGenerationFitness(ga->currentGeneration, START_VELOCITY, START_MAP, ga->fitnessFunction);
+		printExplorerWindow(ga, simIndex);
+	}
+	return 0;
+}
+
 
 int plotSimulation(GA* ga, char** argv, int argc){
 	//Default params
@@ -136,4 +193,22 @@ int plotSimulation(GA* ga, char** argv, int argc){
 
 	}
 	return 0;
+}
+
+
+void printExplorerWindow(GA* ga, int index){
+	int row = 0;
+	wclear(explorerWindow);
+	box(explorerWindow, 0, 0);
+
+	mvwprintw(explorerWindow, row++, 1, "Strategy %d", index);
+	mvwprintw(explorerWindow, row++, 1, "Energy %.2f", ga->currentGeneration->individuals[index].simulation.energy);
+	mvwprintw(explorerWindow, row++, 1, "Time %.2f", ga->currentGeneration->individuals[index].simulation.time);
+	mvwprintw(explorerWindow, row++, 1, "Fitness %.2f", ga->currentGeneration->individuals[index].fitness);
+	mvwprintw(explorerWindow, row++, 1, "Length %d", ga->currentGeneration->individuals[index].size);
+	mvwprintw(explorerWindow, row++, 1, "Similarity %0.2f",ga->currentGeneration->individuals[index].similarity);
+	mvwprintw(explorerWindow, row++, 1, "Valid %d", ga->currentGeneration->individuals[index].simulation.result);
+	mvwprintw(explorerWindow, row++, 1, "End vel %.2f", ga->currentGeneration->individuals[index].simulation.velocity);
+
+	wrefresh(explorerWindow);
 }

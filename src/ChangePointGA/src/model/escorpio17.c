@@ -138,6 +138,7 @@ float getForceAero(float Speed, float TrackRadiusInv){
 float getForceTyres(float Speed, float TrackRadiusInv){
 	float TractiveForce;
 
+#ifndef FAST_SIM
 	// Nessuna differenza sul verso della sterzata
 	float TrackRadiusInvSign = (TrackRadiusInv>0) ? 1.0 : -1.0;
 	TrackRadiusInv = fabs(TrackRadiusInv);
@@ -290,7 +291,19 @@ float getForceTyres(float Speed, float TrackRadiusInv){
 	//if (FrontWheelMaxSlip<Slipi) FrontWheelMaxSlip = Slipi;
 	//if (FrontWheelMaxSlip<Slipo) FrontWheelMaxSlip = Slipo;
 	 */
+#else
+	// Approssimazione veloce del modello triciclo
+	// drag = a + b * (radinv(m))^3/2 * (speed(km/h)+5)^4
+	float temp = Speed*3.6 + 5;
 
+	//TractiveForce = 2.368 + 0.0005064 * pow((TrackRadiusInv), 1.5F) *temp*temp*temp*temp;// pow(Speed*3.6+5, 4);
+	//TractiveForce = 1973*TyresCr + 0.0005064 * pow((TrackRadiusInv), 1.5F) *temp*temp*temp*temp;// pow(Speed*3.6+5, 4);
+	//Dopo correzione 2016:
+	float Cr = TyresCr * (-0.0156*pow(TyrePressure, 3) + 0.289*pow(TyrePressure, 2) - 1.803*TyrePressure + 4.587);
+	TractiveForce = 0.5342 / 0.0008*Cr + 0.0004782 / 0.0008*Cr * pow((TrackRadiusInv), 1.5F)*TyresCorneringCorrFactor*temp*temp*temp*temp;// pow(Speed*3.6+5, 4);
+	// Scale to mass:
+	TractiveForce = TractiveForce / 98.0*VehicleMass;
+#endif
 	// Aero Drag on tyres    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	//TractiveForceb += (0.0153*Speed*Speed - 0.0124*Speed)*0.5;
 	TractiveForce += (0.00765*Speed*Speed - 0.0062*Speed);

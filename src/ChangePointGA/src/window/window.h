@@ -17,7 +17,7 @@
 
 #include "../utils/mathutils.h"
 
-extern WINDOW *gaOutputWindow, *gaParamWindow, *simParamWindow, *commandWindow;
+extern WINDOW *gaOutputWindow, *gaParamWindow, *simParamWindow, *commandWindow, *explorerWindow;
 
 //Init ncurses session
 extern void initWindows();

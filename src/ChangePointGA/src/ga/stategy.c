@@ -156,7 +156,7 @@ void simulateStrategy(Strategy_ptr strategy, float startVelocity, int startMap){
 		//Check if last velocity is >= than the start velocity
 		//Just for general lap
 		if(strategy->simulation.result == SIM_OK
-				&& strategy->simulation.velocity < START_VELOCITY){
+				&& strategy->simulation.velocity < END_VELOCITY){
 			strategy->simulation.time = INFINITY;
 			strategy->simulation.energy = INFINITY;
 			strategy->simulation.result = SIM_END_VEL;

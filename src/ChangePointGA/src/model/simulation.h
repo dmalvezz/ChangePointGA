@@ -17,6 +17,9 @@
 //Motor comparative energy consumption
 //#define POWERTRAIN_FLAT
 
+//Fast simulation
+//#define FAST_SIM
+
 //Motors list
 //#define RE40_24V
 //#define RE40_48V
@@ -34,7 +37,7 @@
 #include "../utils/mathutils.h"
 
 #define SPACE_STEP	1.0
-#define LAP_COUNT	2
+#define LAP_COUNT	1
 #define TRACK_START_POINT	0
 #define TRACK_END_POINT		(TRACK_LENGTH * LAP_COUNT)
 #define SIM_STEP_COUNT	(TRACK_END_POINT / (int)SPACE_STEP)
@@ -48,7 +51,10 @@
 	#define MIN_AVG_SPEED 7.0
 #endif
 
+#define MAX_TIME	((float)TRACK_END_POINT / MIN_AVG_SPEED)
+
 #define START_VELOCITY	7.0
+#define END_VELOCITY	6.0
 #define START_MAP		0
 #define MAP_COUNT		4
 

@@ -15,7 +15,8 @@
 #include "../model/simulation.h"
 #include "../utils/mathutils.h"
 
-Command* commandList = NULL;
+static int stratIndex = 0;
+static Command* commandList = NULL;
 
 void initConsole(){
 	//Create argv bufer
@@ -25,6 +26,7 @@ void initConsole(){
 
 	//Register all commands
 	registerCommand("setmutrate", setMutationRate);
+	registerCommand("filter", applyFilterToStrategy);
 	registerCommand("plotsim", plotSimulation);
 
 }
@@ -41,11 +43,19 @@ void updateConsole(GA* ga, int* loop){
 	int cmdMode = 1;
 	int cmdBufferSize = 0;
 	char cmdBuffer[COLS];
+	char prevCmd[COLS];
 
+	//Empty buffer
+	cmdBuffer[0] = '\0';
+	prevCmd[0] = '\0';
 
 	switch (key){
 		case 'c':
 			//Command mode
+
+			//Print explorer
+			printExplorerWindow(ga, stratIndex);
+
 			//Prepare console
 			wclear(commandWindow);
 			curs_set(1);
@@ -71,9 +81,29 @@ void updateConsole(GA* ga, int* loop){
 
 						//Parse cmd
 						case '\n':
+							//Save current cmd
+							strncpy(prevCmd, cmdBuffer, cmdBufferSize);
+							prevCmd[cmdBufferSize] = '\0';
+							//Parse
 							parseCommand(ga, cmdBuffer, cmdBufferSize);
+							//Reset buffer
 							cmdBufferSize = 0;
 							cmdBuffer[cmdBufferSize] = '\0';
+							break;
+
+						case KEY_UP:
+							strcpy(cmdBuffer, prevCmd);
+							cmdBufferSize = strlen(prevCmd);
+							break;
+
+						case KEY_NPAGE:
+							stratIndex = max(0, stratIndex - 1);
+							printExplorerWindow(ga, stratIndex);
+							break;
+
+						case KEY_PPAGE:
+							stratIndex = min(stratIndex + 1, ga->currentGeneration->count - 1);
+							printExplorerWindow(ga, stratIndex);
 							break;
 
 						//Read cmd char
@@ -118,7 +148,7 @@ void updateConsole(GA* ga, int* loop){
 		case 'p':
 			//Pause
 			wclear(commandWindow);
-			wprintw(commandWindow, "Press a key to resume...");
+			wprintw(commandWindow, "Press a key to resume or Explore(a d)...");
 			wrefresh(commandWindow);
 
 			while (getch() == ERR);
@@ -136,6 +166,7 @@ void updateConsole(GA* ga, int* loop){
 
 			printConsoleMenu();
 			break;
+
 
 	}
 }
