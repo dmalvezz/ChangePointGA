@@ -101,9 +101,9 @@ void evalGenerationFitness(Generation_ptr generation, float startVelocity, int s
 	#pragma omp parallel
 	{
 		#pragma omp for
-		for(int i = 0; i < generation->size; i++){
+		for(int i = 0; i < generation->count; i++){
 			//Simulate the strategy
-			simulateStrategy(&generation->individuals[i], startVelocity, startMap);
+			simulateStrategy(&generation->individuals[i], startVelocity, startMap, KEEP_TIME_INVALID);
 
 			//Similarity factor with previous best
 			generation->individuals[i].similarity = evalStrategySimilarity(&generation->individuals[i], &generation->statistics.best);

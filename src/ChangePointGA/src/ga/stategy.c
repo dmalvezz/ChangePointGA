@@ -35,32 +35,46 @@ void printStrategy(Strategy_ptr strategy){
 	printf("\n");
 }
 
-void strategyToFile(Strategy_ptr strategy, const char* fileName){
-	FILE* file = fopen(fileName, "wt");
+void strategyToFile(Strategy_ptr strategy, const char* stratName){
+	char fileName[32];
+	FILE* file;
 
-	simulationToCsv(&strategy->simulation, file);
+	struct stat st = {0};
 
-	fprintf(file, "\n\n");
-	fprintf(file, "Size: %d\n", strategy->size);
-	fprintf(file, "CP: \n");
-
-	for(int i = 0; i < strategy->size; i++){
-		fprintf(file, "%d, %d", strategy->points[i].positionIndex, strategy->points[i].action);
-		fprintf(file, "\n");
+	if (stat(stratName, &st) == -1) {
+	    mkdir(stratName, 0700);
 	}
 
+	//Save simulation
+	strcpy(fileName, stratName);
+	strcat(fileName, "/simulation.csv");
+	file = fopen(fileName, "wt");
+	simulationToCsv(&strategy->simulation, file);
+	fclose(file);
+
+	//Save strategy
+	strcpy(fileName, stratName);
+	strcat(fileName, "/strategy.csv");
+	file = fopen(fileName, "wt");
+	fprintf(file, "%d\n", strategy->size);
+	for(int i = 0; i < strategy->size; i++){
+		fprintf(file, "%d,%d\n", strategy->points[i].positionIndex, strategy->points[i].action);
+	}
 	fclose(file);
 
 	//Bin file
-	FILE* bestStrategyFile = fopen("str.bin", "wb");
-	fwrite(strategy, sizeof(Strategy), 1, bestStrategyFile);
-	fclose(bestStrategyFile);
-
-	//Strat file
-	file = fopen("strat.txt", "wt");
-	simulationToStrategy(&strategy->simulation, file);
+	strcpy(fileName, stratName);
+	strcat(fileName, "/str.bin");
+	file = fopen(fileName, "wt");
+	fwrite(strategy, sizeof(Strategy), 1, file);
 	fclose(file);
 
+	//Strat file
+	strcpy(fileName, stratName);
+	strcat(fileName, "/strat.txt");
+	file = fopen(fileName, "wt");
+	simulationToStrategy(&strategy->simulation, file);
+	fclose(file);
 }
 
 
@@ -117,7 +131,7 @@ void removeChangePoint(Strategy_ptr strategy, int index){
 	strategy->size--;
 }
 
-void simulateStrategy(Strategy_ptr strategy, float startVelocity, int startMap){
+void simulateStrategy(Strategy_ptr strategy, float startVelocity, int startMap, int keepTimeInvalid){
 	int i = 0;
 
 	//Init simulation
@@ -127,7 +141,8 @@ void simulateStrategy(Strategy_ptr strategy, float startVelocity, int startMap){
 	strategy->simulation.result = simulate(&strategy->simulation,
 			0,
 			strategy->points[0].positionIndex * SPACE_STEP,
-			ACTION_NONE
+			ACTION_NONE,
+			keepTimeInvalid
 			);
 
 	//Simulate all change point
@@ -135,7 +150,8 @@ void simulateStrategy(Strategy_ptr strategy, float startVelocity, int startMap){
 		strategy->simulation.result = simulate(&strategy->simulation,
 				strategy->points[i].positionIndex * SPACE_STEP,
 				strategy->points[i + 1].positionIndex * SPACE_STEP,
-				strategy->points[i].action
+				strategy->points[i].action,
+				keepTimeInvalid
 				);
 		i++;
 	}
@@ -145,7 +161,8 @@ void simulateStrategy(Strategy_ptr strategy, float startVelocity, int startMap){
 		strategy->simulation.result = simulate(&strategy->simulation,
 				strategy->points[strategy->size - 1].positionIndex * SPACE_STEP,
 				TRACK_END_POINT,
-				strategy->points[strategy->size - 1].action
+				strategy->points[strategy->size - 1].action,
+				keepTimeInvalid
 				);
 
 		//Get double energy penalty if started lap with gas on and ended lap with gas on

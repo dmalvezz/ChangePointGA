@@ -13,6 +13,9 @@
 
 
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include "changepoint.h"
 #include "../model/simulation.h"
@@ -20,7 +23,7 @@
 #include "../utils/mathutils.h"
 
 #define MIN_CHANGE_POINT 	3
-#define MAX_CHANGE_POINT 	200
+#define MAX_CHANGE_POINT 	120
 
 
 typedef struct Strategy{
@@ -58,7 +61,7 @@ extern void addChangePoint(Strategy_ptr strategy, int position);
 extern void removeChangePoint(Strategy_ptr strategy, int index);
 
 //Run simulation
-extern void simulateStrategy(Strategy_ptr strategy, float startVelocity, int startMap);
+extern void simulateStrategy(Strategy_ptr strategy, float startVelocity, int startMap, int keepTimeInvalid);
 
 //Eval similarity factor
 extern float evalStrategySimilarity(Strategy_ptr str1, Strategy_ptr str2);

@@ -21,7 +21,7 @@ static void testTrackData(){
 		initStrategy(&str, SPACE_STEP);
 
 		timer = getTime();
-		simulateStrategy(&str, START_VELOCITY, START_MAP);
+		simulateStrategy(&str, START_VELOCITY, START_MAP, KEEP_TIME_INVALID);
 		simTime = getTimeElapsed(timer);
 
 		if(str.simulation.result != SIM_OK){
@@ -82,7 +82,7 @@ static void testStrategy(){
 
 	printf("energy %f \n", str.simulation.energy);
 
-	simulateStrategy(&str, START_VELOCITY, START_MAP);
+	simulateStrategy(&str, START_VELOCITY, START_MAP, KEEP_TIME_INVALID);
 
 	printf("sim res %d \n", str.simulation.result);
 	printf("energy %f \n", str.simulation.energy);

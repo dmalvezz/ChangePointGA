@@ -23,10 +23,10 @@
 //Motors list
 //#define RE40_24V
 //#define RE40_48V
-//#define RE50_24V
-#define RE50_36V
+#define RE50_24V
+//#define RE50_36V
 
-//#define KEEP_TIME_INVALID
+#define KEEP_TIME_INVALID	0
 
 #include "escorpio17.h"
 #include "londontrack18.h"
@@ -54,7 +54,7 @@
 #define MAX_TIME	((float)TRACK_END_POINT / MIN_AVG_SPEED)
 
 #define START_VELOCITY	7.0
-#define END_VELOCITY	6.0
+#define END_VELOCITY	7.0
 #define START_MAP		0
 #define MAP_COUNT		4
 
@@ -133,7 +133,7 @@ extern void initSimulation(Simulation_ptr simulation, float startVelocity, int s
 extern void initMapset();
 
 //Simulate
-SimulationResult simulate(Simulation_ptr simulation, float startPosition, float endPosition, Action action);
+extern SimulationResult simulate(Simulation_ptr simulation, float startPosition, float endPosition, Action action, int keepTimeInvalid);
 
 //Print simulation
 extern void printSimulation(Simulation_ptr simulation);

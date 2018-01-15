@@ -23,11 +23,16 @@ void initSimulation(Simulation_ptr simulation, float startVelocity, int startMap
 
 void initMapset(){
 #ifdef RE50_24V
+	initMap(&maps[0], -100000, 1000.0, 0.0);
+	initMap(&maps[1], -9800, 100.0, 0.0);
+	initMap(&maps[2], -5600.0, 40.0, 0.0);
+	initMap(&maps[3], -4800.0, 45.0, 0.0);
+	/*
 	initMap(&maps[0], -4800.0, 100.0, 0.0);
 	initMap(&maps[1], -9000.0, 100.0, 0.0);
 	initMap(&maps[2], -14000.0, 100.0, 0.0);
 	initMap(&maps[3], -4800.0, 45.0, 0.0);
-
+	*/
 	/*
 	initMap(&maps[0], -4800.0, 45.0, 0.0);
 	initMap(&maps[1], -4800.0, 40.0, 0.0);
@@ -44,10 +49,10 @@ void initMapset(){
 #endif
 
 #ifdef RE50_36V
-	initMap(&maps[0], -100000, 1000.0, 0.0);
-	initMap(&maps[1], -9800, 100.0, 0.0);
-	initMap(&maps[2], -5600.0, 40.0, 0.0);
-	initMap(&maps[3], -4800.0, 45.0, 0.0);
+	initMap(&maps[0], -4800.0, 100.0, 0.0);
+	initMap(&maps[1], -9000.0, 100.0, 0.0);
+	initMap(&maps[2], -4800.0, 45.0, 0.0);
+	initMap(&maps[3], -14000.0, 100.0, 0.0);
 #endif
 
 #ifdef RE40_48V
@@ -66,7 +71,7 @@ void initMapset(){
 
 }
 
-SimulationResult simulate(Simulation_ptr simulation, float startPosition, float endPosition, Action action){
+SimulationResult simulate(Simulation_ptr simulation, float startPosition, float endPosition, Action action, int keepTimeInvalid){
 
 	if(action == ACTION_PLUS){
 		simulation->selectedMap++;
@@ -155,11 +160,11 @@ SimulationResult simulate(Simulation_ptr simulation, float startPosition, float 
 			simRes = SIM_VEL_NEG;
 		}
 
-#ifndef KEEP_TIME_INVALID
-		if(simulation->time > MAX_TIME){
+//#ifndef KEEP_TIME_INVALID
+		if(simulation->time > MAX_TIME && keepTimeInvalid == 0){
 			simRes = SIM_TIME_MAX;
 		}
-#endif
+//#endif
 
 		if(simRes != SIM_OK){
 			simulation->time = INFINITY;
@@ -232,6 +237,8 @@ void saveSimulationParams(const char* fileName){
 	fprintf(file, "Motor: %s\n", MOTOR_NAME);
 	fprintf(file, "Trasmission: %f\n", 1.0 / TransmissionRatio);
 	fprintf(file, "Start vel: %f\n", START_VELOCITY);
+	fprintf(file, "End vel: %f\n", END_VELOCITY);
+	fprintf(file, "Laps: %d\n", LAP_COUNT);
 	fprintf(file, "Start map: %d\n", START_MAP);
 	for(int i = 0; i < MAP_COUNT; i++){
 		fprintf(file, "Map%d   a0: %f   a1: %f   a2: %f\n", i, maps[i].a0, maps[i].a1, maps[i].a2);
@@ -251,9 +258,9 @@ void printSimulationParams(){
 	simFlags[flagsCount++] = 'F';
 #endif
 
-#ifdef KEEP_TIME_INVALID
-	simFlags[flagsCount++] = 'K';
-#endif
+	if(KEEP_TIME_INVALID == 1){
+		simFlags[flagsCount++] = 'K';
+	}
 
 	simFlags[flagsCount]= '\0';
 	mvwprintw(simParamWindow, row++, 1, "Simulation params(%s)", simFlags);

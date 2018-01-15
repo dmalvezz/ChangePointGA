@@ -19,16 +19,15 @@ static int stratIndex = 0;
 static Command* commandList = NULL;
 
 void initConsole(){
-	//Create argv bufer
+	//Create argv buffer
 	initArgv();
 	//Print console menu
 	printConsoleMenu();
 
 	//Register all commands
-	registerCommand("setmutrate", setMutationRate);
 	registerCommand("filter", applyFilterToStrategy);
 	registerCommand("plotsim", plotSimulation);
-
+	registerCommand("setmutrate", setMutationRate);
 }
 
 void printConsoleMenu(){
@@ -136,6 +135,7 @@ void updateConsole(GA* ga, int* loop){
 			strategyToFile(&ga->currentGeneration->statistics.best, BEST_FILE);
 			generationToFile(ga->currentGeneration, GENERATION_FILE);
 			saveSimulationParams(SIMULATION_FILE);
+			saveGAParams(ga, GA_FILE);
 
 			printConsoleMenu();
 			break;

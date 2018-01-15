@@ -110,7 +110,6 @@ int applyFilterToStrategy(GA* ga, char** argv, int argc){
 					sprintf(errorBuffer, "Invalid index %d", simIndex);
 					return 1;
 				}
-
 				break;
 
 			default:
@@ -134,7 +133,11 @@ int applyFilterToStrategy(GA* ga, char** argv, int argc){
 	}
 	else{
 		filterStrategy(&ga->currentGeneration->individuals[simIndex]);
-		evalGenerationFitness(ga->currentGeneration, START_VELOCITY, START_MAP, ga->fitnessFunction);
+
+		simulateStrategy(&ga->currentGeneration->individuals[simIndex], START_VELOCITY, START_MAP, 1);
+		ga->currentGeneration->individuals[simIndex].similarity = evalStrategySimilarity(&ga->currentGeneration->individuals[simIndex], &ga->currentGeneration->statistics.best);
+		ga->currentGeneration->individuals[simIndex].fitness = ga->fitnessFunction(ga->currentGeneration, &ga->currentGeneration->individuals[simIndex]);
+
 		printExplorerWindow(ga, simIndex);
 	}
 	return 0;

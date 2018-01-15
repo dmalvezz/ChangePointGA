@@ -31,9 +31,10 @@
 
 //Save define
 #define SAVE_STATISTICS
-#define BEST_FILE			"best.csv"
+#define BEST_FILE			"best"
 #define GENERATION_FILE		"generation.bin"
 #define SIMULATION_FILE		"simparam.txt"
+#define GA_FILE				"gaparam.txt"
 #define STATISTICS_FILE		"statistics.csv"
 
 typedef struct GA{
@@ -70,5 +71,9 @@ extern void disposeGA(GA* ga);
 
 //Print GA params
 extern void printGAParams(GA* ga);
+
+//Save GA params on file
+extern void saveGAParams(GA* ga, const char* fileName);
+
 
 #endif
