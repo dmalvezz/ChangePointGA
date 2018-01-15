@@ -75,5 +75,4 @@ extern void printGAParams(GA* ga);
 //Save GA params on file
 extern void saveGAParams(GA* ga, const char* fileName);
 
-
 #endif

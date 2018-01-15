@@ -47,6 +47,9 @@ extern void printStrategy(Strategy_ptr strategy);
 //Save strategy to csv, bin and strat file
 extern void strategyToFile(Strategy_ptr strategy, const char* fileName);
 
+//Load strategy from csv
+extern void strategyFromCsv(Strategy_ptr strategy, const char* fileName);
+
 //Compare function used by sort
 extern int compareStrategyFitness(const void* elem1, const void* elem2);
 

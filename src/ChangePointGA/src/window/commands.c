@@ -199,6 +199,73 @@ int plotSimulation(GA* ga, char** argv, int argc){
 }
 
 
+int loadStrategyFromCsv(GA* ga, char** argv, int argc){
+	//Default params
+	char fileName[32];
+	int simIndex = -1;
+
+	fileName[0] = '\0';
+
+	//Parsing
+	int c;
+	char* end;
+
+	while ((c = getopt(argc, argv, "i:f:")) != -1){
+		switch (c) {
+			case 'i':
+				simIndex = strtol(optarg, &end, 10);
+
+				if(simIndex < 0 || simIndex > ga->currentGeneration->count - 1){
+					sprintf(errorBuffer, "Invalid index %d", simIndex);
+					return 1;
+				}
+
+				break;
+
+			case 'f':
+				strcpy(fileName, optarg);
+				strcat(fileName, ".csv");
+
+				if(access(fileName, F_OK) != -1 ) {
+				    // file exists
+				} else {
+					sprintf(errorBuffer, "File %s not found", fileName);
+					return 1;
+				}
+
+				break;
+
+			default:
+				if (optopt == 'i'){
+					sprintf(errorBuffer, "Option -%c requires an argument", optopt);
+				}
+				else if (isprint(optopt)){
+					sprintf(errorBuffer, "Unknown option `-%c'", optopt);
+				}
+				else{
+					sprintf(errorBuffer, "Unknown option character `\\x%x'", optopt);
+				}
+
+				return 1;
+		}
+	}
+
+	if(argc < 1 || simIndex == -1 || strlen(fileName) == 0){
+		sprintf(errorBuffer, "Missing parameters");
+		return 1;
+	}
+	else{
+		strategyFromCsv(&ga->currentGeneration->individuals[simIndex], fileName);
+
+		simulateStrategy(&ga->currentGeneration->individuals[simIndex], START_VELOCITY, START_MAP, 1);
+		ga->currentGeneration->individuals[simIndex].similarity = evalStrategySimilarity(&ga->currentGeneration->individuals[simIndex], &ga->currentGeneration->statistics.best);
+		ga->currentGeneration->individuals[simIndex].fitness = ga->fitnessFunction(ga->currentGeneration, &ga->currentGeneration->individuals[simIndex]);
+
+		printExplorerWindow(ga, simIndex);
+	}
+	return 0;
+}
+
 void printExplorerWindow(GA* ga, int index){
 	int row = 0;
 	wclear(explorerWindow);

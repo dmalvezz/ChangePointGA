@@ -23,8 +23,8 @@
 //Motors list
 //#define RE40_24V
 //#define RE40_48V
-#define RE50_24V
-//#define RE50_36V
+//#define RE50_24V
+#define RE50_36V
 
 #define KEEP_TIME_INVALID	0
 

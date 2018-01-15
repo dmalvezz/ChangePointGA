@@ -51,7 +51,11 @@ extern int applyFilterToStrategy(GA* ga, char** argv, int argc);
 extern int plotSimulation(GA* ga, char** argv, int argc);
 
 //Plot statistics
-extern int plosStatistic(GA* ga, char** argv, int argc);
+extern int plotStatistic(GA* ga, char** argv, int argc);
+
+//Load strategy to csv
+extern int loadStrategyFromCsv(GA* ga, char** argv, int argc);
 
 //Print explorer
 extern void printExplorerWindow(GA* ga, int index);
+

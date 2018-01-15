@@ -77,6 +77,27 @@ void strategyToFile(Strategy_ptr strategy, const char* stratName){
 	fclose(file);
 }
 
+void strategyFromCsv(Strategy_ptr strategy, const char* fileName){
+	FILE* file = fopen(fileName, "rt");
+
+	char newLine, comma;
+	fscanf(file, "%d%c", &strategy->size, &newLine);
+	for(int i = 0; i < strategy->size; i++){
+		fscanf(file,"%d%c%d%c", &strategy->points[i].positionIndex, &comma, &strategy->points[i].action, &newLine);
+	}
+	fclose(file);
+
+	/*
+	wclear(explorerWindow);
+	wmove(explorerWindow,0,0);
+	wprintw(explorerWindow, "%d\n", strategy->size);
+	for(int i = 0; i < strategy->size; i++){
+		wprintw(explorerWindow,"%d %d \n", strategy->points[i].positionIndex, strategy->points[i].action);
+	}
+
+	wrefresh(explorerWindow);
+	*/
+}
 
 
 int compareStrategyFitness(const void* elem1, const void* elem2) {

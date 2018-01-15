@@ -26,6 +26,7 @@ void initConsole(){
 
 	//Register all commands
 	registerCommand("filter", applyFilterToStrategy);
+	registerCommand("loadstrat", loadStrategyFromCsv);
 	registerCommand("plotsim", plotSimulation);
 	registerCommand("setmutrate", setMutationRate);
 }
@@ -148,7 +149,7 @@ void updateConsole(GA* ga, int* loop){
 		case 'p':
 			//Pause
 			wclear(commandWindow);
-			wprintw(commandWindow, "Press a key to resume or Explore(a d)...");
+			wprintw(commandWindow, "Press a key to resume...");
 			wrefresh(commandWindow);
 
 			while (getch() == ERR);

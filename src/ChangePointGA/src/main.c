@@ -23,17 +23,17 @@ int main() {
 	//Loop flag
 	int loop = 1;
 
-#ifdef SAVE_STATISTICS
-	//Create statistics file
-	FILE* statisticsFile = fopen(STATISTICS_FILE, "wt");
-	fprintf(statisticsFile, "generation, energyBest, fitnessBest, fitnessMin, fitnessMax, fitnessMedian, fitnessAvg, lenghtAvg, similarityAvg, %%invalid, lastChange\n");
-#endif
+	#ifdef SAVE_STATISTICS
+		//Create statistics file
+		FILE* statisticsFile = fopen(STATISTICS_FILE, "wt");
+		fprintf(statisticsFile, "generation, energyBest, fitnessBest, fitnessMin, fitnessMax, fitnessMedian, fitnessAvg, lenghtAvg, similarityAvg, %%invalid, lastChange\n");
+	#endif
 
-#ifdef USE_WINDOWS
-	//Init windows
-	initWindows();
-	initConsole();
-#endif
+	#ifdef USE_WINDOWS
+		//Init windows
+		initWindows();
+		initConsole();
+	#endif
 
 	//Init random
 	randInit();
@@ -53,10 +53,10 @@ int main() {
 	addMutation(&ga, changeRandomChangePointAction, CHANGE_ACT_MUTATION_RATE);
 	addMutation(&ga, filterStrategy, 				FILTER_MUTATION_RATE);
 
-#ifdef USE_WINDOWS
-	printGAParams(&ga);
-	printSimulationParams();
-#endif
+	#ifdef USE_WINDOWS
+		printGAParams(&ga);
+		printSimulationParams();
+	#endif
 
 	//Loop
 	while(loop){
@@ -83,16 +83,16 @@ int main() {
 	//Dispose track samples
 	disposeTrackData();
 
-#ifdef SAVE_STATISTICS
-	//Close statistics file
-	fclose(statisticsFile);
-#endif
+	#ifdef SAVE_STATISTICS
+		//Close statistics file
+		fclose(statisticsFile);
+	#endif
 
-#ifdef USE_WINDOWS
-	//Dispose windows
-	disposeConsole();
-	disposeWindows();
-#endif
+	#ifdef USE_WINDOWS
+		//Dispose windows
+		disposeConsole();
+		disposeWindows();
+	#endif
 
 	return 0;
 }
