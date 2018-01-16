@@ -13,6 +13,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include "../window/window.h"
 
 
 //Change point possible action

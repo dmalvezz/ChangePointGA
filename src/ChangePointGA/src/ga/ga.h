@@ -12,10 +12,9 @@
 #define GA_H_
 
 #include "generation.h"
-#include "../window/window.h"
 #include "../utils/sysutils.h"
 
-#define POPULATION_SIZE		200
+#define POPULATION_SIZE		50
 #define MAX_MUTATION_COUNT	10
 
 #define ELITISM_PERCENTAGE	0.01f

@@ -66,16 +66,6 @@ int crossOver(Generation_ptr currentGeneration, Generation_ptr nextGeneration,
 				cut
 			);
 
-		/*
-		printf("Parent %d %d %d %d   Children %d %d\n",
-				parentIndex1,
-				parentIndex2,
-				currentGeneration->individuals[parentIndex1].size,
-				currentGeneration->individuals[parentIndex2].size,
-				nextGeneration->individuals[nextGeneration->count].size,
-				nextGeneration->individuals[nextGeneration->count + 1].size);
-		 */
-
 		nextGeneration->count += 2;
 		childCount += 2;
 	}

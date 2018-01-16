@@ -17,7 +17,10 @@
 
 #include "../utils/mathutils.h"
 
+//#define DEBUG_WINDOW
+
 extern WINDOW *gaOutputWindow, *gaParamWindow, *simParamWindow, *commandWindow, *explorerWindow;
+extern WINDOW* debugWindow;
 
 //Init ncurses session
 extern void initWindows();

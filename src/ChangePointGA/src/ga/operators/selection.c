@@ -7,14 +7,8 @@
 
 #include "../generation.h"
 
-#define MIN_TOURNAMENT_ROUNDS	1
-#define MAX_TOURNAMENT_ROUNDS	3
-
-#define RANK_START_PROBABILITY	0.05f
-
-
 void elitism(Generation_ptr currentGeneration, Generation_ptr nextGeneration, float elitismPercentage){
-	int count = max(1, currentGeneration->size * elitismPercentage);
+	int count = max(1, currentGeneration->count * elitismPercentage);
 
 	//nextGeneration->count = count;
 	//Keep best in the generation
@@ -31,9 +25,9 @@ void elitism(Generation_ptr currentGeneration, Generation_ptr nextGeneration, fl
 
 int FUSS(Generation_ptr currentGeneration, Generation_ptr nextGeneration){
 	//Individual to be replaced
-	int r = randInt(1, nextGeneration->size - 1);
+	int r = randInt(1, nextGeneration->count - 1);
 
-	int validCount = currentGeneration->size - currentGeneration->statistics.invalidCount;
+	int validCount = currentGeneration->count - currentGeneration->statistics.invalidCount;
 	//Fitness to keep
 	float fitness = randFloat(currentGeneration->individuals[0].fitness, currentGeneration->individuals[validCount - 1].fitness);
 
@@ -71,25 +65,28 @@ void filteredFUSS(Generation_ptr currentGeneration, Generation_ptr nextGeneratio
 
 int fitnessProportionalSelection(Generation_ptr generation){
 	int i = 0;
-	int validCount = generation->size - generation->statistics.invalidCount;
+	int validCount = generation->count - generation->statistics.invalidCount;
 	float r = randFloat(0, 1);
 	float p = 0;
 
 	while(i < validCount && p <= r){
-		p +=  (1.0 / generation->individuals[i].fitness) / generation->statistics.fitnessSumInverse;
+		p += (1.0 / generation->individuals[i].fitness) / generation->statistics.fitnessSumInverse;
 		i++;
 	}
 
 	return i - 1;
 }
 
+#define MIN_TOURNAMENT_ROUNDS	1
+#define MAX_TOURNAMENT_ROUNDS	1
+
 int tournamentSelection(Generation_ptr generation){
-	int min = randInt(0, generation->size - 1);
+	int min = randInt(0, generation->count - 1);
 	int round = randInt(MIN_TOURNAMENT_ROUNDS, MAX_TOURNAMENT_ROUNDS);
 	int r;
 
 	for(int i = 0; i < round; i++){
-		r = randInt(0, generation->size - 1);
+		r = randInt(0, generation->count - 1);
 
 		if(generation->individuals[r].fitness < generation->individuals[min].fitness){
 			min = r;
@@ -99,12 +96,32 @@ int tournamentSelection(Generation_ptr generation){
 	return min;
 }
 
+
+#define RANK_START_PROBABILITY	0.02f
+
 int rankSelection(Generation_ptr generation){
 	int i = 0;
 	float r = randFloat(0, 1);
 	float p = 0;
-	while(i < generation->size && p <= r){
+
+	while(i < generation->count && p <= r){
 		p += RANK_START_PROBABILITY * pow((1.0 - RANK_START_PROBABILITY), i);
+		i++;
+	}
+
+	return i - 1;
+}
+
+
+#define RANK_SELECTION_PRESSURE 1.2f
+
+int linearRankWithPressureSelection(Generation_ptr generation){
+	int i = 0;
+	float r = randFloat(0, 1);
+	float p = 0;
+
+	while(i < generation->count && p <= r){
+		p += (2.0f - RANK_SELECTION_PRESSURE + 2.0f * (RANK_SELECTION_PRESSURE - 1.0f) * (generation->count - (i + 1)) /(generation->count - 1))/generation->count;
 		i++;
 	}
 

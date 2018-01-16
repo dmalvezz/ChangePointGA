@@ -49,8 +49,8 @@ void initGA(GA* ga, SelectionFunction selectionFunction, CrossoverFunction cross
 	//Selection functions
 	registerFunctions(fitnessProportionalSelection, "fitProp");
 	registerFunctions(rankSelection, "rank");
+	registerFunctions(linearRankWithPressureSelection, "linearRank");
 	registerFunctions(tournamentSelection, "tournament");
-
 
 	//Fitness functions
 	registerFunctions(energyFitness, "energy");

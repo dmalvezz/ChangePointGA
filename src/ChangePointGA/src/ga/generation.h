@@ -116,6 +116,8 @@ extern int tournamentSelection(Generation_ptr generation);
 //Select an individuals with rank selection
 extern int rankSelection(Generation_ptr generation);
 
+//Select an individuals with linear rank selection with best individual pressure
+extern int linearRankWithPressureSelection(Generation_ptr generation);
 
 /*****Crossover functions*****/
 //Apply single point crossover and create 2 children

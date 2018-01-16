@@ -46,7 +46,7 @@ int main() {
 
 	//Init GA
 	GA ga;
-	initGA(&ga, fitnessProportionalSelection, singlePointCrossover, energyFitness);
+	initGA(&ga, linearRankWithPressureSelection, singlePointCrossover, energyFitness);
 	addMutation(&ga, addRandomChangePoint, 			ADD_POINT_MUTATION_RATE);
 	addMutation(&ga, removeRandomChangePoint, 		REMOVE_POINT_MUTATION_RATE);
 	addMutation(&ga, moveRandomChangePoint, 		CHANGE_POS_MUTATION_RATE);
