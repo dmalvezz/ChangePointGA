@@ -26,7 +26,10 @@ void initConsole(){
 
 	//Register all commands
 	registerCommand("filter", applyFilterToStrategy);
+
 	registerCommand("loadstrat", loadStrategyFromCsv);
+	registerCommand("savestrat", saveStrategyToCsv);
+
 	registerCommand("plotsim", plotSimulation);
 	registerCommand("setmutrate", setMutationRate);
 }

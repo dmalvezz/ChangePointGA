@@ -185,10 +185,15 @@ int plotSimulation(GA* ga, char** argv, int argc){
 	}
 	else{
 		double points[SIM_STEP_COUNT];
+		char title[16];
+		sprintf(title, "Map %d", simIndex);
+
 		gnuplot_ctrl* handle = gnuplot_init();
 		gnuplot_setstyle(handle, "lines") ;
 		gnuplot_set_xlabel(handle, "Track pos");
-		gnuplot_set_xlabel(handle, "Map");
+		gnuplot_set_ylabel(handle, title);
+
+		simulateStrategy(&ga->currentGeneration->individuals[simIndex], START_VELOCITY, START_MAP, KEEP_TIME_INVALID);
 		for (int i = 0 ; i < SIM_STEP_COUNT; i++) {
 			points[i] = ga->currentGeneration->individuals[simIndex].simulation.steps[i].map;
 		}
@@ -262,6 +267,59 @@ int loadStrategyFromCsv(GA* ga, char** argv, int argc){
 		ga->currentGeneration->individuals[simIndex].fitness = ga->fitnessFunction(ga->currentGeneration, &ga->currentGeneration->individuals[simIndex]);
 
 		printExplorerWindow(ga, simIndex);
+	}
+	return 0;
+}
+
+int saveStrategyToCsv(GA* ga, char** argv, int argc){
+	//Default params
+	char fileName[32];
+	int simIndex = -1;
+
+	fileName[0] = '\0';
+
+	//Parsing
+	int c;
+	char* end;
+
+	while ((c = getopt(argc, argv, "i:f:")) != -1){
+		switch (c) {
+			case 'i':
+				simIndex = strtol(optarg, &end, 10);
+
+				if(simIndex < 0 || simIndex > ga->currentGeneration->count - 1){
+					sprintf(errorBuffer, "Invalid index %d", simIndex);
+					return 1;
+				}
+
+				break;
+
+			case 'f':
+				strcpy(fileName, optarg);
+
+				break;
+
+			default:
+				if (optopt == 'i'){
+					sprintf(errorBuffer, "Option -%c requires an argument", optopt);
+				}
+				else if (isprint(optopt)){
+					sprintf(errorBuffer, "Unknown option `-%c'", optopt);
+				}
+				else{
+					sprintf(errorBuffer, "Unknown option character `\\x%x'", optopt);
+				}
+
+				return 1;
+		}
+	}
+
+	if(argc < 1 || simIndex == -1 || strlen(fileName) == 0){
+		sprintf(errorBuffer, "Missing parameters");
+		return 1;
+	}
+	else{
+		strategyToFile(&ga->currentGeneration->individuals[simIndex], fileName);
 	}
 	return 0;
 }

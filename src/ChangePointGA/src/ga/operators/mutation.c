@@ -129,6 +129,10 @@ void filterStrategy(Strategy_ptr strategy){
 		}
 	}
 
+	//Add random changepoint if under the min size
+	while(strategy->size < MIN_CHANGE_POINT){
+		addRandomChangePoint(strategy);
+	}
 }
 
 int mutation(Generation_ptr nextGeneration, MutationFunction mutationFunction, float mutationRate){
@@ -140,7 +144,6 @@ int mutation(Generation_ptr nextGeneration, MutationFunction mutationFunction, f
 		if(r < mutationRate){
 			//Apply mutation
 			mutationFunction(&nextGeneration->individuals[i]);
-
 			mutationCount++;
 		}
 	}

@@ -53,8 +53,11 @@ extern int plotSimulation(GA* ga, char** argv, int argc);
 //Plot statistics
 extern int plotStatistic(GA* ga, char** argv, int argc);
 
-//Load strategy to csv
+//Load strategy from csv
 extern int loadStrategyFromCsv(GA* ga, char** argv, int argc);
+
+//Save strategy to csv
+extern int saveStrategyToCsv(GA* ga, char** argv, int argc);
 
 //Print explorer
 extern void printExplorerWindow(GA* ga, int index);

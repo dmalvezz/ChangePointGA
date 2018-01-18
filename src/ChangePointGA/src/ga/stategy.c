@@ -24,15 +24,16 @@ void initStrategy(Strategy_ptr strategy, int spaceStep){
 }
 
 void printStrategy(Strategy_ptr strategy){
-	printf("Size: %d\n", strategy->size);
-	printf("CP: ");
+	wprintw(debugWindow, "Size: %d\n", strategy->size);
+	wprintw(debugWindow, "CP: ");
 
 	for(int i = 0; i < strategy->size; i++){
 		printChangePoint(strategy->points[i]);
-		printf(" ");
+		wprintw(debugWindow, " ");
 	}
 
 	printf("\n");
+	wrefresh(debugWindow);
 }
 
 void strategyToFile(Strategy_ptr strategy, const char* stratName){

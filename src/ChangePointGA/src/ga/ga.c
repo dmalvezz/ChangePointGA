@@ -242,6 +242,7 @@ void saveGAParams(GA* ga, const char* fileName){
 		fprintf(file, " %d) %-20s   %-10.2f\n", i, regPtr->name, ga->mutationRates[i]);
 	}
 
+	fprintf(file, "Population size: %d\n", ga->currentGeneration->count);
 	fprintf(file, "Strategy size: %d - %d\n", MIN_CHANGE_POINT, MAX_CHANGE_POINT);
 
 	fclose(file);

@@ -34,7 +34,7 @@ typedef ChangePoint* ChangePoint_ptr;
 
 //Print to stdout
 static void printChangePoint(ChangePoint point){
-	printf("{%d, %d}", point.positionIndex, point.action);
+	wprintw(debugWindow, "{%d, %d}", point.positionIndex, point.action);
 }
 
 
