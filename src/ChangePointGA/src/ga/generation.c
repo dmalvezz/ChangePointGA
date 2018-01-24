@@ -79,6 +79,7 @@ void generationFromFile(Generation_ptr generation, const char* fileName){
 
 
 void statisticsToFile(Generation_ptr generation, unsigned long int generationCount, FILE* file){
+	/*
 	fprintf(file, "%lu, %f, %f, %f, %f, %f, %f, %f, %f, %f, %lu\n",
 			generationCount,
 			generation->statistics.best.simulation.energy,
@@ -92,7 +93,7 @@ void statisticsToFile(Generation_ptr generation, unsigned long int generationCou
 			(float)generation->statistics.invalidCount / generation->count,
 			generation->statistics.lastChange
 	);
-
+*/
 }
 
 
@@ -146,9 +147,6 @@ void evalGenerationFitness(Generation_ptr generation, FitnessFunction fitnessFun
 	{
 		#pragma omp for
 		for(int i = 0; i < generation->count; i++){
-			//Similarity factor with previous best
-			generation->individuals[i].similarity = evalStrategySimilarity(&generation->individuals[i], &generation->statistics.best);
-
 			//Update fitness
 			generation->individuals[i].fitness = fitnessFunction(generation, &generation->individuals[i]);
 		}
@@ -161,37 +159,8 @@ void sortGenerationByFitness(Generation_ptr generation){
 
 void updateGenerationStatistics(Generation_ptr generation){
 	//Init
-	generation->statistics.fitnessAvg = 0;
 	generation->statistics.fitnessSumInverse = 0;
-
-	generation->statistics.lengthAvg = 0;
-	generation->statistics.similarityAvg = 0;
-
 	generation->statistics.invalidCount = 0;
-
-	//Sum up
-	for(int i = 0; i < generation->size; i++){
-		generation->statistics.lengthAvg += generation->individuals[i].size;
-
-		if(generation->individuals[i].simulation.result != SIM_OK){
-			generation->statistics.invalidCount++;
-		}
-		else{
-			generation->statistics.fitnessAvg += generation->individuals[i].fitness;
-			generation->statistics.fitnessSumInverse += 1.0 / generation->individuals[i].fitness;
-			generation->statistics.similarityAvg += generation->individuals[i].similarity;
-		}
-	}
-
-	//Min/Max
-	generation->statistics.fitnessMin = generation->individuals[0].fitness;
-	generation->statistics.fitnessMax = generation->individuals[generation->size - generation->statistics.invalidCount - 1].fitness;
-	generation->statistics.fitnessMedian = generation->individuals[(generation->size - generation->statistics.invalidCount) / 2].fitness;
-
-	//Avgs
-	generation->statistics.fitnessAvg /= (generation->size - generation->statistics.invalidCount);
-	generation->statistics.lengthAvg /= generation->size;
-	generation->statistics.similarityAvg /= (generation->size - generation->statistics.invalidCount);
 
 	//Save best
 	if(generation->individuals[0].simulation.result == SIM_OK &&
@@ -203,6 +172,44 @@ void updateGenerationStatistics(Generation_ptr generation){
 	else{
 		generation->statistics.lastChange++;
 	}
+
+	//Reset statitics working with all the population
+	resetStatistic(&generation->statistics.lengthStat, generation->count);
+	resetStatistic(&generation->statistics.genotypeSimilarityStat, generation->count);
+
+	for(int i = 0; i < generation->size; i++){
+		updateStatistic(&generation->statistics.lengthStat, generation->individuals[i].size, i);
+		updateStatistic(&generation->statistics.genotypeSimilarityStat, fabs(generation->statistics.best.size - generation->individuals[i].size), i);
+
+		if(generation->individuals[i].simulation.result != SIM_OK){
+			generation->statistics.invalidCount++;
+		}
+		else{
+			generation->statistics.fitnessSumInverse += 1.0 / generation->individuals[i].fitness;
+		}
+	}
+
+	//Reset statitics working with only the valid population
+	resetStatistic(&generation->statistics.fitnessStat, generation->count - generation->statistics.invalidCount);
+	resetStatistic(&generation->statistics.fitnessSimilarityStat, generation->count - generation->statistics.invalidCount);
+	resetStatistic(&generation->statistics.fenotypeSimilarityStat, generation->count - generation->statistics.invalidCount);
+
+	for(int i = 0; i < generation->size - generation->statistics.invalidCount; i++){
+		//Similarity factor with previous best
+		generation->individuals[i].similarity = evalStrategySimilarity(&generation->individuals[i], &generation->statistics.best);
+
+		updateStatistic(&generation->statistics.fitnessStat, generation->individuals[i].fitness, i);
+		updateStatistic(&generation->statistics.fitnessSimilarityStat, fabs(generation->statistics.best.fitness - generation->individuals[i].fitness), i);
+		updateStatistic(&generation->statistics.fenotypeSimilarityStat, generation->individuals[i].similarity, i);
+	}
+
+
+	//Finalize the statistics
+	finalizeStatistic(&generation->statistics.lengthStat);
+	finalizeStatistic(&generation->statistics.genotypeSimilarityStat);
+	finalizeStatistic(&generation->statistics.fitnessStat);
+	finalizeStatistic(&generation->statistics.fitnessSimilarityStat);
+	finalizeStatistic(&generation->statistics.fenotypeSimilarityStat);
 }
 
 

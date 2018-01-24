@@ -234,7 +234,7 @@ float evalStrategySimilarity(Strategy_ptr str1, Strategy_ptr str2){
 		//Jacquard measure
 		//factor = scalar / (l1 + l2 - scalar);
 
-		return factor;
+		return acosf(factor) * 180.0 / M_PI;
 	}
 
 	return INFINITY;

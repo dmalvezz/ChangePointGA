@@ -30,19 +30,19 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: ChangePointGA_MS
+all: ChangePointGA
 
 # Tool invocations
-ChangePointGA_MS: $(OBJS) $(USER_OBJS)
+ChangePointGA: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	mpicc -fopenmp  -o "ChangePointGA_MS" $(OBJS) $(USER_OBJS) $(LIBS)
+	mpicc -fopenmp  -o "ChangePointGA" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(EXECUTABLES)$(OBJS)$(C_DEPS) ChangePointGA_MS
+	-$(RM) $(EXECUTABLES)$(OBJS)$(C_DEPS) ChangePointGA
 	-@echo ' '
 
 .PHONY: all clean dependents

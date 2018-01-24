@@ -182,12 +182,13 @@ void genetic(MasterProcess* mProcess){
 			);
 
 		//Print stats
+
 		mvwprintw(gaOutputWindow, row++, 1, "Stat fmin %.2f   fmed %.2f   lavg %d   inv %.2f   sim %.2f   lch %lu",
-				ga->currentGeneration->statistics.fitnessMin,
-				ga->currentGeneration->statistics.fitnessMedian,
-				(int)ga->currentGeneration->statistics.lengthAvg,
+				ga->currentGeneration->statistics.fitnessStat.min,
+				ga->currentGeneration->statistics.fitnessStat.median,
+				(int)ga->currentGeneration->statistics.lengthStat.avg,
 				(float)ga->currentGeneration->statistics.invalidCount / ga->currentGeneration->count,
-				ga->currentGeneration->statistics.similarityAvg,
+				ga->currentGeneration->statistics.fenotypeSimilarityStat.avg,
 				ga->currentGeneration->statistics.lastChange
 			);
 

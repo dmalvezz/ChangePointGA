@@ -16,7 +16,9 @@
 #include <omp.h>
 #include <mpi.h>
 
+#include "statistic.h"
 #include "strategy.h"
+
 
 //MPI
 #define SLAVE_CMD_TAG				1
@@ -26,15 +28,23 @@
 typedef struct Statistics{
 	int invalidCount;
 	unsigned long int lastChange;
+	float fitnessSumInverse;
 
+	/*
 	float fitnessMax;
 	float fitnessMin;
 	float fitnessMedian;
 	float fitnessAvg;
-	float fitnessSumInverse;
 
 	float lengthAvg;
 	float similarityAvg;
+	*/
+
+	Statistic lengthStat;
+	Statistic fitnessStat;
+	Statistic fitnessSimilarityStat;
+	Statistic fenotypeSimilarityStat;
+	Statistic genotypeSimilarityStat;
 
 	Strategy best;
 }Statistics;

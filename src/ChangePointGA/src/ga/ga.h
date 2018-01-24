@@ -15,7 +15,7 @@
 #include "../utils/sysutils.h"
 
 //Ga param
-#define POPULATION_SIZE		100
+#define POPULATION_SIZE		50
 #define MAX_MUTATION_COUNT	10
 
 #define ELITISM_PERCENTAGE	0.01f
