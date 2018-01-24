@@ -41,7 +41,7 @@ void printConsoleMenu(){
 }
 
 void updateConsole(GA* ga, int* loop){
-	int key = getch();
+	int key = getKey();//getch();
 
 	int cmdMode = 1;
 	int cmdBufferSize = 0;
@@ -111,6 +111,7 @@ void updateConsole(GA* ga, int* loop){
 
 						//Read cmd char
 						default:
+
 							if(cmdBufferSize < COLS - 1){
 								cmdBuffer[cmdBufferSize++] = c;
 								cmdBuffer[cmdBufferSize] = '\0';

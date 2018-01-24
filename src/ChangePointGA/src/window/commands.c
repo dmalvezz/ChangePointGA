@@ -134,7 +134,7 @@ int applyFilterToStrategy(GA* ga, char** argv, int argc){
 	else{
 		filterStrategy(&ga->currentGeneration->individuals[simIndex]);
 
-		simulateStrategy(&ga->currentGeneration->individuals[simIndex], START_VELOCITY, START_MAP, 1);
+		simulateStrategy(&ga->currentGeneration->individuals[simIndex], START_VELOCITY, END_VELOCITY, START_MAP, 1);
 		ga->currentGeneration->individuals[simIndex].similarity = evalStrategySimilarity(&ga->currentGeneration->individuals[simIndex], &ga->currentGeneration->statistics.best);
 		ga->currentGeneration->individuals[simIndex].fitness = ga->fitnessFunction(ga->currentGeneration, &ga->currentGeneration->individuals[simIndex]);
 
@@ -193,7 +193,7 @@ int plotSimulation(GA* ga, char** argv, int argc){
 		gnuplot_set_xlabel(handle, "Track pos");
 		gnuplot_set_ylabel(handle, title);
 
-		simulateStrategy(&ga->currentGeneration->individuals[simIndex], START_VELOCITY, START_MAP, KEEP_TIME_INVALID);
+		simulateStrategy(&ga->currentGeneration->individuals[simIndex], START_VELOCITY, END_VELOCITY, START_MAP, KEEP_TIME_INVALID);
 		for (int i = 0 ; i < SIM_STEP_COUNT; i++) {
 			points[i] = ga->currentGeneration->individuals[simIndex].simulation.steps[i].map;
 		}
@@ -262,7 +262,7 @@ int loadStrategyFromCsv(GA* ga, char** argv, int argc){
 	else{
 		strategyFromCsv(&ga->currentGeneration->individuals[simIndex], fileName);
 
-		simulateStrategy(&ga->currentGeneration->individuals[simIndex], START_VELOCITY, START_MAP, 1);
+		simulateStrategy(&ga->currentGeneration->individuals[simIndex], START_VELOCITY, END_VELOCITY, START_MAP, 1);
 		ga->currentGeneration->individuals[simIndex].similarity = evalStrategySimilarity(&ga->currentGeneration->individuals[simIndex], &ga->currentGeneration->statistics.best);
 		ga->currentGeneration->individuals[simIndex].fitness = ga->fitnessFunction(ga->currentGeneration, &ga->currentGeneration->individuals[simIndex]);
 

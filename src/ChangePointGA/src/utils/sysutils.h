@@ -17,8 +17,8 @@
 
 #define SECONDS 1000000000
 
-/*
-static int kbhit(void){
+
+static int getKey(void){
   struct termios oldt, newt;
   int ch;
   int oldf;
@@ -37,12 +37,11 @@ static int kbhit(void){
 
   if(ch != EOF){
     ungetc(ch, stdin);
-    return 1;
   }
 
-  return 0;
+  return ch;
 }
-*/
+
 
 static unsigned long long getTime(){
     struct timespec t;

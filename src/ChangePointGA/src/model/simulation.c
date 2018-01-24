@@ -19,21 +19,23 @@ void initSimulation(Simulation_ptr simulation, float startVelocity, int startMap
 	simulation->velocity = startVelocity;
 	simulation->time = 0;
 	simulation->energy = 0;
+
+	simulation->result = SIM_NOT_RUN;
 }
 
 void initMapset(){
 #ifdef RE50_24V
-	/*
 	initMap(&maps[0], -100000, 1000.0, 0.0);
 	initMap(&maps[1], -9800, 100.0, 0.0);
 	initMap(&maps[2], -5600.0, 40.0, 0.0);
 	initMap(&maps[3], -4800.0, 45.0, 0.0);
-	*/
 
+	/*
 	initMap(&maps[0], -4800.0, 100.0, 0.0);
 	initMap(&maps[1], -9000.0, 100.0, 0.0);
 	initMap(&maps[2], -14000.0, 100.0, 0.0);
 	initMap(&maps[3], -4800.0, 45.0, 0.0);
+	*/
 
 	/*
 	initMap(&maps[0], -4800.0, 45.0, 0.0);
@@ -89,8 +91,6 @@ SimulationResult simulate(Simulation_ptr simulation, float startPosition, float 
 		simulation->selectedMap = 0;
 	}
 
-	//printf("Action %d %f Map %d\n", action, startPosition, simulation->selectedMap);
-
 	int startIndex = startPosition / SPACE_STEP;
 	int simStep = (endPosition - startPosition) / SPACE_STEP;
 	float radius, slope, fTraction, fSlope, fAero, fTyres, fResistent, fTot, a, delta, dt, dE;
@@ -137,21 +137,19 @@ SimulationResult simulate(Simulation_ptr simulation, float startPosition, float 
 
 		dE = getPower(simulation, fTraction, simulation->velocity, dt) * dt;
 
-		#ifdef KEEP_SIM_STEP
-			simulation->steps[startIndex + i].map = simulation->selectedMap;
-			simulation->steps[startIndex + i].xi = startPosition + i * SPACE_STEP;
-			simulation->steps[startIndex + i].slope = slope;
-			simulation->steps[startIndex + i].radius = radius;
-			simulation->steps[startIndex + i].vi = simulation->velocity;
-			simulation->steps[startIndex + i].ftraction = fTraction;
-			simulation->steps[startIndex + i].fslope = fSlope;
-			simulation->steps[startIndex + i].faero = fAero;
-			simulation->steps[startIndex + i].ftyres = fTyres;
-			simulation->steps[startIndex + i].fres = fResistent;
-			simulation->steps[startIndex + i].a = a;
-			simulation->steps[startIndex + i].dt = dt;
-			simulation->steps[startIndex + i].dE = dE;
-		#endif
+		simulation->steps[startIndex + i].map = simulation->selectedMap;
+		simulation->steps[startIndex + i].xi = startPosition + i * SPACE_STEP;
+		simulation->steps[startIndex + i].slope = slope;
+		simulation->steps[startIndex + i].radius = radius;
+		simulation->steps[startIndex + i].vi = simulation->velocity;
+		simulation->steps[startIndex + i].ftraction = fTraction;
+		simulation->steps[startIndex + i].fslope = fSlope;
+		simulation->steps[startIndex + i].faero = fAero;
+		simulation->steps[startIndex + i].ftyres = fTyres;
+		simulation->steps[startIndex + i].fres = fResistent;
+		simulation->steps[startIndex + i].a = a;
+		simulation->steps[startIndex + i].dt = dt;
+		simulation->steps[startIndex + i].dE = dE;
 
 		simulation->position += SPACE_STEP;
 		simulation->velocity = simulation->velocity + a * dt;
@@ -162,11 +160,9 @@ SimulationResult simulate(Simulation_ptr simulation, float startPosition, float 
 			simRes = SIM_VEL_NEG;
 		}
 
-//#ifndef KEEP_TIME_INVALID
-		if(simulation->time > ceilf(MAX_TIME) && keepTimeInvalid == 0){
+		if(simulation->time > MAX_TIME && keepTimeInvalid == 0){
 			simRes = SIM_TIME_MAX;
 		}
-//#endif
 
 		if(simRes != SIM_OK){
 			simulation->time = INFINITY;
@@ -181,7 +177,6 @@ SimulationResult simulate(Simulation_ptr simulation, float startPosition, float 
 void printSimulation(Simulation_ptr simulation){
 	printf("Sim res %d   time %f   energy %f\n", simulation->result, simulation->time, simulation->energy);
 
-#ifdef KEEP_SIM_STEP
 	printf("map   x   v   ft  fslope   faero   ftyres   fres   a   dt   dE\n");
 	for(int i = 0; i < SIM_STEP_COUNT; i++){
 			printf("%d  %f  %f  %f   %f   %f   %f   %f   %f   %f   %f\n",
@@ -198,7 +193,6 @@ void printSimulation(Simulation_ptr simulation){
 				simulation->steps[i].dE
 			);
 	}
-#endif
 }
 
 
@@ -276,8 +270,6 @@ void printSimulationParams(){
 		mvwprintw(simParamWindow, row++, 1, "   a0:%.2f  a1:%.2f  a2:%.2f", maps[i].a0, maps[i].a1, maps[i].a2);
 	}
 	*/
-
-
 	wrefresh(simParamWindow);
 }
 

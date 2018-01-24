@@ -14,9 +14,14 @@
 #include <math.h>
 #include <string.h>
 #include <omp.h>
+#include <mpi.h>
 
 #include "strategy.h"
 
+//MPI
+#define SLAVE_CMD_TAG				1
+#define SLAVE_SIMULATE_STRAT_CMD	's'
+#define SLAVE_QUIT_CMD				'q'
 
 typedef struct Statistics{
 	int invalidCount;
@@ -83,7 +88,7 @@ extern float energyDiversityFitness(Generation_ptr generation, Strategy_ptr stra
 
 
 //Eval fitness for all individuals
-extern void evalGenerationFitness(Generation_ptr generation, float startVelocity, int startMap, FitnessFunction fitness);
+extern void evalGenerationFitness(Generation_ptr generation, FitnessFunction fitness, MPI_Comm* comm);
 
 //Sort individual by fitness value
 extern void sortGenerationByFitness(Generation_ptr generation);

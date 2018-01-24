@@ -66,7 +66,6 @@ void initGA(GA* ga, SelectionFunction selectionFunction, CrossoverFunction cross
 	registerFunctions(moveRandomChangePoint, "moveRandom");
 	registerFunctions(changeRandomChangePointAction, "changeRandom");
 	registerFunctions(filterStrategy, "filter");
-
 }
 
 void addMutation(GA* ga, MutationFunction mutation, float rate){
@@ -77,7 +76,8 @@ void addMutation(GA* ga, MutationFunction mutation, float rate){
 	}
 }
 
-void genetic(GA* ga){
+/*
+void genetic(MasterProcess* process, GA* ga){
 	//Counters
 	int childCount = 0, mutationCount = 0;
 
@@ -90,7 +90,7 @@ void genetic(GA* ga){
 
 	//Eval fitness
 	timer = getTime();
-	evalGenerationFitness(ga->currentGeneration, START_VELOCITY, START_MAP, ga->fitnessFunction);
+	evalGenerationFitness(ga->currentGeneration, ga->fitnessFunction, &process->comm);
 	fitnessTime = getTimeElapsed(timer);
 
 	//Sort individual by fitness
@@ -186,6 +186,7 @@ void genetic(GA* ga){
 	ga->generationCount++;
 
 }
+*/
 
 void disposeGA(GA* ga){
 	//Dispose generation

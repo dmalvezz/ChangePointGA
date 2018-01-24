@@ -18,6 +18,7 @@
 #include <unistd.h>
 
 #include "changepoint.h"
+#include "datatype/gaMPIDatatype.h"
 #include "../model/simulation.h"
 #include "../utils/arrayutils.h"
 #include "../utils/mathutils.h"
@@ -25,6 +26,7 @@
 #define MIN_CHANGE_POINT 	3
 #define MAX_CHANGE_POINT 	40
 
+#define SIM_THREAD_COUNT	4
 
 typedef struct Strategy{
 	int size;									//Num of change points used
@@ -64,7 +66,10 @@ extern void addChangePoint(Strategy_ptr strategy, int position);
 extern void removeChangePoint(Strategy_ptr strategy, int index);
 
 //Run simulation
-extern void simulateStrategy(Strategy_ptr strategy, float startVelocity, int startMap, int keepTimeInvalid);
+extern void simulateStrategy(Strategy_ptr strategy, float startVelocity, float endVelocity, int startMap, int keepTimeInvalid);
+
+//Run paralell simulation
+extern void parallelSimulateStrategy(Strategy_ptr strategies, int count, int threadCount, float startVelocity, float endVelocity, int startMap, int keepTimeInvalid);
 
 //Eval similarity factor
 extern float evalStrategySimilarity(Strategy_ptr str1, Strategy_ptr str2);

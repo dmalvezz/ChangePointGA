@@ -66,6 +66,13 @@ int crossOver(Generation_ptr currentGeneration, Generation_ptr nextGeneration,
 				cut
 			);
 
+
+		/*
+		wprintw(debugWindow, "%d %d   %d %d\n", parentIndex1, parentIndex2,
+				nextGeneration->individuals[nextGeneration->count].size,
+				nextGeneration->individuals[nextGeneration->count+1].size);
+			*/
+
 		nextGeneration->count += 2;
 		childCount += 2;
 	}

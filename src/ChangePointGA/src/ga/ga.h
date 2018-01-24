@@ -14,7 +14,8 @@
 #include "generation.h"
 #include "../utils/sysutils.h"
 
-#define POPULATION_SIZE		50
+//Ga param
+#define POPULATION_SIZE		100
 #define MAX_MUTATION_COUNT	10
 
 #define ELITISM_PERCENTAGE	0.01f
@@ -36,6 +37,7 @@
 #define GA_FILE				"gaparam.txt"
 #define STATISTICS_FILE		"statistics.csv"
 
+//GA
 typedef struct GA{
 	//Counter
 	unsigned long int generationCount;
@@ -50,7 +52,6 @@ typedef struct GA{
 	CrossoverFunction crossoverFunction;
 	FitnessFunction fitnessFunction;
 
-
 	//Generations
 	Generation_ptr currentGeneration;
 	Generation_ptr nextGeneration;
@@ -63,7 +64,7 @@ extern void initGA(GA* ga, SelectionFunction selectionFunction, CrossoverFunctio
 extern void addMutation(GA* ga, MutationFunction mutation, float rate);
 
 //Run a generation
-extern void genetic(GA* ga);
+//extern void genetic(GA* ga);
 
 //Dispose GA struct
 extern void disposeGA(GA* ga);

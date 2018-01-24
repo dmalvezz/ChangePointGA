@@ -10,8 +10,10 @@ RM := rm -rf
 -include sources.mk
 -include src/window/subdir.mk
 -include src/utils/gnuplot/subdir.mk
+-include src/process/subdir.mk
 -include src/model/subdir.mk
 -include src/ga/operators/subdir.mk
+-include src/ga/datatype/subdir.mk
 -include src/ga/subdir.mk
 -include src/subdir.mk
 -include subdir.mk
@@ -28,19 +30,19 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: ChangePointGA
+all: ChangePointGA_MS
 
 # Tool invocations
-ChangePointGA: $(OBJS) $(USER_OBJS)
+ChangePointGA_MS: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc -fopenmp  -o "ChangePointGA" $(OBJS) $(USER_OBJS) $(LIBS)
+	mpicc -fopenmp  -o "ChangePointGA_MS" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(EXECUTABLES)$(OBJS)$(C_DEPS) ChangePointGA
+	-$(RM) $(EXECUTABLES)$(OBJS)$(C_DEPS) ChangePointGA_MS
 	-@echo ' '
 
 .PHONY: all clean dependents

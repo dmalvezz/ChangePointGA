@@ -23,8 +23,8 @@
 //Motors list
 //#define RE40_24V
 //#define RE40_48V
-//#define RE50_24V
-#define RE50_36V
+#define RE50_24V
+//#define RE50_36V
 
 #define KEEP_TIME_INVALID	0
 
@@ -37,10 +37,10 @@
 #include "../utils/mathutils.h"
 
 #define SPACE_STEP	1.0
-#define LAP_COUNT	3
+#define LAP_COUNT	1
 #define TRACK_START_POINT	0
 #define TRACK_END_POINT		(TRACK_LENGTH * LAP_COUNT)
-#define SIM_STEP_COUNT	(TRACK_END_POINT / (int)SPACE_STEP)
+#define SIM_STEP_COUNT		(TRACK_END_POINT / (int)SPACE_STEP)
 
 //#define FIRST_LAP
 #ifdef FIRST_LAP
@@ -64,7 +64,8 @@ typedef enum SimulationResult{
 	SIM_DT_NEG,
 	SIM_VEL_NEG,
 	SIM_END_VEL,
-	SIM_TIME_MAX
+	SIM_TIME_MAX,
+	SIM_NOT_RUN
 }SimulationResult;
 
 typedef struct SimulationStep{
@@ -85,7 +86,6 @@ typedef struct SimulationStep{
 
 typedef SimulationStep* SimulationStep_ptr;
 
-#define KEEP_SIM_STEP
 typedef struct Simulation{
 	float lastTractiveForce;	//Last force applied
 
@@ -98,12 +98,8 @@ typedef struct Simulation{
 	float time;			//Total time
 	float energy;		//Total energy consumed
 
-	SimulationResult result;
-
-	//Simulation steps
-#ifdef KEEP_SIM_STEP
-	SimulationStep steps[SIM_STEP_COUNT];
-#endif
+	SimulationResult result;					//Simulation result
+	SimulationStep steps[SIM_STEP_COUNT];		//Simulation steps
 }Simulation;
 
 typedef Simulation* Simulation_ptr;

@@ -6,6 +6,7 @@
  */
 
 #include "strategy.h"
+#include <omp.h>
 
 void initStrategy(Strategy_ptr strategy, int spaceStep){
 	//strategy->lastChange = -1;
@@ -153,7 +154,7 @@ void removeChangePoint(Strategy_ptr strategy, int index){
 	strategy->size--;
 }
 
-void simulateStrategy(Strategy_ptr strategy, float startVelocity, int startMap, int keepTimeInvalid){
+void simulateStrategy(Strategy_ptr strategy, float startVelocity, float endVelocity, int startMap, int keepTimeInvalid){
 	int i = 0;
 
 	//Init simulation
@@ -195,13 +196,24 @@ void simulateStrategy(Strategy_ptr strategy, float startVelocity, int startMap, 
 		//Check if last velocity is >= than the start velocity
 		//Just for general lap
 		if(strategy->simulation.result == SIM_OK
-				&& strategy->simulation.velocity < END_VELOCITY){
+				&& strategy->simulation.velocity < endVelocity){
 			strategy->simulation.time = INFINITY;
 			strategy->simulation.energy = INFINITY;
 			strategy->simulation.result = SIM_END_VEL;
 		}
 	}
 
+}
+
+void parallelSimulateStrategy(Strategy_ptr strategies, int count, int threadCount, float startVelocity, float endVelocity, int startMap, int keepTimeInvalid){
+	#pragma omp parallel num_threads(threadCount)
+	{
+		#pragma omp for
+		for(int i = 0; i < count; i++){
+			//Simulate the strategy
+			simulateStrategy(&strategies[i], startVelocity, endVelocity, startMap, keepTimeInvalid);
+		}
+	}
 }
 
 float evalStrategySimilarity(Strategy_ptr str1, Strategy_ptr str2){

@@ -13,10 +13,12 @@ C_DEPS :=
 
 # Every subdirectory with source files must be described here
 SUBDIRS := \
+src/ga/datatype \
 src/ga \
 src/ga/operators \
 src \
 src/model \
+src/process \
 src/utils/gnuplot \
 src/window \
 

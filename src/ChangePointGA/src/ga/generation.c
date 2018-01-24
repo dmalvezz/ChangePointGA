@@ -97,14 +97,55 @@ void statisticsToFile(Generation_ptr generation, unsigned long int generationCou
 
 
 
-void evalGenerationFitness(Generation_ptr generation, float startVelocity, int startMap, FitnessFunction fitnessFunction){
-	#pragma omp parallel
+void evalGenerationFitness(Generation_ptr generation, FitnessFunction fitnessFunction, MPI_Comm* comm){
+	//Simulate
+
+	//Use local thread
+	if(comm == NULL){
+		parallelSimulateStrategy(
+				generation->individuals, generation->count, SIM_THREAD_COUNT,
+				START_VELOCITY, END_VELOCITY, START_MAP, KEEP_TIME_INVALID
+		);
+	}
+	//Use slaves
+	else{
+		char cmd;
+		int size;
+		MPI_Comm_size(*comm, &size);
+
+		int strCount = generation->count / size;
+		Strategy strategies[strCount];
+
+		//Broadcast the command
+		cmd = SLAVE_SIMULATE_STRAT_CMD;
+		MPI_Bcast(&cmd, 1, MPI_CHAR, 0, *comm);
+
+		//Scatter the strategies
+		MPI_Scatter(
+			generation->individuals, strCount, MPI_STRATEGY,
+			strategies, strCount, MPI_STRATEGY,
+			0, *comm
+		);
+
+		//Simulate all
+		parallelSimulateStrategy(
+				strategies, strCount, SIM_THREAD_COUNT,
+				START_VELOCITY, END_VELOCITY, START_MAP, KEEP_TIME_INVALID
+		);
+
+		//Send back the simulate generation portion
+		MPI_Gather(
+			strategies, strCount, MPI_STRATEGY,
+			generation->individuals, strCount, MPI_STRATEGY,
+			0, *comm
+		);
+	}
+
+	//Eval fitness
+	#pragma omp parallel num_threads(SIM_THREAD_COUNT)
 	{
 		#pragma omp for
 		for(int i = 0; i < generation->count; i++){
-			//Simulate the strategy
-			simulateStrategy(&generation->individuals[i], startVelocity, startMap, KEEP_TIME_INVALID);
-
 			//Similarity factor with previous best
 			generation->individuals[i].similarity = evalStrategySimilarity(&generation->individuals[i], &generation->statistics.best);
 
