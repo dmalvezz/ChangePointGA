@@ -20,7 +20,13 @@ void initMaster(MasterProcess* mProcess, int worldId, int color){
 	#ifdef SAVE_STATISTICS
 		//Create statistics file
 		mProcess->statisticsFile = fopen(STATISTICS_FILE, "at");
-		fprintf(mProcess->statisticsFile, "generation, energyBest, fitnessBest, fitnessMin, fitnessMax, fitnessMedian, fitnessAvg, lenghtAvg, similarityAvg, %%invalid, lastChange\n");
+		fprintf(mProcess->statisticsFile, "generation, lastChange, bestEnergy, bestTime, bestFitness, %%invalid, validCount, deltaInv, dtInv, negVelInv, endVelInv, timeInv, notRun, ");
+		printStatisticCsvHeader("fitness", mProcess->statisticsFile);
+		printStatisticCsvHeader("length", mProcess->statisticsFile);
+		printStatisticCsvHeader("genotypeSim", mProcess->statisticsFile);
+		printStatisticCsvHeader("fenotypeSim", mProcess->statisticsFile);
+		printStatisticCsvHeader("fitnessSim", mProcess->statisticsFile);
+		fprintf(mProcess->statisticsFile, "\n");
 	#endif
 
 	#ifdef KEEP_BEST
@@ -33,7 +39,7 @@ void initMaster(MasterProcess* mProcess, int worldId, int color){
 	initConsole();
 
 	//Init ga
-	initGA(&mProcess->ga, linearRankWithPressureSelection, singlePointCrossover, energyFitness);
+	initGA(&mProcess->ga, fitnessProportionalSelection, singlePointCrossover, energyFitness);
 	addMutation(&mProcess->ga, addRandomChangePoint, 			ADD_POINT_MUTATION_RATE);
 	addMutation(&mProcess->ga, removeRandomChangePoint, 		REMOVE_POINT_MUTATION_RATE);
 	addMutation(&mProcess->ga, moveRandomChangePoint, 			CHANGE_POS_MUTATION_RATE);

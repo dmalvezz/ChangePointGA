@@ -79,21 +79,26 @@ void generationFromFile(Generation_ptr generation, const char* fileName){
 
 
 void statisticsToFile(Generation_ptr generation, unsigned long int generationCount, FILE* file){
-	/*
-	fprintf(file, "%lu, %f, %f, %f, %f, %f, %f, %f, %f, %f, %lu\n",
+	fprintf(file, "%lu,  %lu,  %f,  %f,  %f,  %f,",
 			generationCount,
+			generation->statistics.lastChange,
 			generation->statistics.best.simulation.energy,
+			generation->statistics.best.simulation.time,
 			generation->statistics.best.fitness,
-			generation->statistics.fitnessMin,
-			generation->statistics.fitnessMax,
-			generation->statistics.fitnessMedian,
-			generation->statistics.fitnessAvg,
-			generation->statistics.lengthAvg,
-			generation->statistics.similarityAvg,
-			(float)generation->statistics.invalidCount / generation->count,
-			generation->statistics.lastChange
-	);
-*/
+			(float)generation->statistics.invalidCount / generation->count
+		);
+
+	for(int i = 0; i < SIM_RESULT_COUNT; i++){
+		fprintf(file, "%d, ", generation->statistics.invalidTypeCount[i]);
+	}
+
+	printStatisticCsvData(&generation->statistics.fitnessStat, file);
+	printStatisticCsvData(&generation->statistics.lengthStat, file);
+	printStatisticCsvData(&generation->statistics.genotypeSimilarityStat, file);
+	printStatisticCsvData(&generation->statistics.fenotypeSimilarityStat, file);
+	printStatisticCsvData(&generation->statistics.fitnessSimilarityStat, file);
+
+	fprintf(file, "\n");
 }
 
 
@@ -161,6 +166,9 @@ void updateGenerationStatistics(Generation_ptr generation){
 	//Init
 	generation->statistics.fitnessSumInverse = 0;
 	generation->statistics.invalidCount = 0;
+	for(int i = 0; i < SIM_RESULT_COUNT; i++){
+		generation->statistics.invalidTypeCount[i] = 0;
+	}
 
 	//Save best
 	if(generation->individuals[0].simulation.result == SIM_OK &&
@@ -173,11 +181,13 @@ void updateGenerationStatistics(Generation_ptr generation){
 		generation->statistics.lastChange++;
 	}
 
-	//Reset statitics working with all the population
+	//Reset statistics working with all the population
 	resetStatistic(&generation->statistics.lengthStat, generation->count);
 	resetStatistic(&generation->statistics.genotypeSimilarityStat, generation->count);
 
-	for(int i = 0; i < generation->size; i++){
+	for(int i = 0; i < generation->count; i++){
+		generation->statistics.invalidTypeCount[generation->individuals[i].simulation.result]++;
+
 		updateStatistic(&generation->statistics.lengthStat, generation->individuals[i].size, i);
 		updateStatistic(&generation->statistics.genotypeSimilarityStat, fabs(generation->statistics.best.size - generation->individuals[i].size), i);
 
@@ -189,12 +199,12 @@ void updateGenerationStatistics(Generation_ptr generation){
 		}
 	}
 
-	//Reset statitics working with only the valid population
+	//Reset statistics working with only the valid population
 	resetStatistic(&generation->statistics.fitnessStat, generation->count - generation->statistics.invalidCount);
 	resetStatistic(&generation->statistics.fitnessSimilarityStat, generation->count - generation->statistics.invalidCount);
 	resetStatistic(&generation->statistics.fenotypeSimilarityStat, generation->count - generation->statistics.invalidCount);
 
-	for(int i = 0; i < generation->size - generation->statistics.invalidCount; i++){
+	for(int i = 0; i < generation->count - generation->statistics.invalidCount; i++){
 		//Similarity factor with previous best
 		generation->individuals[i].similarity = evalStrategySimilarity(&generation->individuals[i], &generation->statistics.best);
 

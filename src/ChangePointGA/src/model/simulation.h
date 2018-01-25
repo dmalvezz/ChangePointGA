@@ -23,8 +23,8 @@
 //Motors list
 //#define RE40_24V
 //#define RE40_48V
-#define RE50_24V
-//#define RE50_36V
+//#define RE50_24V
+#define RE50_36V
 
 #define KEEP_TIME_INVALID	0
 
@@ -65,7 +65,9 @@ typedef enum SimulationResult{
 	SIM_VEL_NEG,
 	SIM_END_VEL,
 	SIM_TIME_MAX,
-	SIM_NOT_RUN
+	SIM_NOT_RUN,
+
+	SIM_RESULT_COUNT
 }SimulationResult;
 
 typedef struct SimulationStep{

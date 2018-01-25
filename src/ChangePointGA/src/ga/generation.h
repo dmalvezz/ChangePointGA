@@ -27,6 +27,8 @@
 
 typedef struct Statistics{
 	int invalidCount;
+	int invalidTypeCount[SIM_RESULT_COUNT];
+
 	unsigned long int lastChange;
 	float fitnessSumInverse;
 

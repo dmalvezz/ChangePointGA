@@ -49,7 +49,7 @@ void finalizeStatistic(Statistic_ptr stat){
 }
 
 void printStatisticCsvHeader(const char* statName, FILE* file){
-	fprintf(file, "%sMin, %sMax, %sMedian, %sAvg, %sStd", statName, statName, statName, statName, statName);
+	fprintf(file, "%sMin, %sMax, %sMedian, %sAvg, %sStd,", statName, statName, statName, statName, statName);
 }
 
 void printStatisticCsvData(Statistic_ptr stat, FILE* file){

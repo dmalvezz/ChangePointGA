@@ -24,7 +24,7 @@
 #include "../utils/mathutils.h"
 
 #define MIN_CHANGE_POINT 	3
-#define MAX_CHANGE_POINT 	40
+#define MAX_CHANGE_POINT 	60
 
 #define SIM_THREAD_COUNT	4
 
