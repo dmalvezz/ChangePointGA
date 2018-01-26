@@ -41,7 +41,7 @@ void printConsoleMenu(){
 }
 
 void updateConsole(GA* ga, int* loop){
-	int key = getKey();//getch();
+	int key = getch();
 
 	int cmdMode = 1;
 	int cmdBufferSize = 0;

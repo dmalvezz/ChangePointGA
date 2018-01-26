@@ -65,9 +65,6 @@ int main(int argc, char *argv[]) {
 
 
 void mainInit(){
-	//Init windows
-	initWindows();
-
 	//Init random
 	randInit();
 
@@ -87,7 +84,4 @@ void mainDispose(){
 
 	//Dispose track samples
 	disposeTrackData();
-
-	//Dispose windows
-	disposeWindows();
 }

@@ -36,6 +36,7 @@ void initMaster(MasterProcess* mProcess, int worldId, int color){
 	#endif
 
 	//Init console
+	initWindows();
 	initConsole();
 
 	//Init ga
@@ -104,6 +105,7 @@ void disposeMaster(MasterProcess* mProcess){
 	#endif
 
 	//Dispose windows
+	disposeWindows();
 	disposeConsole();
 }
 
