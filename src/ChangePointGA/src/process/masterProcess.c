@@ -40,7 +40,7 @@ void initMaster(MasterProcess* mProcess, int worldId, int color){
 	initConsole();
 
 	//Init ga
-	initGA(&mProcess->ga, fitnessProportionalSelection, singlePointCrossover, energyFitness);
+	initGA(&mProcess->ga, linearRankWithPressureSelection, singlePointCrossover, energyFitness);
 	addMutation(&mProcess->ga, addRandomChangePoint, 			ADD_POINT_MUTATION_RATE);
 	addMutation(&mProcess->ga, removeRandomChangePoint, 		REMOVE_POINT_MUTATION_RATE);
 	addMutation(&mProcess->ga, moveRandomChangePoint, 			CHANGE_POS_MUTATION_RATE);
@@ -52,6 +52,11 @@ void execMaster(MasterProcess* mProcess){
 	//Refresh console
 	printGAParams(&mProcess->ga);
 	printSimulationParams();
+
+	//Run first gen
+	evalGenerationFitness(mProcess->ga.currentGeneration, mProcess->ga.fitnessFunction, &mProcess->comm);
+	sortGenerationByFitness(mProcess->ga.currentGeneration);
+	updateGenerationStatistics(mProcess->ga.currentGeneration);
 
 	//Loop
 	while(mProcess->loop){
@@ -123,18 +128,46 @@ void genetic(MasterProcess* mProcess){
 	//Start timer
 	generationTimer = getTime();
 
+	//Perform crossover
+	timer = getTime();
+	childCount = crossOver(ga->currentGeneration, ga->nextGeneration, ga->selectionFunction, ga->crossoverFunction);
+	crossoverTime = getTimeElapsed(timer);
+
+	//Perform mutations
+	timer = getTime();
+
+	for(int i = 0; i < ga->mutationCount; i++){
+		mutationCount += mutation(ga->nextGeneration, ga->mutationsFunction[i], ga->mutationRates[i]);
+	}
+	/*
+	for(int i = 0; i < ga->nextGeneration->count; i++){
+		int j = randInt(0, ga->mutationCount - 1);
+		int r = randFloat(0, 1);
+		if(r < ga->mutationRates[j]){
+			ga->mutationsFunction[j](&ga->nextGeneration->individuals[i]);
+		}
+	}*/
+	mutationTime = getTimeElapsed(timer);
+
+	//Perform elitism selection
+	timer = getTime();
+	elitism(ga->currentGeneration, ga->nextGeneration, ELITISM_PERCENTAGE);
+	//FUSS(ga->currentGeneration, ga->nextGeneration);
+	elitismTime = getTimeElapsed(timer);
+
 	//Eval fitness
 	timer = getTime();
-	evalGenerationFitness(ga->currentGeneration, ga->fitnessFunction, &mProcess->comm);
+	evalGenerationFitness(ga->nextGeneration, ga->fitnessFunction, &mProcess->comm);
 	fitnessTime = getTimeElapsed(timer);
 
 	//Sort individual by fitness
 	timer = getTime();
-	sortGenerationByFitness(ga->currentGeneration);
+	sortGenerationByFitness(ga->nextGeneration);
 	sortTime = getTimeElapsed(timer);
 
 	//Calculate the statistics
 	timer = getTime();
+	swap(ga->currentGeneration->individuals, ga->nextGeneration->individuals);
 	updateGenerationStatistics(ga->currentGeneration);
 	statTime = getTimeElapsed(timer);
 
@@ -144,24 +177,6 @@ void genetic(MasterProcess* mProcess){
 		//Add new valid random strategy
 
 	}
-
-	//Perform crossover
-	timer = getTime();
-	childCount = crossOver(ga->currentGeneration, ga->nextGeneration, ga->selectionFunction, ga->crossoverFunction);
-	crossoverTime = getTimeElapsed(timer);
-
-	//Perform mutations
-	timer = getTime();
-	for(int i = 0; i < ga->mutationCount; i++){
-		mutationCount += mutation(ga->nextGeneration, ga->mutationsFunction[i], ga->mutationRates[i]);
-	}
-	mutationTime = getTimeElapsed(timer);
-
-	//Perform elitism selection
-	timer = getTime();
-	elitism(ga->currentGeneration, ga->nextGeneration, ELITISM_PERCENTAGE);
-	FUSS(ga->currentGeneration, ga->nextGeneration);
-	elitismTime = getTimeElapsed(timer);
 
 	//Prints
 	if(ga->generationCount % 10 == 0){
@@ -214,7 +229,6 @@ void genetic(MasterProcess* mProcess){
 	}
 
 	//Next generation
-	swap(ga->currentGeneration->individuals, ga->nextGeneration->individuals);
 	ga->nextGeneration->count = 0;
 	ga->generationCount++;
 }

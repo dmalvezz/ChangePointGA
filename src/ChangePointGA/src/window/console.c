@@ -30,6 +30,8 @@ void initConsole(){
 	registerCommand("loadstrat", loadStrategyFromCsv);
 	registerCommand("savestrat", saveStrategyToCsv);
 
+	registerCommand("savegen", saveGenerationToCsv);
+
 	registerCommand("plotsim", plotSimulation);
 	registerCommand("setmutrate", setMutationRate);
 }

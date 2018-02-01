@@ -66,6 +66,24 @@ void generationToFile(Generation_ptr generation, const char* fileName){
 	fclose(file);
 }
 
+void generationToCsv(Generation_ptr generation, const char* fileName){
+	FILE* file = fopen(fileName, "wt");
+
+	fprintf(file, "index, fitness, energy, time, length, fenSim,\n");
+	for(int i = 0; i < generation->count; i++){
+		fprintf(file, "%d, %f, %f, %f, %d, %f,\n",
+				i,
+				generation->individuals[i].fitness,
+				generation->individuals[i].simulation.energy,
+				generation->individuals[i].simulation.time,
+				generation->individuals[i].size,
+				generation->individuals[i].similarity
+		);
+	}
+
+	fclose(file);
+}
+
 void generationFromFile(Generation_ptr generation, const char* fileName){
 	FILE* file = fopen(fileName, "rb");
 
@@ -120,7 +138,7 @@ void evalGenerationFitness(Generation_ptr generation, FitnessFunction fitnessFun
 		MPI_Comm_size(*comm, &size);
 
 		int strCount = generation->count / size;
-		Strategy strategies[strCount];
+		Strategy_ptr strategies = (Strategy_ptr)malloc(sizeof(Strategy) * generation->count);
 
 		//Broadcast the command
 		cmd = SLAVE_SIMULATE_STRAT_CMD;
@@ -145,6 +163,8 @@ void evalGenerationFitness(Generation_ptr generation, FitnessFunction fitnessFun
 			generation->individuals, strCount, MPI_STRATEGY,
 			0, *comm
 		);
+
+		free(strategies);
 	}
 
 	//Eval fitness
@@ -164,21 +184,11 @@ void sortGenerationByFitness(Generation_ptr generation){
 
 void updateGenerationStatistics(Generation_ptr generation){
 	//Init
+	generation->statistics.fitnessSum = 0;
 	generation->statistics.fitnessSumInverse = 0;
 	generation->statistics.invalidCount = 0;
 	for(int i = 0; i < SIM_RESULT_COUNT; i++){
 		generation->statistics.invalidTypeCount[i] = 0;
-	}
-
-	//Save best
-	if(generation->individuals[0].simulation.result == SIM_OK &&
-			generation->individuals[0].fitness < generation->statistics.best.fitness){
-		memcpy(&generation->statistics.best, &generation->individuals[0], sizeof(Strategy));
-
-		generation->statistics.lastChange = 0;
-	}
-	else{
-		generation->statistics.lastChange++;
 	}
 
 	//Reset statistics working with all the population
@@ -189,13 +199,14 @@ void updateGenerationStatistics(Generation_ptr generation){
 		generation->statistics.invalidTypeCount[generation->individuals[i].simulation.result]++;
 
 		updateStatistic(&generation->statistics.lengthStat, generation->individuals[i].size, i);
-		updateStatistic(&generation->statistics.genotypeSimilarityStat, fabs(generation->statistics.best.size - generation->individuals[i].size), i);
+		updateStatistic(&generation->statistics.genotypeSimilarityStat, generation->individuals[i].size - generation->statistics.best.size, i);
 
 		if(generation->individuals[i].simulation.result != SIM_OK){
 			generation->statistics.invalidCount++;
 		}
 		else{
 			generation->statistics.fitnessSumInverse += 1.0 / generation->individuals[i].fitness;
+			generation->statistics.fitnessSum = generation->individuals[i].fitness;
 		}
 	}
 
@@ -209,7 +220,7 @@ void updateGenerationStatistics(Generation_ptr generation){
 		generation->individuals[i].similarity = evalStrategySimilarity(&generation->individuals[i], &generation->statistics.best);
 
 		updateStatistic(&generation->statistics.fitnessStat, generation->individuals[i].fitness, i);
-		updateStatistic(&generation->statistics.fitnessSimilarityStat, fabs(generation->statistics.best.fitness - generation->individuals[i].fitness), i);
+		updateStatistic(&generation->statistics.fitnessSimilarityStat, generation->individuals[i].fitness - generation->statistics.best.fitness , i);
 		updateStatistic(&generation->statistics.fenotypeSimilarityStat, generation->individuals[i].similarity, i);
 	}
 
@@ -220,6 +231,18 @@ void updateGenerationStatistics(Generation_ptr generation){
 	finalizeStatistic(&generation->statistics.fitnessStat);
 	finalizeStatistic(&generation->statistics.fitnessSimilarityStat);
 	finalizeStatistic(&generation->statistics.fenotypeSimilarityStat);
+
+
+	//Save best
+	if(generation->individuals[0].simulation.result == SIM_OK &&
+			generation->individuals[0].fitness < generation->statistics.best.fitness){
+		memcpy(&generation->statistics.best, &generation->individuals[0], sizeof(Strategy));
+
+		generation->statistics.lastChange = 0;
+	}
+	else{
+		generation->statistics.lastChange++;
+	}
 }
 
 

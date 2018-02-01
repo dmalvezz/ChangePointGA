@@ -324,6 +324,15 @@ int saveStrategyToCsv(GA* ga, char** argv, int argc){
 	return 0;
 }
 
+int saveGenerationToCsv(GA* ga, char** argv, int argc){
+	char fileName[32];
+	sprintf(fileName, "generation%d.csv", ga->generationCount);
+
+	generationToCsv(ga->currentGeneration, fileName);
+
+	return 0;
+}
+
 void printExplorerWindow(GA* ga, int index){
 	int row = 0;
 	wclear(explorerWindow);

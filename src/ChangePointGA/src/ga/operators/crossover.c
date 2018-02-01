@@ -53,6 +53,8 @@ int crossOver(Generation_ptr currentGeneration, Generation_ptr nextGeneration,
 	int cut = randFloat(0, TRACK_END_POINT) / SPACE_STEP;
 
 	int childCount = 0;
+	//wclear(debugWindow);
+
 
 	while(nextGeneration->count < currentGeneration->size){
 		parentIndex1 = selectionFunction(currentGeneration);
@@ -66,17 +68,17 @@ int crossOver(Generation_ptr currentGeneration, Generation_ptr nextGeneration,
 				cut
 			);
 
-
-		/*
+/*
 		wprintw(debugWindow, "%d %d   %d %d\n", parentIndex1, parentIndex2,
 				nextGeneration->individuals[nextGeneration->count].size,
 				nextGeneration->individuals[nextGeneration->count+1].size);
-			*/
 
+*/
 		nextGeneration->count += 2;
 		childCount += 2;
 	}
-
+	//wrefresh(debugWindow);
+	//while(getch() == ERR);
 	return childCount;
 }
 

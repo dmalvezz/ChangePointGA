@@ -137,7 +137,7 @@ extern SimulationResult simulate(Simulation_ptr simulation, float startPosition,
 extern void printSimulation(Simulation_ptr simulation);
 
 //Get motor power
-extern float getPower (Simulation_ptr simulation, float Ftraction, float Speed, float dt);
+extern float getPower(Simulation_ptr simulation, float Ftraction, float Speed, float dt);
 
 //Get motor attrito
 extern float getMotorMattrito(float Speed);

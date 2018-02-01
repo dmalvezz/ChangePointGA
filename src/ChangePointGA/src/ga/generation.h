@@ -30,6 +30,7 @@ typedef struct Statistics{
 	int invalidTypeCount[SIM_RESULT_COUNT];
 
 	unsigned long int lastChange;
+	float fitnessSum;
 	float fitnessSumInverse;
 
 	/*
@@ -80,6 +81,9 @@ extern void printGeneration(Generation_ptr generation);
 
 //Save the generation to file
 extern void generationToFile(Generation_ptr generation, const char* fileName);
+
+//Save the generation to file
+extern void generationToCsv(Generation_ptr generation, const char* fileName);
 
 //Load the generation from file
 extern void generationFromFile(Generation_ptr generation, const char* fileName);

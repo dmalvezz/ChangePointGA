@@ -27,6 +27,8 @@ typedef struct SlaveProcess{
 	//Proc info
 	int worldId;
 	MPI_Comm comm;
+
+	Strategy_ptr strategies;
 }SlaveProcess;
 
 //Initialize the slave process

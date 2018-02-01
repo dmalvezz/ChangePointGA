@@ -11,17 +11,18 @@ void initSlave(SlaveProcess* sProcess, int worldId, int color){
 	//Process info
 	sProcess->worldId = worldId;
 	MPI_Comm_split(MPI_COMM_WORLD, color, worldId, &sProcess->comm);
+
+	sProcess->strategies = (Strategy_ptr)malloc(sizeof(Strategy) * POPULATION_SIZE);
 }
 
 void execSlave(SlaveProcess* sProcess){
 	char cmd;
-	int size;
-	MPI_Comm_size(sProcess->comm, &size);
-
 	int loop = 1;
 
+	//Get strategies portion count
+	int size;
+	MPI_Comm_size(sProcess->comm, &size);
 	int strCount = POPULATION_SIZE / size;
-	Strategy strategies[strCount];
 
 	while(loop){
 		//Wait for command from mater
@@ -37,19 +38,19 @@ void execSlave(SlaveProcess* sProcess){
 				//Receive generation portion to simulate
 				MPI_Scatter(
 					NULL, 0, MPI_STRATEGY,
-					strategies, strCount, MPI_STRATEGY,
+					sProcess->strategies, strCount, MPI_STRATEGY,
 					0, sProcess->comm
 				);
 
 				//Simulate all
 				parallelSimulateStrategy(
-						strategies, strCount, SIM_THREAD_COUNT,
+						sProcess->strategies, strCount, SIM_THREAD_COUNT,
 						START_VELOCITY, END_VELOCITY, START_MAP, KEEP_TIME_INVALID
 				);
 
 				//Send back the simulate generation portion
 				MPI_Gather(
-					strategies, strCount, MPI_STRATEGY,
+					sProcess->strategies, strCount, MPI_STRATEGY,
 					NULL, 0, MPI_STRATEGY,
 					0, sProcess->comm
 				);
@@ -61,5 +62,5 @@ void execSlave(SlaveProcess* sProcess){
 }
 
 void disposeSlave(SlaveProcess* sProcess){
-
+	free(sProcess->strategies);
 }

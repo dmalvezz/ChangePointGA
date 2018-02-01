@@ -59,6 +59,9 @@ extern int loadStrategyFromCsv(GA* ga, char** argv, int argc);
 //Save strategy to csv
 extern int saveStrategyToCsv(GA* ga, char** argv, int argc);
 
+//Save generation to csv
+extern int saveGenerationToCsv(GA* ga, char** argv, int argc);
+
 //Print explorer
 extern void printExplorerWindow(GA* ga, int index);
 
