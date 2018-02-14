@@ -97,13 +97,14 @@ void generationFromFile(Generation_ptr generation, const char* fileName){
 
 
 void statisticsToFile(Generation_ptr generation, unsigned long int generationCount, FILE* file){
-	fprintf(file, "%lu,  %lu,  %f,  %f,  %f,  %f,",
+	fprintf(file, "%lu,  %lu,  %f,  %f,  %f,  %f,   %f,",
 			generationCount,
 			generation->statistics.lastChange,
 			generation->statistics.best.simulation.energy,
 			generation->statistics.best.simulation.time,
 			generation->statistics.best.fitness,
-			(float)generation->statistics.invalidCount / generation->count
+			(float)generation->statistics.invalidCount / generation->count,
+			generation->statistics.fitnessSumInverse
 		);
 
 	for(int i = 0; i < SIM_RESULT_COUNT; i++){

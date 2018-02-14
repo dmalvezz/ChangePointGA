@@ -1,3 +1,7 @@
+#Dir
+
+src/ChangePointGA/Debug/*
+
 # Prerequisites
 *.d
 

@@ -4,7 +4,7 @@
  Author      : Davide Malvezzi
  Version     : 1.0
  Copyright   :
- Description : Slave process function for parallel implementation
+ Description : GA struct MPI data structs
  ============================================================================
  */
 

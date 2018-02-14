@@ -14,12 +14,14 @@
 #include "generation.h"
 #include "../utils/sysutils.h"
 
-//Ga param
+//Population
 #define POPULATION_SIZE		100
-#define MAX_MUTATION_COUNT	10
 
+//Percentage of individuals to keep
 #define ELITISM_PERCENTAGE	0.01f
 
+//Mutations rates
+#define MAX_MUTATION_COUNT				10
 #define ADD_POINT_MUTATION_RATE 		0.15f
 #define REMOVE_POINT_MUTATION_RATE 		0.15f
 #define CHANGE_POS_MUTATION_RATE 		0.15f
@@ -39,32 +41,28 @@
 
 //GA
 typedef struct GA{
-	//Counter
-	unsigned long int generationCount;
+	unsigned long int generationCount;				//Generation counter
 
 	//Mutations
-	int mutationCount;
-	float mutationRates[MAX_MUTATION_COUNT];
-	MutationFunction mutationsFunction[MAX_MUTATION_COUNT];
+	int mutationCount;											//Registered mutations count
+	float mutationRates[MAX_MUTATION_COUNT];					//Registered mutations  rates
+	MutationFunction mutationsFunction[MAX_MUTATION_COUNT];		//Registered mutations functions
 
 	//Other function
-	SelectionFunction selectionFunction;
-	CrossoverFunction crossoverFunction;
-	FitnessFunction fitnessFunction;
+	SelectionFunction selectionFunction;	//Selection function
+	CrossoverFunction crossoverFunction;	//Crossover function
+	FitnessFunction fitnessFunction;		//Fitness function
 
 	//Generations
-	Generation_ptr currentGeneration;
-	Generation_ptr nextGeneration;
+	Generation_ptr currentGeneration;		//Current generation population
+	Generation_ptr nextGeneration;			//Used as temp buffer to create the new generation
 }GA;
 
 //Init GA struct
 extern void initGA(GA* ga, SelectionFunction selectionFunction, CrossoverFunction crossoverFunction, FitnessFunction fitnessFunction);
 
 //Add mutation to the list
-extern void addMutation(GA* ga, MutationFunction mutation, float rate);
-
-//Run a generation
-//extern void genetic(GA* ga);
+extern void addGAMutation(GA* ga, MutationFunction mutation, float rate);
 
 //Dispose GA struct
 extern void disposeGA(GA* ga);

@@ -19,44 +19,34 @@
 #include "statistic.h"
 #include "strategy.h"
 
-
-//MPI
-#define SLAVE_CMD_TAG				1
+//MPI slave commands
 #define SLAVE_SIMULATE_STRAT_CMD	's'
 #define SLAVE_QUIT_CMD				'q'
 
-typedef struct Statistics{
-	int invalidCount;
-	int invalidTypeCount[SIM_RESULT_COUNT];
+typedef struct GenerationStats{
+	int invalidCount;							//Invalid individuals counter
+	int invalidTypeCount[SIM_RESULT_COUNT];		//Simulation results counters
 
-	unsigned long int lastChange;
-	float fitnessSum;
-	float fitnessSumInverse;
+	unsigned long int lastChange;				//Generations passed from last change
+	float fitnessSum;							//Fitnesses sum
+	float fitnessSumInverse;					//Invers fitnesses sum
 
-	/*
-	float fitnessMax;
-	float fitnessMin;
-	float fitnessMedian;
-	float fitnessAvg;
+	Statistic lengthStat;						//Statistics on genome length
+	Statistic fitnessStat;						//Statistics on fitness
+	Statistic fitnessSimilarityStat;			//Statistics on fitnesses similarity
+	Statistic fenotypeSimilarityStat;			//Statistics on fenotype similarity
+	Statistic genotypeSimilarityStat;			//Statistics on genome similarity
 
-	float lengthAvg;
-	float similarityAvg;
-	*/
+	Strategy best;								//Best strategy found so far
+}GenerationStats;
 
-	Statistic lengthStat;
-	Statistic fitnessStat;
-	Statistic fitnessSimilarityStat;
-	Statistic fenotypeSimilarityStat;
-	Statistic genotypeSimilarityStat;
-
-	Strategy best;
-}Statistics;
+typedef GenerationStats* GenerationStats_ptr;
 
 typedef struct Generation{
 	int count;							//Current num of individuals
 	int size;							//Max num of individuals
 	Strategy_ptr individuals;			//Individuals array
-	Statistics statistics;				//Population statistics
+	GenerationStats statistics;				//Population statistics
 }Generation;
 
 typedef Generation* Generation_ptr;
@@ -145,7 +135,7 @@ extern int linearRankWithPressureSelection(Generation_ptr generation);
 extern void singlePointCrossover(Strategy_ptr parent1, Strategy_ptr parent2, Strategy_ptr child1, Strategy_ptr child2, int cut);
 
 //Apply crossover to current generation and save it in next generation
-extern int crossOver(Generation_ptr currentGeneration, Generation_ptr nextGeneration, SelectionFunction selection, CrossoverFunction crossover);
+extern int crossover(Generation_ptr currentGeneration, Generation_ptr nextGeneration, SelectionFunction selection, CrossoverFunction crossover);
 
 
 

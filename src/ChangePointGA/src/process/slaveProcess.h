@@ -21,14 +21,12 @@
 #include "../ga/ga.h"
 #include "../window/console.h"
 
-
-//Slave process global variables
 typedef struct SlaveProcess{
 	//Proc info
-	int worldId;
-	MPI_Comm comm;
+	int worldId;				//Process word rank
+	MPI_Comm comm;				//Process group communicator
 
-	Strategy_ptr strategies;
+	Strategy_ptr strategies;	//Strategies temp buffer
 }SlaveProcess;
 
 //Initialize the slave process

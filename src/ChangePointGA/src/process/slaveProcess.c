@@ -25,7 +25,7 @@ void execSlave(SlaveProcess* sProcess){
 	int strCount = POPULATION_SIZE / size;
 
 	while(loop){
-		//Wait for command from mater
+		//Wait for command from master
 		MPI_Bcast(&cmd, 1, MPI_CHAR, 0, sProcess->comm);
 
 		switch (cmd) {

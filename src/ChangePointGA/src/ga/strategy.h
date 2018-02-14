@@ -11,7 +11,6 @@
 #ifndef STRATEGY_H
 #define STRATEGY_H
 
-
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -23,9 +22,11 @@
 #include "../utils/arrayutils.h"
 #include "../utils/mathutils.h"
 
+//Min/Max genome size
 #define MIN_CHANGE_POINT 	3
 #define MAX_CHANGE_POINT 	60
 
+//Thread count to use in simulation
 #define SIM_THREAD_COUNT	4
 
 typedef struct Strategy{

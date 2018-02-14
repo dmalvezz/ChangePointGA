@@ -68,7 +68,7 @@ void initGA(GA* ga, SelectionFunction selectionFunction, CrossoverFunction cross
 	registerFunctions(filterStrategy, "filter");
 }
 
-void addMutation(GA* ga, MutationFunction mutation, float rate){
+void addGAMutation(GA* ga, MutationFunction mutation, float rate){
 	if(ga->mutationCount < MAX_MUTATION_COUNT){
 		ga->mutationRates[ga->mutationCount] = rate;
 		ga->mutationsFunction[ga->mutationCount] = mutation;

@@ -20,7 +20,7 @@ void initMaster(MasterProcess* mProcess, int worldId, int color){
 	#ifdef SAVE_STATISTICS
 		//Create statistics file
 		mProcess->statisticsFile = fopen(STATISTICS_FILE, "at");
-		fprintf(mProcess->statisticsFile, "generation, lastChange, bestEnergy, bestTime, bestFitness, %%invalid, validCount, deltaInv, dtInv, negVelInv, endVelInv, timeInv, notRun, ");
+		fprintf(mProcess->statisticsFile, "generation, lastChange, bestEnergy, bestTime, bestFitness, %%invalid, validCount, fitnessInverseSum, deltaInv, dtInv, negVelInv, endVelInv, timeInv, notRun,");
 		printStatisticCsvHeader("fitness", mProcess->statisticsFile);
 		printStatisticCsvHeader("length", mProcess->statisticsFile);
 		printStatisticCsvHeader("genotypeSim", mProcess->statisticsFile);
@@ -40,12 +40,16 @@ void initMaster(MasterProcess* mProcess, int worldId, int color){
 	initConsole();
 
 	//Init ga
-	initGA(&mProcess->ga, linearRankWithPressureSelection, singlePointCrossover, energyFitness);
-	addMutation(&mProcess->ga, addRandomChangePoint, 			ADD_POINT_MUTATION_RATE);
-	addMutation(&mProcess->ga, removeRandomChangePoint, 		REMOVE_POINT_MUTATION_RATE);
-	addMutation(&mProcess->ga, moveRandomChangePoint, 			CHANGE_POS_MUTATION_RATE);
-	addMutation(&mProcess->ga, changeRandomChangePointAction, 	CHANGE_ACT_MUTATION_RATE);
-	addMutation(&mProcess->ga, filterStrategy, 					FILTER_MUTATION_RATE);
+	initGA(&mProcess->ga,
+			fitnessProportionalSelection,
+			singlePointCrossover,
+			energyFitness
+		);
+	addGAMutation(&mProcess->ga, addRandomChangePoint, 				ADD_POINT_MUTATION_RATE);
+	addGAMutation(&mProcess->ga, removeRandomChangePoint, 			REMOVE_POINT_MUTATION_RATE);
+	addGAMutation(&mProcess->ga, moveRandomChangePoint, 			CHANGE_POS_MUTATION_RATE);
+	addGAMutation(&mProcess->ga, changeRandomChangePointAction, 	CHANGE_ACT_MUTATION_RATE);
+	addGAMutation(&mProcess->ga, filterStrategy, 					FILTER_MUTATION_RATE);
 }
 
 void execMaster(MasterProcess* mProcess){
@@ -60,7 +64,7 @@ void execMaster(MasterProcess* mProcess){
 
 	//Loop
 	while(mProcess->loop){
-		//Apply genetics
+		//Run genetics
 		genetic(mProcess);
 
 		#ifdef SAVE_STATISTICS
@@ -88,7 +92,6 @@ void execMaster(MasterProcess* mProcess){
 	saveGAParams(&mProcess->ga, GA_FILE);
 	strategyToFile(&mProcess->ga.currentGeneration->statistics.best, BEST_FILE);
 	generationToFile(mProcess->ga.currentGeneration, GENERATION_FILE);
-
 }
 
 void disposeMaster(MasterProcess* mProcess){
@@ -122,7 +125,7 @@ void genetic(MasterProcess* mProcess){
 	int childCount = 0, mutationCount = 0;
 
 	//Timers
-	unsigned long long generationTimer, timer;
+	double generationTimer, timer;
 	double generationTime, fitnessTime, sortTime, statTime, elitismTime, crossoverTime, mutationTime;
 
 	//Start timer
@@ -130,23 +133,14 @@ void genetic(MasterProcess* mProcess){
 
 	//Perform crossover
 	timer = getTime();
-	childCount = crossOver(ga->currentGeneration, ga->nextGeneration, ga->selectionFunction, ga->crossoverFunction);
+	childCount = crossover(ga->currentGeneration, ga->nextGeneration, ga->selectionFunction, ga->crossoverFunction);
 	crossoverTime = getTimeElapsed(timer);
 
 	//Perform mutations
 	timer = getTime();
-
 	for(int i = 0; i < ga->mutationCount; i++){
 		mutationCount += mutation(ga->nextGeneration, ga->mutationsFunction[i], ga->mutationRates[i]);
 	}
-	/*
-	for(int i = 0; i < ga->nextGeneration->count; i++){
-		int j = randInt(0, ga->mutationCount - 1);
-		int r = randFloat(0, 1);
-		if(r < ga->mutationRates[j]){
-			ga->mutationsFunction[j](&ga->nextGeneration->individuals[i]);
-		}
-	}*/
 	mutationTime = getTimeElapsed(timer);
 
 	//Perform elitism selection

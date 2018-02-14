@@ -47,7 +47,7 @@ void singlePointCrossover(Strategy_ptr parent1, Strategy_ptr parent2, Strategy_p
 
 }
 
-int crossOver(Generation_ptr currentGeneration, Generation_ptr nextGeneration,
+int crossover(Generation_ptr currentGeneration, Generation_ptr nextGeneration,
 		SelectionFunction selectionFunction, CrossoverFunction crossoverFunction){
 	int parentIndex1, parentIndex2;
 	int cut = randFloat(0, TRACK_END_POINT) / SPACE_STEP;

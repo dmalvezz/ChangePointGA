@@ -15,8 +15,6 @@
 #include <time.h>
 #include <sys/time.h>
 
-#define SECONDS 1000000000
-
 
 static int getKey(void){
   struct termios oldt, newt;
@@ -43,20 +41,11 @@ static int getKey(void){
 }
 
 
-static unsigned long long getTime(){
-    struct timespec t;
-    int r;
-
-    r = clock_gettime(CLOCK_MONOTONIC, &t);
-    if (r < 0) {
-        fprintf(stderr,"Error to get time! (%i)\n", r);
-        return -1;
-    }
-
-    return (unsigned long long) t.tv_sec * SECONDS + t.tv_nsec;
+static double getTime(){
+   return MPI_Wtime();
 }
 
-static double getTimeElapsed(unsigned long long start){
-	unsigned long long end = getTime();
-	return (double)(end - start) / SECONDS;
+static double getTimeElapsed(double start){
+	double end = MPI_Wtime();
+	return end - start;
 }

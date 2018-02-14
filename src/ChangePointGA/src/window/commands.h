@@ -9,6 +9,7 @@
  */
 
 #include <ctype.h>
+#include <getopt.h>
 
 #include "../ga/ga.h"
 #include "../utils/gnuplot/gnuplot_i.h"

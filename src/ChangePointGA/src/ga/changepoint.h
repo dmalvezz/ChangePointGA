@@ -33,9 +33,7 @@ typedef ChangePoint* ChangePoint_ptr;
 
 
 //Print to stdout
-static void printChangePoint(ChangePoint point){
-	wprintw(debugWindow, "{%d, %d}", point.positionIndex, point.action);
-}
+extern void printChangePoint(ChangePoint point);
 
 
 
