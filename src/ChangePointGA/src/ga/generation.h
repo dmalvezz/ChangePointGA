@@ -46,7 +46,7 @@ typedef struct Generation{
 	int count;							//Current num of individuals
 	int size;							//Max num of individuals
 	Strategy_ptr individuals;			//Individuals array
-	GenerationStats statistics;				//Population statistics
+	GenerationStats statistics;			//Population statistics
 }Generation;
 
 typedef Generation* Generation_ptr;
@@ -94,7 +94,7 @@ extern float energyDiversityFitness(Generation_ptr generation, Strategy_ptr stra
 
 
 //Eval fitness for all individuals
-extern void evalGenerationFitness(Generation_ptr generation, FitnessFunction fitness, MPI_Comm* comm);
+extern double evalGenerationFitness(Generation_ptr generation, FitnessFunction fitness, MPI_Comm* comm);
 
 //Sort individual by fitness value
 extern void sortGenerationByFitness(Generation_ptr generation);

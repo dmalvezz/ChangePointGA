@@ -6,6 +6,7 @@
  */
 
 #include "generation.h"
+#include "../utils/sysutils.h"
 
 
 Generation_ptr initEmptyGeneration(int size){
@@ -122,8 +123,9 @@ void statisticsToFile(Generation_ptr generation, unsigned long int generationCou
 
 
 
-void evalGenerationFitness(Generation_ptr generation, FitnessFunction fitnessFunction, MPI_Comm* comm){
+double evalGenerationFitness(Generation_ptr generation, FitnessFunction fitnessFunction, MPI_Comm* comm){
 	//Simulate
+	double commTime = 0, timer;
 
 	//Use local thread
 	if(comm == NULL){
@@ -142,6 +144,7 @@ void evalGenerationFitness(Generation_ptr generation, FitnessFunction fitnessFun
 		Strategy_ptr strategies = (Strategy_ptr)malloc(sizeof(Strategy) * generation->count);
 
 		//Broadcast the command
+		timer = getTime();
 		cmd = SLAVE_SIMULATE_STRAT_CMD;
 		MPI_Bcast(&cmd, 1, MPI_CHAR, 0, *comm);
 
@@ -152,6 +155,8 @@ void evalGenerationFitness(Generation_ptr generation, FitnessFunction fitnessFun
 			0, *comm
 		);
 
+		commTime += (getTime() - timer);
+
 		//Simulate all
 		parallelSimulateStrategy(
 				strategies, strCount, SIM_THREAD_COUNT,
@@ -159,6 +164,7 @@ void evalGenerationFitness(Generation_ptr generation, FitnessFunction fitnessFun
 		);
 
 		//Send back the simulate generation portion
+		timer = getTime();
 		MPI_Gather(
 			strategies, strCount, MPI_STRATEGY,
 			generation->individuals, strCount, MPI_STRATEGY,
@@ -166,6 +172,8 @@ void evalGenerationFitness(Generation_ptr generation, FitnessFunction fitnessFun
 		);
 
 		free(strategies);
+
+		commTime += (getTime() - timer);
 	}
 
 	//Eval fitness
@@ -177,6 +185,8 @@ void evalGenerationFitness(Generation_ptr generation, FitnessFunction fitnessFun
 			generation->individuals[i].fitness = fitnessFunction(generation, &generation->individuals[i]);
 		}
 	}
+
+	return commTime;
 }
 
 void sortGenerationByFitness(Generation_ptr generation){

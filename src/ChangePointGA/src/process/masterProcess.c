@@ -19,7 +19,7 @@ void initMaster(MasterProcess* mProcess, int worldId, int color){
 
 	#ifdef SAVE_STATISTICS
 		//Create statistics file
-		mProcess->statisticsFile = fopen(STATISTICS_FILE, "at");
+		mProcess->statisticsFile = fopen(STATISTICS_FILE, "wt");
 		fprintf(mProcess->statisticsFile, "generation, lastChange, bestEnergy, bestTime, bestFitness, %%invalid, validCount, fitnessInverseSum, deltaInv, dtInv, negVelInv, endVelInv, timeInv, notRun,");
 		printStatisticCsvHeader("fitness", mProcess->statisticsFile);
 		printStatisticCsvHeader("length", mProcess->statisticsFile);
@@ -27,6 +27,12 @@ void initMaster(MasterProcess* mProcess, int worldId, int color){
 		printStatisticCsvHeader("fenotypeSim", mProcess->statisticsFile);
 		printStatisticCsvHeader("fitnessSim", mProcess->statisticsFile);
 		fprintf(mProcess->statisticsFile, "\n");
+	#endif
+
+	#ifdef SAVE_TIMES
+		//Create time file
+		mProcess->timesFile = fopen(TIME_FILE, "wt");
+		fprintf(mProcess->timesFile, "generation, mutation, crossover, elitism, simulation, sort, stats, comm,\n");
 	#endif
 
 	#ifdef KEEP_BEST
@@ -107,6 +113,11 @@ void disposeMaster(MasterProcess* mProcess){
 		fclose(mProcess->statisticsFile);
 	#endif
 
+	#ifdef SAVE_TIMES
+		//Close times file
+		fclose(mProcess->timesFile);
+	#endif
+
 	#ifdef KEEP_BEST
 		//Close best file
 		fclose(mProcess->bestFile);
@@ -126,7 +137,7 @@ void genetic(MasterProcess* mProcess){
 
 	//Timers
 	double generationTimer, timer;
-	double generationTime, fitnessTime, sortTime, statTime, elitismTime, crossoverTime, mutationTime;
+	double generationTime, fitnessTime, commTime, sortTime, statTime, elitismTime, crossoverTime, mutationTime;
 
 	//Start timer
 	generationTimer = getTime();
@@ -151,7 +162,7 @@ void genetic(MasterProcess* mProcess){
 
 	//Eval fitness
 	timer = getTime();
-	evalGenerationFitness(ga->nextGeneration, ga->fitnessFunction, &mProcess->comm);
+	commTime = evalGenerationFitness(ga->nextGeneration, ga->fitnessFunction, &mProcess->comm);
 	fitnessTime = getTimeElapsed(timer);
 
 	//Sort individual by fitness
@@ -221,6 +232,20 @@ void genetic(MasterProcess* mProcess){
 		mvwprintw(gaOutputWindow, row++, 1, "Total time %lf", generationTime);
 		wrefresh(gaOutputWindow);
 	}
+
+	#ifdef SAVE_TIMES
+		//Save times
+		fprintf(mProcess->timesFile, "%lu, %f, %f, %f, %f, %f, %f, %f\n",
+				ga->generationCount,
+				mutationTime,
+				crossoverTime,
+				elitismTime,
+				fitnessTime - commTime,
+				sortTime,
+				statTime,
+				commTime
+		);
+	#endif
 
 	//Next generation
 	ga->nextGeneration->count = 0;

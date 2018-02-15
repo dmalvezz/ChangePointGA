@@ -33,26 +33,42 @@ static void initMPIChangePoint(){
 }
 
 static void initMPISimulationStep(){
-	//Simulation
-	int structlen = 13;
-	int blocklengths[structlen];
-	MPI_Datatype types[structlen];
-	MPI_Aint displacements[structlen];
-	SimulationStep sim;
+	//Simulation step
+	#ifndef USE_COMPACT_STEP
+		int structlen = 13;
+		int blocklengths[structlen];
+		MPI_Datatype types[structlen];
+		MPI_Aint displacements[structlen];
+		SimulationStep sim;
 
-	blocklengths[0] = 1; types[0] = MPI_INT; displacements[0] = (size_t)&(sim.map) - (size_t)&sim;
-	blocklengths[1] = 1; types[1] = MPI_FLOAT; displacements[1] = (size_t)&(sim.xi) - (size_t)&sim;
-	blocklengths[2] = 1; types[2] = MPI_FLOAT; displacements[2] = (size_t)&(sim.radius) - (size_t)&sim;
-	blocklengths[3] = 1; types[3] = MPI_FLOAT; displacements[3] = (size_t)&(sim.slope) - (size_t)&sim;
-	blocklengths[4] = 1; types[4] = MPI_FLOAT; displacements[4] = (size_t)&(sim.vi) - (size_t)&sim;
-	blocklengths[5] = 1; types[5] = MPI_FLOAT; displacements[5] = (size_t)&(sim.ftraction) - (size_t)&sim;
-	blocklengths[6] = 1; types[6] = MPI_FLOAT; displacements[6] = (size_t)&(sim.fslope) - (size_t)&sim;
-	blocklengths[7] = 1; types[7] = MPI_FLOAT; displacements[7] = (size_t)&(sim.faero) - (size_t)&sim;
-	blocklengths[8] = 1; types[8] = MPI_FLOAT; displacements[8] = (size_t)&(sim.ftyres) - (size_t)&sim;
-	blocklengths[9] = 1; types[9] = MPI_FLOAT; displacements[9] = (size_t)&(sim.fres) - (size_t)&sim;
-	blocklengths[10] = 1; types[10] = MPI_FLOAT; displacements[10] = (size_t)&(sim.a) - (size_t)&sim;
-	blocklengths[11] = 1; types[11] = MPI_FLOAT; displacements[11] = (size_t)&(sim.dt) - (size_t)&sim;
-	blocklengths[12] = 1; types[12] = MPI_FLOAT; displacements[12] = (size_t)&(sim.dE) - (size_t)&sim;
+		blocklengths[0] = 1; types[0] = MPI_INT; displacements[0] = (size_t)&(sim.map) - (size_t)&sim;
+		blocklengths[1] = 1; types[1] = MPI_FLOAT; displacements[1] = (size_t)&(sim.xi) - (size_t)&sim;
+		blocklengths[2] = 1; types[2] = MPI_FLOAT; displacements[2] = (size_t)&(sim.radius) - (size_t)&sim;
+		blocklengths[3] = 1; types[3] = MPI_FLOAT; displacements[3] = (size_t)&(sim.slope) - (size_t)&sim;
+		blocklengths[4] = 1; types[4] = MPI_FLOAT; displacements[4] = (size_t)&(sim.vi) - (size_t)&sim;
+		blocklengths[5] = 1; types[5] = MPI_FLOAT; displacements[5] = (size_t)&(sim.ftraction) - (size_t)&sim;
+		blocklengths[6] = 1; types[6] = MPI_FLOAT; displacements[6] = (size_t)&(sim.fslope) - (size_t)&sim;
+		blocklengths[7] = 1; types[7] = MPI_FLOAT; displacements[7] = (size_t)&(sim.faero) - (size_t)&sim;
+		blocklengths[8] = 1; types[8] = MPI_FLOAT; displacements[8] = (size_t)&(sim.ftyres) - (size_t)&sim;
+		blocklengths[9] = 1; types[9] = MPI_FLOAT; displacements[9] = (size_t)&(sim.fres) - (size_t)&sim;
+		blocklengths[10] = 1; types[10] = MPI_FLOAT; displacements[10] = (size_t)&(sim.a) - (size_t)&sim;
+		blocklengths[11] = 1; types[11] = MPI_FLOAT; displacements[11] = (size_t)&(sim.dt) - (size_t)&sim;
+		blocklengths[12] = 1; types[12] = MPI_FLOAT; displacements[12] = (size_t)&(sim.dE) - (size_t)&sim;
+	#else
+		//Simulation
+		int structlen = 6;
+		int blocklengths[structlen];
+		MPI_Datatype types[structlen];
+		MPI_Aint displacements[structlen];
+		SimulationStep sim;
+
+		blocklengths[0] = 1; types[0] = MPI_INT; displacements[0] = (size_t)&(sim.map) - (size_t)&sim;
+		blocklengths[1] = 1; types[1] = MPI_FLOAT; displacements[1] = (size_t)&(sim.vi) - (size_t)&sim;
+		blocklengths[2] = 1; types[2] = MPI_FLOAT; displacements[2] = (size_t)&(sim.ftraction) - (size_t)&sim;
+		blocklengths[3] = 1; types[3] = MPI_FLOAT; displacements[3] = (size_t)&(sim.a) - (size_t)&sim;
+		blocklengths[4] = 1; types[4] = MPI_FLOAT; displacements[4] = (size_t)&(sim.dt) - (size_t)&sim;
+		blocklengths[5] = 1; types[5] = MPI_FLOAT; displacements[5] = (size_t)&(sim.dE) - (size_t)&sim;
+	#endif
 
 	assert(MPI_Type_create_struct(structlen, blocklengths, displacements,types, &MPI_SIMULATION_STEP) == MPI_SUCCESS);
 	assert(MPI_Type_commit(&MPI_SIMULATION_STEP) == MPI_SUCCESS);

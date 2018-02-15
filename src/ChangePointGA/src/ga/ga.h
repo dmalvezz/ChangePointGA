@@ -33,11 +33,13 @@
 
 //Save define
 #define SAVE_STATISTICS
+#define SAVE_TIMES
 #define BEST_FILE			"best"
 #define GENERATION_FILE		"generation.bin"
 #define SIMULATION_FILE		"simparam.txt"
 #define GA_FILE				"gaparam.txt"
 #define STATISTICS_FILE		"statistics.csv"
+#define TIME_FILE			"time.csv"
 
 //GA
 typedef struct GA{

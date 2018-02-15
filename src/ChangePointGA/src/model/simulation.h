@@ -75,17 +75,22 @@ typedef enum SimulationResult{
 	SIM_RESULT_COUNT
 }SimulationResult;
 
+#define USE_COMPACT_STEP
 typedef struct SimulationStep{
 	int map;
+#ifndef USE_COMPACT_STEP
 	float xi;
 	float radius;
 	float slope;
+#endif
 	float vi;
 	float ftraction;
+#ifndef USE_COMPACT_STEP
 	float fslope;
 	float faero;
 	float ftyres;
 	float fres;
+#endif
 	float a;
 	float dt;
 	float dE;

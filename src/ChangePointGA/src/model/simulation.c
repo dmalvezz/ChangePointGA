@@ -138,15 +138,22 @@ SimulationResult simulate(Simulation_ptr simulation, float startPosition, float 
 		dE = getPower(simulation, fTraction, simulation->velocity, dt) * dt;
 
 		simulation->steps[startIndex + i].map = simulation->selectedMap;
-		simulation->steps[startIndex + i].xi = startPosition + i * SPACE_STEP;
-		simulation->steps[startIndex + i].slope = slope;
-		simulation->steps[startIndex + i].radius = radius;
+		#ifndef USE_COMPACT_STEP
+			simulation->steps[startIndex + i].xi = startPosition + i * SPACE_STEP;
+			simulation->steps[startIndex + i].slope = slope;
+			simulation->steps[startIndex + i].radius = radius;
+		#endif
+
 		simulation->steps[startIndex + i].vi = simulation->velocity;
 		simulation->steps[startIndex + i].ftraction = fTraction;
+
+		#ifndef USE_COMPACT_STEP
 		simulation->steps[startIndex + i].fslope = fSlope;
 		simulation->steps[startIndex + i].faero = fAero;
 		simulation->steps[startIndex + i].ftyres = fTyres;
 		simulation->steps[startIndex + i].fres = fResistent;
+		#endif
+
 		simulation->steps[startIndex + i].a = a;
 		simulation->steps[startIndex + i].dt = dt;
 		simulation->steps[startIndex + i].dE = dE;
@@ -177,8 +184,14 @@ SimulationResult simulate(Simulation_ptr simulation, float startPosition, float 
 void printSimulation(Simulation_ptr simulation){
 	printf("Sim res %d   time %f   energy %f\n", simulation->result, simulation->time, simulation->energy);
 
-	printf("map   x   v   ft  fslope   faero   ftyres   fres   a   dt   dE\n");
+	#ifndef USE_COMPACT_STEP
+		printf("map   x   v   ft  fslope   faero   ftyres   fres   a   dt   dE\n");
+	#else
+		printf("map   x   v   fslope   a   dt   dE\n");
+	#endif
+
 	for(int i = 0; i < SIM_STEP_COUNT; i++){
+		#ifndef USE_COMPACT_STEP
 			printf("%d  %f  %f  %f   %f   %f   %f   %f   %f   %f   %f\n",
 				simulation->steps[i].map,
 				simulation->steps[i].xi,
@@ -192,6 +205,17 @@ void printSimulation(Simulation_ptr simulation){
 				simulation->steps[i].dt,
 				simulation->steps[i].dE
 			);
+		#else
+			printf("%d  %f  %f  %f   %f   %f   %f\n",
+				simulation->steps[i].map,
+				i * SPACE_STEP,
+				simulation->steps[i].vi,
+				simulation->steps[i].ftraction,
+				simulation->steps[i].a,
+				simulation->steps[i].dt,
+				simulation->steps[i].dE
+			);
+		#endif
 	}
 }
 
@@ -200,24 +224,41 @@ void simulationToCsv(Simulation_ptr simulation, FILE* file){
 	fprintf(file, "sim result, %d\n", simulation->result);
 	fprintf(file, "total time, %f\n", simulation->time);
 	fprintf(file, "total energy, %f\n", simulation->energy);
-	fprintf(file, "map,x,slope,radius,vi,ft,fslope,faero,ftyres,fres,ftot,a,dt,dE\n");
+
+	#ifndef USE_COMPACT_STEP
+		fprintf(file, "map,x,slope,radius,vi,ft,fslope,faero,ftyres,fres,ftot,a,dt,dE\n");
+	#else
+		fprintf(file, "map,x,vi,ft,a,dt,dE\n");
+	#endif
 	for(int i = 0; i < SIM_STEP_COUNT; i++){
+		#ifndef USE_COMPACT_STEP
 			fprintf(file, "%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
+					simulation->steps[i].map,
+					simulation->steps[i].xi,
+					simulation->steps[i].slope,
+					simulation->steps[i].radius,
+					simulation->steps[i].vi,
+					simulation->steps[i].ftraction,
+					simulation->steps[i].fslope,
+					simulation->steps[i].faero,
+					simulation->steps[i].ftyres,
+					simulation->steps[i].fres,
+					simulation->steps[i].ftraction - simulation->steps[i].fres,
+					simulation->steps[i].a,
+					simulation->steps[i].dt,
+					simulation->steps[i].dE
+				);
+		#else
+			fprintf(file, "%d,%f,%f,%f,%f,%f,%f,\n",
 				simulation->steps[i].map,
-				simulation->steps[i].xi,
-				simulation->steps[i].slope,
-				simulation->steps[i].radius,
+				i * SPACE_STEP,
 				simulation->steps[i].vi,
 				simulation->steps[i].ftraction,
-				simulation->steps[i].fslope,
-				simulation->steps[i].faero,
-				simulation->steps[i].ftyres,
-				simulation->steps[i].fres,
-				simulation->steps[i].ftraction - simulation->steps[i].fres,
 				simulation->steps[i].a,
 				simulation->steps[i].dt,
 				simulation->steps[i].dE
 			);
+		#endif
 	}
 }
 

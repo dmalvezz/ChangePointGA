@@ -27,7 +27,7 @@
 #define MAX_CHANGE_POINT 	60
 
 //Thread count to use in simulation
-#define SIM_THREAD_COUNT	4
+#define SIM_THREAD_COUNT	2
 
 typedef struct Strategy{
 	int size;									//Num of change points used
