@@ -26,8 +26,8 @@
 	#define min( a, b ) ( ((a) < (b)) ? (a) : (b) )
 #endif
 
-#ifndef swap
-	#define swap(x, y) do { typeof(x) SWAP = x; x = y; y = SWAP; } while (0)
+#ifndef swapv
+	#define swapv(x, y) do { typeof(x) SWAP = x; x = y; y = SWAP; } while (0)
 #endif
 
 static void randInit(){

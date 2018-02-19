@@ -15,7 +15,7 @@
 #include "slaveProcess.h"
 
 //Keep trace of all best strategies
-#define KEEP_BEST
+//#define KEEP_BEST
 
 //Master process global variables
 typedef struct MasterProcess{

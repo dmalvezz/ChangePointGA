@@ -15,12 +15,13 @@ Generation_ptr initEmptyGeneration(int size){
 	generation->count = 0;
 	generation->size = size;
 	generation->individuals = (Strategy_ptr)malloc(size * sizeof(Strategy));
+	generation->simOutputs = (SimulationOutput_ptr)malloc(size * sizeof(SimulationOutput));
 
 	generation->statistics.lastChange = 0;
 
 	generation->statistics.best.fitness = INFINITY;
-	generation->statistics.best.simulation.energy = INFINITY;
-	generation->statistics.best.simulation.time = INFINITY;
+	generation->statistics.bestOutput.energy = INFINITY;
+	generation->statistics.bestOutput.time = INFINITY;
 
 	return generation;
 }
@@ -31,6 +32,7 @@ Generation_ptr initRandomGeneration(int size){
 	generation->count = size;
 	generation->size = size;
 	generation->individuals = (Strategy_ptr)malloc(size * sizeof(Strategy));
+	generation->simOutputs = (SimulationOutput_ptr)malloc(size * sizeof(SimulationOutput));
 
 	for(int i = 0; i < size; i++){
 		initStrategy(&generation->individuals[i], SPACE_STEP);
@@ -39,14 +41,15 @@ Generation_ptr initRandomGeneration(int size){
 	generation->statistics.lastChange = 0;
 
 	generation->statistics.best.fitness = INFINITY;
-	generation->statistics.best.simulation.energy = INFINITY;
-	generation->statistics.best.simulation.time = INFINITY;
+	generation->statistics.bestOutput.energy = INFINITY;
+	generation->statistics.bestOutput.time = INFINITY;
 
 	return generation;
 }
 
 void disposeGeneration(Generation_ptr generation){
 	free(generation->individuals);
+	free(generation->simOutputs);
 	free(generation);
 }
 
@@ -72,13 +75,12 @@ void generationToCsv(Generation_ptr generation, const char* fileName){
 
 	fprintf(file, "index, fitness, energy, time, length, fenSim,\n");
 	for(int i = 0; i < generation->count; i++){
-		fprintf(file, "%d, %f, %f, %f, %d, %f,\n",
+		fprintf(file, "%d, %f, %f, %f, %d,\n",
 				i,
 				generation->individuals[i].fitness,
-				generation->individuals[i].simulation.energy,
-				generation->individuals[i].simulation.time,
-				generation->individuals[i].size,
-				generation->individuals[i].similarity
+				generation->simOutputs[i].energy,
+				generation->simOutputs[i].time,
+				generation->individuals[i].size
 		);
 	}
 
@@ -101,8 +103,8 @@ void statisticsToFile(Generation_ptr generation, unsigned long int generationCou
 	fprintf(file, "%lu,  %lu,  %f,  %f,  %f,  %f,   %f,",
 			generationCount,
 			generation->statistics.lastChange,
-			generation->statistics.best.simulation.energy,
-			generation->statistics.best.simulation.time,
+			generation->statistics.bestOutput.energy,
+			generation->statistics.bestOutput.time,
 			generation->statistics.best.fitness,
 			(float)generation->statistics.invalidCount / generation->count,
 			generation->statistics.fitnessSumInverse
@@ -115,8 +117,10 @@ void statisticsToFile(Generation_ptr generation, unsigned long int generationCou
 	printStatisticCsvData(&generation->statistics.fitnessStat, file);
 	printStatisticCsvData(&generation->statistics.lengthStat, file);
 	printStatisticCsvData(&generation->statistics.genotypeSimilarityStat, file);
+	printStatisticCsvData(&generation->statistics.genotypeAbsSimilarityStat, file);
 	printStatisticCsvData(&generation->statistics.fenotypeSimilarityStat, file);
 	printStatisticCsvData(&generation->statistics.fitnessSimilarityStat, file);
+	printStatisticCsvData(&generation->statistics.fitnessAbsSimilarityStat, file);
 
 	fprintf(file, "\n");
 }
@@ -130,7 +134,8 @@ double evalGenerationFitness(Generation_ptr generation, FitnessFunction fitnessF
 	//Use local thread
 	if(comm == NULL){
 		parallelSimulateStrategy(
-				generation->individuals, generation->count, SIM_THREAD_COUNT,
+				generation->individuals, generation->simOutputs, generation->count,
+				SIM_THREAD_COUNT,
 				START_VELOCITY, END_VELOCITY, START_MAP, KEEP_TIME_INVALID
 		);
 	}
@@ -142,6 +147,7 @@ double evalGenerationFitness(Generation_ptr generation, FitnessFunction fitnessF
 
 		int strCount = generation->count / size;
 		Strategy_ptr strategies = (Strategy_ptr)malloc(sizeof(Strategy) * generation->count);
+		SimulationOutput simOut[generation->count];
 
 		//Broadcast the command
 		timer = getTime();
@@ -154,26 +160,25 @@ double evalGenerationFitness(Generation_ptr generation, FitnessFunction fitnessF
 			strategies, strCount, MPI_STRATEGY,
 			0, *comm
 		);
-
 		commTime += (getTime() - timer);
 
 		//Simulate all
 		parallelSimulateStrategy(
-				strategies, strCount, SIM_THREAD_COUNT,
+				strategies, simOut, strCount,
+				SIM_THREAD_COUNT,
 				START_VELOCITY, END_VELOCITY, START_MAP, KEEP_TIME_INVALID
 		);
 
 		//Send back the simulate generation portion
 		timer = getTime();
 		MPI_Gather(
-			strategies, strCount, MPI_STRATEGY,
-			generation->individuals, strCount, MPI_STRATEGY,
+			simOut, strCount, MPI_SIMULATION_OUTPUT,
+			generation->simOutputs, strCount, MPI_SIMULATION_OUTPUT,
 			0, *comm
 		);
+		commTime += (getTime() - timer);
 
 		free(strategies);
-
-		commTime += (getTime() - timer);
 	}
 
 	//Eval fitness
@@ -182,16 +187,45 @@ double evalGenerationFitness(Generation_ptr generation, FitnessFunction fitnessF
 		#pragma omp for
 		for(int i = 0; i < generation->count; i++){
 			//Update fitness
-			generation->individuals[i].fitness = fitnessFunction(generation, &generation->individuals[i]);
+			generation->individuals[i].fitness = fitnessFunction(generation, i);
 		}
 	}
 
 	return commTime;
 }
 
-void sortGenerationByFitness(Generation_ptr generation){
-	qsort(generation->individuals, generation->count, sizeof(Strategy), compareStrategyFitness);
+static void qsortkeyvalue(Strategy_ptr key, SimulationOutput_ptr value, int left, int right) {
+	int i, last;
+
+	if (left >= right)
+		return;
+	swapv(key[left], key[(left + right)/2]);
+	swapv(value[left], value[(left + right)/2]);
+
+	last = left;
+
+	for (i = left+1; i <= right; i++){
+		if (key[i].fitness < key[left].fitness){
+			last++;
+			swapv(key[last], key[i]);
+			swapv(value[last], value[i]);
+		}
+	}
+
+	swapv(key[left], key[last]);
+	swapv(value[left], value[last]);
+
+
+	qsortkeyvalue(key, value, left, last-1);
+	qsortkeyvalue(key, value, last+1, right);
 }
+
+void sortGenerationByFitness(Generation_ptr generation){
+	//qsort(generation->individuals, generation->count, sizeof(Strategy), compareStrategyFitness);
+
+	qsortkeyvalue(generation->individuals, generation->simOutputs, 0, generation->count - 1);
+}
+
 
 void updateGenerationStatistics(Generation_ptr generation){
 	//Init
@@ -205,14 +239,16 @@ void updateGenerationStatistics(Generation_ptr generation){
 	//Reset statistics working with all the population
 	resetStatistic(&generation->statistics.lengthStat, generation->count);
 	resetStatistic(&generation->statistics.genotypeSimilarityStat, generation->count);
+	resetStatistic(&generation->statistics.genotypeAbsSimilarityStat, generation->count);
 
 	for(int i = 0; i < generation->count; i++){
-		generation->statistics.invalidTypeCount[generation->individuals[i].simulation.result]++;
+		generation->statistics.invalidTypeCount[generation->simOutputs[i].result]++;
 
 		updateStatistic(&generation->statistics.lengthStat, generation->individuals[i].size, i);
 		updateStatistic(&generation->statistics.genotypeSimilarityStat, generation->individuals[i].size - generation->statistics.best.size, i);
+		updateStatistic(&generation->statistics.genotypeAbsSimilarityStat, fabs(generation->individuals[i].size - generation->statistics.best.size), i);
 
-		if(generation->individuals[i].simulation.result != SIM_OK){
+		if(generation->simOutputs[i].result != SIM_OK){
 			generation->statistics.invalidCount++;
 		}
 		else{
@@ -224,30 +260,31 @@ void updateGenerationStatistics(Generation_ptr generation){
 	//Reset statistics working with only the valid population
 	resetStatistic(&generation->statistics.fitnessStat, generation->count - generation->statistics.invalidCount);
 	resetStatistic(&generation->statistics.fitnessSimilarityStat, generation->count - generation->statistics.invalidCount);
+	resetStatistic(&generation->statistics.fitnessAbsSimilarityStat, generation->count - generation->statistics.invalidCount);
 	resetStatistic(&generation->statistics.fenotypeSimilarityStat, generation->count - generation->statistics.invalidCount);
 
 	for(int i = 0; i < generation->count - generation->statistics.invalidCount; i++){
-		//Similarity factor with previous best
-		generation->individuals[i].similarity = evalStrategySimilarity(&generation->individuals[i], &generation->statistics.best);
-
 		updateStatistic(&generation->statistics.fitnessStat, generation->individuals[i].fitness, i);
 		updateStatistic(&generation->statistics.fitnessSimilarityStat, generation->individuals[i].fitness - generation->statistics.best.fitness , i);
-		updateStatistic(&generation->statistics.fenotypeSimilarityStat, generation->individuals[i].similarity, i);
+		updateStatistic(&generation->statistics.fitnessAbsSimilarityStat, fabs(generation->individuals[i].fitness - generation->statistics.best.fitness) , i);
+		updateStatistic(&generation->statistics.fenotypeSimilarityStat, evalStrategySimilarity(&generation->individuals[i], &generation->statistics.best), i);
 	}
-
 
 	//Finalize the statistics
 	finalizeStatistic(&generation->statistics.lengthStat);
 	finalizeStatistic(&generation->statistics.genotypeSimilarityStat);
+	finalizeStatistic(&generation->statistics.genotypeAbsSimilarityStat);
 	finalizeStatistic(&generation->statistics.fitnessStat);
 	finalizeStatistic(&generation->statistics.fitnessSimilarityStat);
+	finalizeStatistic(&generation->statistics.fitnessAbsSimilarityStat);
 	finalizeStatistic(&generation->statistics.fenotypeSimilarityStat);
 
-
 	//Save best
-	if(generation->individuals[0].simulation.result == SIM_OK &&
+	if(generation->simOutputs[0].result == SIM_OK &&
 			generation->individuals[0].fitness < generation->statistics.best.fitness){
+
 		memcpy(&generation->statistics.best, &generation->individuals[0], sizeof(Strategy));
+		memcpy(&generation->statistics.bestOutput, &generation->simOutputs[0], sizeof(SimulationOutput));
 
 		generation->statistics.lastChange = 0;
 	}

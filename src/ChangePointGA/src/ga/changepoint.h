@@ -35,6 +35,8 @@ typedef ChangePoint* ChangePoint_ptr;
 //Print to stdout
 extern void printChangePoint(ChangePoint point);
 
+//Get map
+extern int getCurrentMap(Action action, int map);
 
 
 #endif

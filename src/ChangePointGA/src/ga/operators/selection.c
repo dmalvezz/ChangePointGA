@@ -10,17 +10,7 @@
 void elitism(Generation_ptr currentGeneration, Generation_ptr nextGeneration, float elitismPercentage){
 	int count = max(1, currentGeneration->count * elitismPercentage);
 
-	//nextGeneration->count = count;
-	//Keep best in the generation
-	/*
-	if(currentGeneration->individuals[0].simulation.energy < currentGeneration->statistics.best.simulation.energy){
-		memcpy(&nextGeneration->individuals[0], &currentGeneration->statistics.best, sizeof(Strategy));
-		memcpy(&nextGeneration->individuals[1], currentGeneration->individuals, (count - 1) * sizeof(Strategy));
-	}
-	else{
-	*/
-		memcpy(nextGeneration->individuals, currentGeneration->individuals, count * sizeof(Strategy));
-	//}
+	memcpy(nextGeneration->individuals, currentGeneration->individuals, count * sizeof(Strategy));
 }
 
 int FUSS(Generation_ptr currentGeneration, Generation_ptr nextGeneration){
@@ -113,7 +103,7 @@ int rankSelection(Generation_ptr generation){
 }
 
 
-#define RANK_SELECTION_PRESSURE 1.9f
+#define LINEAR_RANK_SP 1.3f
 
 int linearRankWithPressureSelection(Generation_ptr generation){
 	int i = 0;
@@ -121,7 +111,7 @@ int linearRankWithPressureSelection(Generation_ptr generation){
 	float p = 0;
 
 	while(i < generation->count && p <= r){
-		p += (2.0f - RANK_SELECTION_PRESSURE + 2.0f * (RANK_SELECTION_PRESSURE - 1.0f) * (generation->count - (i + 1)) /(generation->count - 1))/generation->count;
+		p += (2.0f - LINEAR_RANK_SP + 2.0f * (LINEAR_RANK_SP - 1.0f) * (generation->count - (i + 1)) /(generation->count - 1))/generation->count;
 		i++;
 	}
 

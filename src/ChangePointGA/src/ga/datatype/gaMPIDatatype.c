@@ -15,6 +15,7 @@
 MPI_Datatype MPI_CHANGEPOINT;
 MPI_Datatype MPI_SIMULATION_STEP;
 MPI_Datatype MPI_SIMULATION;
+MPI_Datatype MPI_SIMULATION_OUTPUT;
 MPI_Datatype MPI_STRATEGY;
 
 static void initMPIChangePoint(){
@@ -97,9 +98,26 @@ static void initMPISimulation(){
 	assert(MPI_Type_commit(&MPI_SIMULATION) == MPI_SUCCESS);
 }
 
+static void initMPISimulationOutput(){
+	//Simulation
+	int structlen = 4;
+	int blocklengths[structlen];
+	MPI_Datatype types[structlen];
+	MPI_Aint displacements[structlen];
+	SimulationOutput sim;
+
+	blocklengths[0] = 1; types[0] = MPI_FLOAT; displacements[0] = (size_t)&(sim.velocity) - (size_t)&sim;
+	blocklengths[1] = 1; types[1] = MPI_FLOAT; displacements[1] = (size_t)&(sim.time) - (size_t)&sim;
+	blocklengths[2] = 1; types[2] = MPI_FLOAT; displacements[2] = (size_t)&(sim.energy) - (size_t)&sim;
+	blocklengths[3] = 1; types[3] = MPI_INT;   displacements[3] = (size_t)&(sim.result) - (size_t)&sim;
+
+	assert(MPI_Type_create_struct(structlen, blocklengths, displacements,types, &MPI_SIMULATION_OUTPUT) == MPI_SUCCESS);
+	assert(MPI_Type_commit(&MPI_SIMULATION_OUTPUT) == MPI_SUCCESS);
+}
+
 static void initMPIStrategy(){
 	//Strategy
-	int structlen = 5;
+	int structlen = 3;
 	int blocklengths[structlen];
 	MPI_Datatype types[structlen];
 	MPI_Aint displacements[structlen];
@@ -107,9 +125,7 @@ static void initMPIStrategy(){
 
 	blocklengths[0] = 1; types[0] = MPI_INT; displacements[0] = (size_t)&(str.size) - (size_t)&str;
 	blocklengths[1] = 1; types[1] = MPI_FLOAT; displacements[1] = (size_t)&(str.fitness) - (size_t)&str;
-	blocklengths[2] = 1; types[2] = MPI_FLOAT; displacements[2] = (size_t)&(str.similarity) - (size_t)&str;
-	blocklengths[3] = MAX_CHANGE_POINT; types[3] = MPI_CHANGEPOINT; displacements[3] = (size_t)&(str.points) - (size_t)&str;
-	blocklengths[4] = 1; types[4] = MPI_SIMULATION; displacements[4] = (size_t)&(str.simulation) - (size_t)&str;
+	blocklengths[2] = MAX_CHANGE_POINT; types[2] = MPI_CHANGEPOINT; displacements[2] = (size_t)&(str.points) - (size_t)&str;
 
 	assert(MPI_Type_create_struct(structlen, blocklengths, displacements,types, &MPI_STRATEGY) == MPI_SUCCESS);
 	assert(MPI_Type_commit(&MPI_STRATEGY) == MPI_SUCCESS);
@@ -120,6 +136,7 @@ void initGAMPIDatatypes(){
 	initMPIChangePoint();
 	initMPISimulationStep();
 	initMPISimulation();
+	initMPISimulationOutput();
 	initMPIStrategy();
 }
 
@@ -127,5 +144,6 @@ void disposteGAMPIDatatypes(){
 	MPI_Type_free(&MPI_CHANGEPOINT);
 	MPI_Type_free(&MPI_SIMULATION_STEP);
 	MPI_Type_free(&MPI_SIMULATION);
+	MPI_Type_free(&MPI_SIMULATION_OUTPUT);
 	MPI_Type_free(&MPI_STRATEGY);
 }

@@ -76,25 +76,13 @@ void initMapset(){
 }
 
 SimulationResult simulate(Simulation_ptr simulation, float startPosition, float endPosition, Action action, int keepTimeInvalid){
-
-	if(action == ACTION_PLUS){
-		simulation->selectedMap++;
-	}
-	else if(action == ACTION_MINUS){
-		simulation->selectedMap--;
-	}
-
-	if(simulation->selectedMap > MAP_COUNT){
-		simulation->selectedMap = MAP_COUNT;
-	}
-	else if(simulation->selectedMap < 0){
-		simulation->selectedMap = 0;
-	}
-
 	int startIndex = startPosition / SPACE_STEP;
 	int simStep = (endPosition - startPosition) / SPACE_STEP;
 	float radius, slope, fTraction, fSlope, fAero, fTyres, fResistent, fTot, a, delta, dt, dE;
 	SimulationResult simRes = SIM_OK;
+
+	//Update current map
+	simulation->selectedMap = getCurrentMap(action, simulation->selectedMap);
 
 	for(int i = 0; i < simStep; i++){
 		slope = getTrackSlope(simulation->position, SPACE_STEP);

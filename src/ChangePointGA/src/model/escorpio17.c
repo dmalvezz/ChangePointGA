@@ -347,6 +347,6 @@ float getForceTraction(float Speed, int map){
 		return 0;
 	}
 
-	return max(0, min(getMapForce(&maps[map - 1], Speed), getMaxForceTraction(Speed)));
+	return min(getMapForce(&maps[map - 1], Speed), getMaxForceTraction(Speed));
 }
 

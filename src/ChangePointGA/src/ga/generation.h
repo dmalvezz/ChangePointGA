@@ -34,10 +34,13 @@ typedef struct GenerationStats{
 	Statistic lengthStat;						//Statistics on genome length
 	Statistic fitnessStat;						//Statistics on fitness
 	Statistic fitnessSimilarityStat;			//Statistics on fitnesses similarity
-	Statistic fenotypeSimilarityStat;			//Statistics on fenotype similarity
+	Statistic fitnessAbsSimilarityStat;			//Statistics on fitnesses absolute similarity
 	Statistic genotypeSimilarityStat;			//Statistics on genome similarity
+	Statistic genotypeAbsSimilarityStat;		//Statistics on genome absolute similarity
+	Statistic fenotypeSimilarityStat;			//Statistics on fenotype similarity
 
 	Strategy best;								//Best strategy found so far
+	SimulationOutput bestOutput;				//Best strategy simulation output
 }GenerationStats;
 
 typedef GenerationStats* GenerationStats_ptr;
@@ -46,15 +49,19 @@ typedef struct Generation{
 	int count;							//Current num of individuals
 	int size;							//Max num of individuals
 	Strategy_ptr individuals;			//Individuals array
+	SimulationOutput_ptr simOutputs;	//Simulations output array
 	GenerationStats statistics;			//Population statistics
 }Generation;
 
 typedef Generation* Generation_ptr;
 
-typedef float (*FitnessFunction)(Generation_ptr generation, Strategy_ptr strategy);
+typedef float (*FitnessFunction)(Generation_ptr generation, int index);
 typedef int (*SelectionFunction)(Generation_ptr generation);
 typedef void (*CrossoverFunction)(Strategy_ptr parent1, Strategy_ptr parent2, Strategy_ptr child1, Strategy_ptr child2, int cut);
 typedef void (*MutationFunction)(Strategy_ptr strategy);
+
+
+
 
 /*****Init functions*****/
 //Initialize a empty population
@@ -82,15 +89,16 @@ extern void generationFromFile(Generation_ptr generation, const char* fileName);
 extern void statisticsToFile(Generation_ptr generation, unsigned long int generationCount, FILE* file);
 
 
+
 /*****Fitness eval functions*****/
 //Pure energy based fitness
-extern float energyFitness(Generation_ptr generation, Strategy_ptr strategy);
+extern float energyFitness(Generation_ptr generation, int index);
 
 //Energy and time fitness
-extern float energyTimeFitness(Generation_ptr generation, Strategy_ptr strategy);
+extern float energyTimeFitness(Generation_ptr generation, int index);
 
 //Energy and diversity fitness
-extern float energyDiversityFitness(Generation_ptr generation, Strategy_ptr strategy);
+extern float energyDiversityFitness(Generation_ptr generation, int index);
 
 
 //Eval fitness for all individuals

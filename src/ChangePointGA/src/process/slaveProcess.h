@@ -27,6 +27,7 @@ typedef struct SlaveProcess{
 	MPI_Comm comm;				//Process group communicator
 
 	Strategy_ptr strategies;	//Strategies temp buffer
+	SimulationOutput simOut[POPULATION_SIZE];	//Simulation out buffer
 }SlaveProcess;
 
 //Initialize the slave process

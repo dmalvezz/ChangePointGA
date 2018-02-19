@@ -17,6 +17,7 @@
 extern MPI_Datatype MPI_CHANGEPOINT;
 extern MPI_Datatype MPI_SIMULATION_STEP;
 extern MPI_Datatype MPI_SIMULATION;
+extern MPI_Datatype MPI_SIMULATION_OUTPUT;
 extern MPI_Datatype MPI_STRATEGY;
 
 //Init MPI datatype for custom struct

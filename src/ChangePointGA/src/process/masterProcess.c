@@ -20,12 +20,14 @@ void initMaster(MasterProcess* mProcess, int worldId, int color){
 	#ifdef SAVE_STATISTICS
 		//Create statistics file
 		mProcess->statisticsFile = fopen(STATISTICS_FILE, "wt");
-		fprintf(mProcess->statisticsFile, "generation, lastChange, bestEnergy, bestTime, bestFitness, %%invalid, validCount, fitnessInverseSum, deltaInv, dtInv, negVelInv, endVelInv, timeInv, notRun,");
+		fprintf(mProcess->statisticsFile, "generation, lastChange, bestEnergy, bestTime, bestFitness, %%invalid, fitnessInverseSum, validCount, deltaInv, dtInv, negVelInv, endVelInv, timeInv, notRun,");
 		printStatisticCsvHeader("fitness", mProcess->statisticsFile);
 		printStatisticCsvHeader("length", mProcess->statisticsFile);
 		printStatisticCsvHeader("genotypeSim", mProcess->statisticsFile);
+		printStatisticCsvHeader("genotypeAbsSim", mProcess->statisticsFile);
 		printStatisticCsvHeader("fenotypeSim", mProcess->statisticsFile);
 		printStatisticCsvHeader("fitnessSim", mProcess->statisticsFile);
+		printStatisticCsvHeader("fitnessAbsSim", mProcess->statisticsFile);
 		fprintf(mProcess->statisticsFile, "\n");
 	#endif
 
@@ -172,16 +174,20 @@ void genetic(MasterProcess* mProcess){
 
 	//Calculate the statistics
 	timer = getTime();
-	swap(ga->currentGeneration->individuals, ga->nextGeneration->individuals);
+	swapv(ga->currentGeneration->individuals, ga->nextGeneration->individuals);
+	swapv(ga->currentGeneration->simOutputs, ga->nextGeneration->simOutputs);
+
 	updateGenerationStatistics(ga->currentGeneration);
 	statTime = getTimeElapsed(timer);
 
+	/* Implement migration
 	if (ga->currentGeneration->statistics.invalidCount / ga->currentGeneration->size > INVALID_THRESHOLD
 			|| ga->currentGeneration->statistics.lastChange > MAX_LAST_CHANGE) {
 
 		//Add new valid random strategy
 
 	}
+	*/
 
 	//Prints
 	if(ga->generationCount % 10 == 0){
@@ -204,8 +210,8 @@ void genetic(MasterProcess* mProcess){
 		//Print best
 		mvwprintw(gaOutputWindow, row++, 1, "Best fitness %.2f   energy %.2f   time %.2f/%.2f",
 				ga->currentGeneration->statistics.best.fitness,
-				ga->currentGeneration->statistics.best.simulation.energy,
-				ga->currentGeneration->statistics.best.simulation.time,
+				ga->currentGeneration->statistics.bestOutput.energy,
+				ga->currentGeneration->statistics.bestOutput.time,
 				MAX_TIME
 			);
 
@@ -229,7 +235,12 @@ void genetic(MasterProcess* mProcess){
 				crossoverTime,
 				mutationTime
 			);
-		mvwprintw(gaOutputWindow, row++, 1, "Total time %lf", generationTime);
+		mvwprintw(gaOutputWindow, row++, 1, "Total %0.5lf    ser %0.5lf   par %0.5lf   comm %0.5lf",
+				generationTime,
+				sortTime + statTime + elitismTime + crossoverTime + mutationTime,
+				fitnessTime - commTime,
+				commTime
+				);
 		wrefresh(gaOutputWindow);
 	}
 

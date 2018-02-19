@@ -44,14 +44,16 @@ void execSlave(SlaveProcess* sProcess){
 
 				//Simulate all
 				parallelSimulateStrategy(
-						sProcess->strategies, strCount, SIM_THREAD_COUNT,
+						sProcess->strategies, sProcess->simOut, strCount,
+						SIM_THREAD_COUNT,
 						START_VELOCITY, END_VELOCITY, START_MAP, KEEP_TIME_INVALID
 				);
 
-				//Send back the simulate generation portion
+
+				//Send back the simulation output
 				MPI_Gather(
-					sProcess->strategies, strCount, MPI_STRATEGY,
-					NULL, 0, MPI_STRATEGY,
+					sProcess->simOut, strCount, MPI_SIMULATION_OUTPUT,
+					NULL, 0, MPI_SIMULATION_OUTPUT,
 					0, sProcess->comm
 				);
 

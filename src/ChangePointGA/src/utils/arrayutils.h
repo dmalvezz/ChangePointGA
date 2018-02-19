@@ -12,6 +12,7 @@
 #define ARRAY_UTILS_H
 
 #include <string.h>
+#include <stdlib.h>
 
 static void addElement(void* array, int index, int size, size_t elemSize){
 	char* dst = (char*)array;

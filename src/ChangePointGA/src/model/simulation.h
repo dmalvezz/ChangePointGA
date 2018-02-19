@@ -75,7 +75,7 @@ typedef enum SimulationResult{
 	SIM_RESULT_COUNT
 }SimulationResult;
 
-#define USE_COMPACT_STEP
+//#define USE_COMPACT_STEP
 typedef struct SimulationStep{
 	int map;
 #ifndef USE_COMPACT_STEP
@@ -115,6 +115,18 @@ typedef struct Simulation{
 }Simulation;
 
 typedef Simulation* Simulation_ptr;
+
+//Compact struct for mpi comunications
+typedef struct SimulationOutput{
+	float velocity;		//Current velocity
+	float time;			//Total time
+	float energy;		//Total energy consumed
+
+	SimulationResult result;	//Simulation result
+}SimulationOutput;
+
+typedef SimulationOutput* SimulationOutput_ptr;
+
 
 //Maps
 typedef struct Map{

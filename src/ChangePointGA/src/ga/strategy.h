@@ -27,15 +27,12 @@
 #define MAX_CHANGE_POINT 	60
 
 //Thread count to use in simulation
-#define SIM_THREAD_COUNT	2
+#define SIM_THREAD_COUNT	4
 
 typedef struct Strategy{
 	int size;									//Num of change points used
-	//int lastChange;							//Last change point changed
 	float fitness;								//Strategy fitness
-	float similarity;							//Strategy similarity factor
 	ChangePoint points[MAX_CHANGE_POINT];		//Change points
-	Simulation simulation;						//Simulation
 }Strategy;
 
 typedef Strategy* Strategy_ptr;
@@ -67,10 +64,10 @@ extern void addChangePoint(Strategy_ptr strategy, int position);
 extern void removeChangePoint(Strategy_ptr strategy, int index);
 
 //Run simulation
-extern void simulateStrategy(Strategy_ptr strategy, float startVelocity, float endVelocity, int startMap, int keepTimeInvalid);
+extern void simulateStrategy(Strategy_ptr strategy, Simulation_ptr simulation, float startVelocity, float endVelocity, int startMap, int keepTimeInvalid);
 
 //Run paralell simulation
-extern void parallelSimulateStrategy(Strategy_ptr strategies, int count, int threadCount, float startVelocity, float endVelocity, int startMap, int keepTimeInvalid);
+extern void parallelSimulateStrategy(Strategy_ptr strategies, SimulationOutput_ptr simOut, int count, int threadCount, float startVelocity, float endVelocity, int startMap, int keepTimeInvalid);
 
 //Eval similarity factor
 extern float evalStrategySimilarity(Strategy_ptr str1, Strategy_ptr str2);

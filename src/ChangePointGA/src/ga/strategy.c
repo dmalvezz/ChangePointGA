@@ -41,6 +41,11 @@ void strategyToFile(Strategy_ptr strategy, const char* stratName){
 	char fileName[32];
 	FILE* file;
 
+	Simulation simulation;
+	simulateStrategy(strategy, &simulation,
+			START_VELOCITY, END_VELOCITY, START_MAP, KEEP_TIME_INVALID
+	);
+
 	struct stat st = {0};
 
 	if (stat(stratName, &st) == -1) {
@@ -51,7 +56,7 @@ void strategyToFile(Strategy_ptr strategy, const char* stratName){
 	strcpy(fileName, stratName);
 	strcat(fileName, "/simulation.csv");
 	file = fopen(fileName, "wt");
-	simulationToCsv(&strategy->simulation, file);
+	simulationToCsv(&simulation, file);
 	fclose(file);
 
 	//Save strategy
@@ -75,7 +80,7 @@ void strategyToFile(Strategy_ptr strategy, const char* stratName){
 	strcpy(fileName, stratName);
 	strcat(fileName, "/strat.txt");
 	file = fopen(fileName, "wt");
-	simulationToStrategy(&strategy->simulation, file);
+	simulationToStrategy(&simulation, file);
 	fclose(file);
 }
 
@@ -88,19 +93,7 @@ void strategyFromCsv(Strategy_ptr strategy, const char* fileName){
 		fscanf(file,"%d%c%d%c", &strategy->points[i].positionIndex, &comma, &strategy->points[i].action, &newLine);
 	}
 	fclose(file);
-
-	/*
-	wclear(explorerWindow);
-	wmove(explorerWindow,0,0);
-	wprintw(explorerWindow, "%d\n", strategy->size);
-	for(int i = 0; i < strategy->size; i++){
-		wprintw(explorerWindow,"%d %d \n", strategy->points[i].positionIndex, strategy->points[i].action);
-	}
-
-	wrefresh(explorerWindow);
-	*/
 }
-
 
 int compareStrategyFitness(const void* elem1, const void* elem2) {
     Strategy_ptr str1 = (Strategy_ptr)elem1;
@@ -140,7 +133,6 @@ int getChangePointNearAt(Strategy_ptr strategy, int position){
 		m++;
 	}
 
-
 	return m;
 }
 
@@ -154,14 +146,14 @@ void removeChangePoint(Strategy_ptr strategy, int index){
 	strategy->size--;
 }
 
-void simulateStrategy(Strategy_ptr strategy, float startVelocity, float endVelocity, int startMap, int keepTimeInvalid){
+void simulateStrategy(Strategy_ptr strategy, Simulation_ptr simulation, float startVelocity, float endVelocity, int startMap, int keepTimeInvalid){
 	int i = 0;
 
 	//Init simulation
-	initSimulation(&strategy->simulation, startVelocity, startMap);
+	initSimulation(simulation, startVelocity, startMap);
 
 	//Simulate from start to first change point
-	strategy->simulation.result = simulate(&strategy->simulation,
+	simulation->result = simulate(simulation,
 			0,
 			strategy->points[0].positionIndex * SPACE_STEP,
 			ACTION_NONE,
@@ -169,8 +161,8 @@ void simulateStrategy(Strategy_ptr strategy, float startVelocity, float endVeloc
 			);
 
 	//Simulate all change point
-	while(i < strategy->size - 1 && strategy->simulation.result == SIM_OK){
-		strategy->simulation.result = simulate(&strategy->simulation,
+	while(i < strategy->size - 1 && simulation->result == SIM_OK){
+		simulation->result = simulate(simulation,
 				strategy->points[i].positionIndex * SPACE_STEP,
 				strategy->points[i + 1].positionIndex * SPACE_STEP,
 				strategy->points[i].action,
@@ -179,9 +171,9 @@ void simulateStrategy(Strategy_ptr strategy, float startVelocity, float endVeloc
 		i++;
 	}
 
-	if(strategy->simulation.result == SIM_OK){
+	if(simulation->result == SIM_OK){
 		//Simulate from last change point to track end
-		strategy->simulation.result = simulate(&strategy->simulation,
+		simulation->result = simulate(simulation,
 				strategy->points[strategy->size - 1].positionIndex * SPACE_STEP,
 				TRACK_END_POINT,
 				strategy->points[strategy->size - 1].action,
@@ -189,29 +181,37 @@ void simulateStrategy(Strategy_ptr strategy, float startVelocity, float endVeloc
 				);
 
 		//Get double energy penalty if started lap with gas on and ended lap with gas on
-		if (strategy->simulation.selectedMap != 0 && strategy->simulation.steps[0].map != 0) {
-			strategy->simulation.energy -= MotorStartPenalty;
+		if (simulation->selectedMap != 0 && simulation->steps[0].map != 0) {
+			simulation->energy -= MotorStartPenalty;
 		}
 
 		//Check if last velocity is >= than the start velocity
 		//Just for general lap
-		if(strategy->simulation.result == SIM_OK
-				&& strategy->simulation.velocity < endVelocity){
-			strategy->simulation.time = INFINITY;
-			strategy->simulation.energy = INFINITY;
-			strategy->simulation.result = SIM_END_VEL;
+		if(simulation->result == SIM_OK
+				&& simulation->velocity < endVelocity){
+			simulation->time = INFINITY;
+			simulation->energy = INFINITY;
+			simulation->result = SIM_END_VEL;
 		}
 	}
 
 }
 
-void parallelSimulateStrategy(Strategy_ptr strategies, int count, int threadCount, float startVelocity, float endVelocity, int startMap, int keepTimeInvalid){
+void parallelSimulateStrategy(Strategy_ptr strategies, SimulationOutput_ptr simOut, int count, int threadCount, float startVelocity, float endVelocity, int startMap, int keepTimeInvalid){
 	#pragma omp parallel num_threads(threadCount)
 	{
+		Simulation sim;
+
 		#pragma omp for
 		for(int i = 0; i < count; i++){
 			//Simulate the strategy
-			simulateStrategy(&strategies[i], startVelocity, endVelocity, startMap, keepTimeInvalid);
+			simulateStrategy(&strategies[i], &sim, startVelocity, endVelocity, startMap, keepTimeInvalid);
+
+			//Save the output
+			simOut[i].energy = sim.energy;
+			simOut[i].time = sim.time;
+			simOut[i].velocity = sim.velocity;
+			simOut[i].result = sim.result;
 		}
 	}
 }
@@ -219,25 +219,34 @@ void parallelSimulateStrategy(Strategy_ptr strategies, int count, int threadCoun
 float evalStrategySimilarity(Strategy_ptr str1, Strategy_ptr str2){
 	float factor;
 	float scalar = 0, l1 = 0, l2 = 0;
+	int map1 = START_MAP;
+	int map2 = START_MAP;
+	int index1 = 0, index2 = 0;
 
-	if(str1->simulation.result == SIM_OK && str2->simulation.result == SIM_OK){
-
-		for(int i = 0; i < SIM_STEP_COUNT; i++){
-			scalar += str1->simulation.steps[i].map * str2->simulation.steps[i].map;
-			l1 += str1->simulation.steps[i].map * str1->simulation.steps[i].map;
-			l2 += str2->simulation.steps[i].map * str2->simulation.steps[i].map;
+	for(int i = 0; i < SIM_STEP_COUNT; i++){
+		if(index1 < str1->size && str1->points[index1].positionIndex == i){
+			map1 = getCurrentMap(str1->points[index1].action, map1);
+			index1++;
 		}
 
-		//Cosine measure
-		factor = scalar / (sqrt(l1) * sqrt(l2));
+		if(index2 < str2->size && str2->points[index2].positionIndex == i){
+			map2 = getCurrentMap(str2->points[index2].action, map2);
+			index2++;
+		}
 
-		//Jacquard measure
-		//factor = scalar / (l1 + l2 - scalar);
-
-		return acosf(factor) * 180.0 / M_PI;
+		scalar += map1 * map2;
+		l1 += map1 * map1;
+		l2 += map2 * map2;
 	}
 
-	return INFINITY;
+	//Cosine measure
+	factor = scalar / (sqrt(l1) * sqrt(l2));
+
+	//Jacquard measure
+	//factor = scalar / (l1 + l2 - scalar);
+
+	return acosf(factor) * 180.0 / M_PI;
+
 }
 
 

@@ -134,9 +134,12 @@ int applyFilterToStrategy(GA* ga, char** argv, int argc){
 	else{
 		filterStrategy(&ga->currentGeneration->individuals[simIndex]);
 
-		simulateStrategy(&ga->currentGeneration->individuals[simIndex], START_VELOCITY, END_VELOCITY, START_MAP, 1);
-		ga->currentGeneration->individuals[simIndex].similarity = evalStrategySimilarity(&ga->currentGeneration->individuals[simIndex], &ga->currentGeneration->statistics.best);
-		ga->currentGeneration->individuals[simIndex].fitness = ga->fitnessFunction(ga->currentGeneration, &ga->currentGeneration->individuals[simIndex]);
+		parallelSimulateStrategy(
+				ga->currentGeneration->individuals, ga->currentGeneration->simOutputs,
+				ga->currentGeneration->count, SIM_THREAD_COUNT,
+				START_VELOCITY, END_VELOCITY, START_MAP, 1
+		);
+		ga->currentGeneration->individuals[simIndex].fitness = ga->fitnessFunction(ga->currentGeneration, simIndex);
 
 		printExplorerWindow(ga, simIndex);
 	}
@@ -193,9 +196,12 @@ int plotSimulation(GA* ga, char** argv, int argc){
 		gnuplot_set_xlabel(handle, "Track pos");
 		gnuplot_set_ylabel(handle, title);
 
-		simulateStrategy(&ga->currentGeneration->individuals[simIndex], START_VELOCITY, END_VELOCITY, START_MAP, KEEP_TIME_INVALID);
+		Simulation sim;
+		simulateStrategy(&ga->currentGeneration->individuals[simIndex], &sim,
+				START_VELOCITY, END_VELOCITY, START_MAP, KEEP_TIME_INVALID
+			);
 		for (int i = 0 ; i < SIM_STEP_COUNT; i++) {
-			points[i] = ga->currentGeneration->individuals[simIndex].simulation.steps[i].map;
+			points[i] = sim.steps[i].map;
 		}
 		gnuplot_plot_x(handle, points, SIM_STEP_COUNT, "Map");
 
@@ -262,9 +268,12 @@ int loadStrategyFromCsv(GA* ga, char** argv, int argc){
 	else{
 		strategyFromCsv(&ga->currentGeneration->individuals[simIndex], fileName);
 
-		simulateStrategy(&ga->currentGeneration->individuals[simIndex], START_VELOCITY, END_VELOCITY, START_MAP, 1);
-		ga->currentGeneration->individuals[simIndex].similarity = evalStrategySimilarity(&ga->currentGeneration->individuals[simIndex], &ga->currentGeneration->statistics.best);
-		ga->currentGeneration->individuals[simIndex].fitness = ga->fitnessFunction(ga->currentGeneration, &ga->currentGeneration->individuals[simIndex]);
+		parallelSimulateStrategy(
+					ga->currentGeneration->individuals, ga->currentGeneration->simOutputs,
+					ga->currentGeneration->count, SIM_THREAD_COUNT,
+					START_VELOCITY, END_VELOCITY, START_MAP, 1
+			);
+		ga->currentGeneration->individuals[simIndex].fitness = ga->fitnessFunction(ga->currentGeneration, simIndex);
 
 		printExplorerWindow(ga, simIndex);
 	}
@@ -326,7 +335,7 @@ int saveStrategyToCsv(GA* ga, char** argv, int argc){
 
 int saveGenerationToCsv(GA* ga, char** argv, int argc){
 	char fileName[32];
-	sprintf(fileName, "generation%d.csv", ga->generationCount);
+	sprintf(fileName, "generation%lu.csv", ga->generationCount);
 
 	generationToCsv(ga->currentGeneration, fileName);
 
@@ -339,13 +348,13 @@ void printExplorerWindow(GA* ga, int index){
 	box(explorerWindow, 0, 0);
 
 	mvwprintw(explorerWindow, row++, 1, "Strategy %d", index);
-	mvwprintw(explorerWindow, row++, 1, "Energy %.2f", ga->currentGeneration->individuals[index].simulation.energy);
-	mvwprintw(explorerWindow, row++, 1, "Time %.2f", ga->currentGeneration->individuals[index].simulation.time);
+	mvwprintw(explorerWindow, row++, 1, "Energy %.2f", ga->currentGeneration->simOutputs[index].energy);
+	mvwprintw(explorerWindow, row++, 1, "Time %.2f", ga->currentGeneration->simOutputs[index].time);
 	mvwprintw(explorerWindow, row++, 1, "Fitness %.2f", ga->currentGeneration->individuals[index].fitness);
 	mvwprintw(explorerWindow, row++, 1, "Length %d", ga->currentGeneration->individuals[index].size);
-	mvwprintw(explorerWindow, row++, 1, "Similarity %0.2f",ga->currentGeneration->individuals[index].similarity);
-	mvwprintw(explorerWindow, row++, 1, "Valid %d", ga->currentGeneration->individuals[index].simulation.result);
-	mvwprintw(explorerWindow, row++, 1, "End vel %.2f", ga->currentGeneration->individuals[index].simulation.velocity);
+	//mvwprintw(explorerWindow, row++, 1, "Similarity %0.2f",ga->currentGeneration->individuals[index].similarity);
+	mvwprintw(explorerWindow, row++, 1, "Valid %d", ga->currentGeneration->simOutputs[index].result);
+	mvwprintw(explorerWindow, row++, 1, "End vel %.2f", ga->currentGeneration->simOutputs[index].velocity);
 
 	wrefresh(explorerWindow);
 }
