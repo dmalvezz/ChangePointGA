@@ -91,7 +91,6 @@ void changeRandomChangePointAction(Strategy_ptr strategy){
 void filterStrategy(Strategy_ptr strategy){
 	int map = START_MAP;
 
-	/*
 	//Remove useless change point
 	for(int i = 0; i < strategy->size; i++){
 		if(strategy->points[i].action == ACTION_PLUS){
@@ -118,7 +117,6 @@ void filterStrategy(Strategy_ptr strategy){
 		}
 
 	}
-	*/
 
 	//Remove spikes
 	for(int i = 1; i < strategy->size; i++){
@@ -130,7 +128,6 @@ void filterStrategy(Strategy_ptr strategy){
 			i = i - 2;
 		}
 	}
-
 
 	//Add random changepoint if under the min size
 	while(strategy->size < MIN_CHANGE_POINT){

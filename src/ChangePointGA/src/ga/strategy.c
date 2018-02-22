@@ -43,7 +43,7 @@ void strategyToFile(Strategy_ptr strategy, const char* stratName){
 
 	Simulation simulation;
 	simulateStrategy(strategy, &simulation,
-			START_VELOCITY, END_VELOCITY, START_MAP, KEEP_TIME_INVALID
+			START_VELOCITY, END_VELOCITY, START_MAP, 1
 	);
 
 	struct stat st = {0};
@@ -216,6 +216,7 @@ void parallelSimulateStrategy(Strategy_ptr strategies, SimulationOutput_ptr simO
 	}
 }
 
+#include <assert.h>
 float evalStrategySimilarity(Strategy_ptr str1, Strategy_ptr str2){
 	float factor;
 	float scalar = 0, l1 = 0, l2 = 0;
@@ -223,13 +224,15 @@ float evalStrategySimilarity(Strategy_ptr str1, Strategy_ptr str2){
 	int map2 = START_MAP;
 	int index1 = 0, index2 = 0;
 
-	for(int i = 0; i < SIM_STEP_COUNT; i++){
-		if(index1 < str1->size && str1->points[index1].positionIndex == i){
+	if(str1->size == 0 || str2->size == 0)return INFINITY;
+	int i = 0;
+	for( i = 0; i < SIM_STEP_COUNT; i++){
+		while(index1 < str1->size && str1->points[index1].positionIndex == i){
 			map1 = getCurrentMap(str1->points[index1].action, map1);
 			index1++;
 		}
 
-		if(index2 < str2->size && str2->points[index2].positionIndex == i){
+		while(index2 < str2->size && str2->points[index2].positionIndex == i){
 			map2 = getCurrentMap(str2->points[index2].action, map2);
 			index2++;
 		}
@@ -239,6 +242,8 @@ float evalStrategySimilarity(Strategy_ptr str1, Strategy_ptr str2){
 		l2 += map2 * map2;
 	}
 
+	assert(l1 >0);
+	assert(l2>0	);
 	//Cosine measure
 	factor = scalar / (sqrt(l1) * sqrt(l2));
 

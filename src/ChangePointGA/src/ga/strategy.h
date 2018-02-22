@@ -23,8 +23,8 @@
 #include "../utils/mathutils.h"
 
 //Min/Max genome size
-#define MIN_CHANGE_POINT 	3
-#define MAX_CHANGE_POINT 	60
+#define MIN_CHANGE_POINT 	1
+#define MAX_CHANGE_POINT 	100
 
 //Thread count to use in simulation
 #define SIM_THREAD_COUNT	4

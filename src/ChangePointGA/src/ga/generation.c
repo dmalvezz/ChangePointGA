@@ -73,7 +73,7 @@ void generationToFile(Generation_ptr generation, const char* fileName){
 void generationToCsv(Generation_ptr generation, const char* fileName){
 	FILE* file = fopen(fileName, "wt");
 
-	fprintf(file, "index, fitness, energy, time, length, fenSim,\n");
+	fprintf(file, "index, fitness, energy, time, length,\n");
 	for(int i = 0; i < generation->count; i++){
 		fprintf(file, "%d, %f, %f, %f, %d,\n",
 				i,
@@ -146,7 +146,8 @@ double evalGenerationFitness(Generation_ptr generation, FitnessFunction fitnessF
 		MPI_Comm_size(*comm, &size);
 
 		int strCount = generation->count / size;
-		Strategy_ptr strategies = (Strategy_ptr)malloc(sizeof(Strategy) * generation->count);
+		//Strategy_ptr strategies = (Strategy_ptr)malloc(sizeof(Strategy) * generation->count);
+		Strategy strategies[generation->count];
 		SimulationOutput simOut[generation->count];
 
 		//Broadcast the command
@@ -178,7 +179,7 @@ double evalGenerationFitness(Generation_ptr generation, FitnessFunction fitnessF
 		);
 		commTime += (getTime() - timer);
 
-		free(strategies);
+		//free(strategies);
 	}
 
 	//Eval fitness
@@ -226,7 +227,7 @@ void sortGenerationByFitness(Generation_ptr generation){
 	qsortkeyvalue(generation->individuals, generation->simOutputs, 0, generation->count - 1);
 }
 
-
+#include <assert.h>
 void updateGenerationStatistics(Generation_ptr generation){
 	//Init
 	generation->statistics.fitnessSum = 0;
@@ -268,6 +269,7 @@ void updateGenerationStatistics(Generation_ptr generation){
 		updateStatistic(&generation->statistics.fitnessSimilarityStat, generation->individuals[i].fitness - generation->statistics.best.fitness , i);
 		updateStatistic(&generation->statistics.fitnessAbsSimilarityStat, fabs(generation->individuals[i].fitness - generation->statistics.best.fitness) , i);
 		updateStatistic(&generation->statistics.fenotypeSimilarityStat, evalStrategySimilarity(&generation->individuals[i], &generation->statistics.best), i);
+
 	}
 
 	//Finalize the statistics
@@ -278,6 +280,12 @@ void updateGenerationStatistics(Generation_ptr generation){
 	finalizeStatistic(&generation->statistics.fitnessSimilarityStat);
 	finalizeStatistic(&generation->statistics.fitnessAbsSimilarityStat);
 	finalizeStatistic(&generation->statistics.fenotypeSimilarityStat);
+
+	if(generation->statistics.fenotypeSimilarityStat.avg == NAN){
+		assert(0);
+
+
+	}
 
 	//Save best
 	if(generation->simOutputs[0].result == SIM_OK &&

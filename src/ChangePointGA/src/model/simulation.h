@@ -39,7 +39,7 @@
 
 //Simulation params
 #define SPACE_STEP	1.0
-#define LAP_COUNT	1
+#define LAP_COUNT	3
 
 //Track param
 #define TRACK_START_POINT	0
