@@ -188,6 +188,10 @@ int plotSimulation(GA* ga, char** argv, int argc){
 	}
 	else{
 		double points[SIM_STEP_COUNT];
+		double vel[SIM_STEP_COUNT];
+		double slope[SIM_STEP_COUNT];
+		double ft[SIM_STEP_COUNT];
+
 		char title[16];
 		sprintf(title, "Map %d", simIndex);
 
@@ -200,10 +204,21 @@ int plotSimulation(GA* ga, char** argv, int argc){
 		simulateStrategy(&ga->currentGeneration->individuals[simIndex], &sim,
 				START_VELOCITY, END_VELOCITY, START_MAP, KEEP_TIME_INVALID
 			);
-		for (int i = 0 ; i < SIM_STEP_COUNT; i++) {
+		for(int i = 0; i < SIM_STEP_COUNT; i++) {
 			points[i] = sim.steps[i].map;
+			vel[i] = sim.steps[i].vi;
+			slope[i] = sim.steps[i].slope;
+			ft[i] = sim.steps[i].ftraction;
 		}
+		slope[0] = 6;
+		for(int i = 1; i < SIM_STEP_COUNT; i++) {
+			slope[i] = slope[i - 1] + atan(slope[i]);
+		}
+
 		gnuplot_plot_x(handle, points, SIM_STEP_COUNT, "Map");
+		gnuplot_plot_x(handle, vel, SIM_STEP_COUNT, "Vel");
+		gnuplot_plot_x(handle, slope, SIM_STEP_COUNT, "Slope");
+		gnuplot_plot_x(handle, ft, SIM_STEP_COUNT, "Ft");
 
 	}
 	return 0;
@@ -352,7 +367,7 @@ void printExplorerWindow(GA* ga, int index){
 	mvwprintw(explorerWindow, row++, 1, "Time %.2f", ga->currentGeneration->simOutputs[index].time);
 	mvwprintw(explorerWindow, row++, 1, "Fitness %.2f", ga->currentGeneration->individuals[index].fitness);
 	mvwprintw(explorerWindow, row++, 1, "Length %d", ga->currentGeneration->individuals[index].size);
-	//mvwprintw(explorerWindow, row++, 1, "Similarity %0.2f",ga->currentGeneration->individuals[index].similarity);
+	mvwprintw(explorerWindow, row++, 1, "Similarity %0.2f", evalStrategySimilarity(&ga->currentGeneration->individuals[index], &ga->currentGeneration->statistics.best));
 	mvwprintw(explorerWindow, row++, 1, "Valid %d", ga->currentGeneration->simOutputs[index].result);
 	mvwprintw(explorerWindow, row++, 1, "End vel %.2f", ga->currentGeneration->simOutputs[index].velocity);
 

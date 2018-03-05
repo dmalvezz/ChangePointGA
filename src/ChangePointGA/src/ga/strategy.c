@@ -225,8 +225,8 @@ float evalStrategySimilarity(Strategy_ptr str1, Strategy_ptr str2){
 	int index1 = 0, index2 = 0;
 
 	if(str1->size == 0 || str2->size == 0)return INFINITY;
-	int i = 0;
-	for( i = 0; i < SIM_STEP_COUNT; i++){
+
+	for(int i = 0; i < SIM_STEP_COUNT; i++){
 		while(index1 < str1->size && str1->points[index1].positionIndex == i){
 			map1 = getCurrentMap(str1->points[index1].action, map1);
 			index1++;
@@ -242,15 +242,14 @@ float evalStrategySimilarity(Strategy_ptr str1, Strategy_ptr str2){
 		l2 += map2 * map2;
 	}
 
-	assert(l1 >0);
-	assert(l2>0	);
 	//Cosine measure
 	factor = scalar / (sqrt(l1) * sqrt(l2));
+	factor = acosf(factor) * 180.0 / M_PI;
 
 	//Jacquard measure
 	//factor = scalar / (l1 + l2 - scalar);
 
-	return acosf(factor) * 180.0 / M_PI;
+	return factor;
 
 }
 

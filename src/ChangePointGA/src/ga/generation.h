@@ -94,6 +94,9 @@ extern void statisticsToFile(Generation_ptr generation, unsigned long int genera
 //Pure energy based fitness
 extern float energyFitness(Generation_ptr generation, int index);
 
+//Energy squared based fitness
+extern float energySquaredFitness(Generation_ptr generation, int index);
+
 //Energy and time fitness
 extern float energyTimeFitness(Generation_ptr generation, int index);
 

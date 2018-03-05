@@ -54,6 +54,7 @@ void initGA(GA* ga, SelectionFunction selectionFunction, CrossoverFunction cross
 
 	//Fitness functions
 	registerFunctions(energyFitness, "energy");
+	registerFunctions(energySquaredFitness, "energy^2");
 	registerFunctions(energyTimeFitness, "energy+time");
 	registerFunctions(energyDiversityFitness, "energy+div");
 

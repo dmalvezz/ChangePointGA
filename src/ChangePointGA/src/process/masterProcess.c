@@ -40,8 +40,9 @@ void initMaster(MasterProcess* mProcess, int worldId, int color){
 	#ifdef KEEP_BEST
 		//Create best file
 		mProcess->bestFile = fopen("bestSim.csv", "at");
-		mProcess->currBest = INFINITY;
 	#endif
+
+	mProcess->currBest = INFINITY;
 
 	//Init console
 	initWindows();
@@ -80,17 +81,22 @@ void execMaster(MasterProcess* mProcess){
 			statisticsToFile(mProcess->ga.currentGeneration, mProcess->ga.generationCount, mProcess->statisticsFile);
 		#endif
 
-		#ifdef KEEP_BEST
-			//Save the new best
-			if(mProcess->currBest > mProcess->ga.currentGeneration->statistics.best.fitness){
-				mProcess->currBest = mProcess->ga.currentGeneration->statistics.best.fitness;
+
+		//Auto save
+		if(mProcess->currBest > mProcess->ga.currentGeneration->statistics.best.fitness){
+			strategyToFile(&mProcess->ga.currentGeneration->statistics.best, BEST_FILE);
+			generationToFile(mProcess->ga.currentGeneration, GENERATION_FILE);
+
+			#ifdef KEEP_BEST
+				//Save the new best
 				for(int i = 0; i < SIM_STEP_COUNT; i++){
 					fprintf(mProcess->bestFile, "%d,", mProcess->ga.currentGeneration->statistics.best.simulation.steps[i].map);
 				}
 				fprintf(mProcess->bestFile, "\n");
-			}
-		#endif
+			#endif
 
+			mProcess->currBest = mProcess->ga.currentGeneration->statistics.best.fitness;
+		}
 		//Update console
 		updateConsole(&mProcess->ga, &mProcess->loop);
 	}

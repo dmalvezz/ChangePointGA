@@ -27,7 +27,7 @@
 #endif
 
 #ifndef swapv
-	#define swapv(x, y) do { typeof(x) SWAP = x; x = y; y = SWAP; } while (0)
+	#define swapv(x, y) do { __typeof__(x) SWAP = x; x = y; y = SWAP; } while (0)
 #endif
 
 static void randInit(){

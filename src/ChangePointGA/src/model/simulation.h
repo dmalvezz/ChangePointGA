@@ -23,8 +23,8 @@
 //Motors list
 //#define RE40_24V
 //#define RE40_48V
-//#define RE50_24V
-#define RE50_36V
+#define RE50_24V
+//#define RE50_36V
 
 //Keep time invalid simulations
 #define KEEP_TIME_INVALID	0
@@ -39,7 +39,7 @@
 
 //Simulation params
 #define SPACE_STEP	1.0
-#define LAP_COUNT	3
+#define LAP_COUNT	1
 
 //Track param
 #define TRACK_START_POINT	0
@@ -52,14 +52,14 @@
 #elif LAST_LAP
 	#define MIN_AVG_SPEED 6.74
 #else
-	#define MIN_AVG_SPEED 7.0
+	#define MIN_AVG_SPEED 6.95
 #endif
 
 #define MAX_TIME	((float)TRACK_END_POINT / MIN_AVG_SPEED)
 
 //Simulation initial conditions
-#define START_VELOCITY	7.0
-#define END_VELOCITY	7.0
+#define START_VELOCITY	6.3
+#define END_VELOCITY	6.3
 #define START_MAP		0
 #define MAP_COUNT		4
 

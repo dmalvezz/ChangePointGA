@@ -17,6 +17,9 @@
 //Keep trace of all best strategies
 //#define KEEP_BEST
 
+//Autosave on each new best strategies
+#define AUTO_SAVE
+
 //Master process global variables
 typedef struct MasterProcess{
 	//Proc info

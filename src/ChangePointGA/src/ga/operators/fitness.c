@@ -12,6 +12,10 @@ float energyFitness(Generation_ptr generation, int index){
 	return generation->simOutputs[index].energy;
 }
 
+float energySquaredFitness(Generation_ptr generation, int index){
+	return generation->simOutputs[index].energy * generation->simOutputs[index].energy;
+}
+
 float energyTimeFitness(Generation_ptr generation, int index){
 	//return strategy->simulation.energy + pow(strategy->simulation.time - (MAX_TIME), 10);
 	float fitness =  generation->simOutputs[index].energy;
