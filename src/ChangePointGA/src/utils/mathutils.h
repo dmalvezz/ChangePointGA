@@ -18,6 +18,10 @@
 #include <stdio.h>
 #include <time.h>
 
+#ifndef M_PI
+	#define M_PI	3.14159265359
+#endif
+
 #ifndef max
 	#define max( a, b ) ( ((a) > (b)) ? (a) : (b) )
 #endif

@@ -5,7 +5,7 @@
 #ifndef TRACK_H
 #define TRACK_H
 
-#include <math.h>
+#include "../utils/mathutils.h"
 
 #define RACE_LAPS	15
 #define RACE_TIME   2100	// s
