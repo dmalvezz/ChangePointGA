@@ -158,7 +158,7 @@ void simulateStrategy(Strategy_ptr strategy, Simulation_ptr simulation, float st
 			strategy->points[0].positionIndex * SPACE_STEP,
 			ACTION_NONE,
 			keepTimeInvalid
-			);
+		);
 
 	//Simulate all change point
 	while(i < strategy->size - 1 && simulation->result == SIM_OK){
@@ -167,7 +167,7 @@ void simulateStrategy(Strategy_ptr strategy, Simulation_ptr simulation, float st
 				strategy->points[i + 1].positionIndex * SPACE_STEP,
 				strategy->points[i].action,
 				keepTimeInvalid
-				);
+			);
 		i++;
 	}
 
@@ -178,21 +178,60 @@ void simulateStrategy(Strategy_ptr strategy, Simulation_ptr simulation, float st
 				TRACK_END_POINT,
 				strategy->points[strategy->size - 1].action,
 				keepTimeInvalid
-				);
+			);
 
-		//Get double energy penalty if started lap with gas on and ended lap with gas on
-		if (simulation->selectedMap != 0 && simulation->steps[0].map != 0) {
-			simulation->energy -= MotorStartPenalty;
-		}
+		#ifdef N_LAP
+			//Get double energy penalty if started lap with gas on and ended lap with gas on
+			if (simulation->selectedMap != 0 && simulation->steps[0].map != 0) {
+				simulation->energy -= MotorStartPenalty;
+			}
 
-		//Check if last velocity is >= than the start velocity
-		//Just for general lap
-		if(simulation->result == SIM_OK
-				&& simulation->velocity < endVelocity){
-			simulation->time = INFINITY;
-			simulation->energy = INFINITY;
-			simulation->result = SIM_END_VEL;
-		}
+			//Check if last velocity is >= than the start velocity
+			//Just for general lap
+			if(simulation->result == SIM_OK
+					&& simulation->velocity < endVelocity){
+				simulation->time = INFINITY;
+				simulation->energy = INFINITY;
+				simulation->result = SIM_END_VEL;
+			}
+		#endif
+
+		#ifdef PATTERN_LAPS
+			if(simulation->result == SIM_OK &&
+				fabs(simulation->steps[TRACK_LENGTH * PATTERN_START_LAP].vi - simulation->steps[TRACK_LENGTH * PATTERN_END_LAP].vi) < 0.01){
+
+				float patternLapsEnergy = 0;
+				float patternLapsTime = 0;
+				for(int i = TRACK_LENGTH * PATTERN_START_LAP; i < TRACK_LENGTH * PATTERN_END_LAP; i++){
+					patternLapsEnergy += simulation->steps[i].dE;
+					patternLapsTime += simulation->steps[i].dt;
+				}
+
+				simulation->time += patternLapsTime * PATTERN_REPEAT;
+
+				if(simulation->time <= RACE_TIME){
+					if(simulation->steps[TRACK_LENGTH * PATTERN_START_LAP - 1].map == 0 &&
+							simulation->steps[TRACK_LENGTH * PATTERN_START_LAP].map != 0 &&
+							simulation->steps[TRACK_LENGTH * PATTERN_END_LAP - 1].map != 0){
+						//simulation->energy -= MotorStartPenalty;
+						patternLapsEnergy -= MotorStartPenalty;
+					}
+					simulation->energy += patternLapsEnergy * PATTERN_REPEAT;
+
+				}
+				else{
+					simulation->time = INFINITY;
+					simulation->energy = INFINITY;
+					simulation->result = SIM_TIME_MAX;
+				}
+			}
+			else{
+				simulation->time = INFINITY;
+				simulation->energy = INFINITY;
+				simulation->result = SIM_END_VEL;
+			}
+		#endif
+
 	}
 
 }
@@ -216,7 +255,6 @@ void parallelSimulateStrategy(Strategy_ptr strategies, SimulationOutput_ptr simO
 	}
 }
 
-#include <assert.h>
 float evalStrategySimilarity(Strategy_ptr str1, Strategy_ptr str2){
 	float factor;
 	float scalar = 0, l1 = 0, l2 = 0;

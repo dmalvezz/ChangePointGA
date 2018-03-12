@@ -50,7 +50,7 @@ void initMaster(MasterProcess* mProcess, int worldId, int color){
 
 	//Init ga
 	initGA(&mProcess->ga,
-			fitnessProportionalSelection,
+			linearRankWithPressureSelection,
 			singlePointCrossover,
 			energyFitness
 		);

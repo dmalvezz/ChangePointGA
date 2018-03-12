@@ -11,8 +11,8 @@
 void initSimulation(Simulation_ptr simulation, float startVelocity, int startMap){
 	simulation->lastTractiveForce = 0;
 
-	simulation->Twindings = 38;
-	simulation->TmotorCase = 35;
+	simulation->Twindings = INITIAL_T_WINDINGS;
+	simulation->TmotorCase = INITIAL_T_MOTOR;
 
 	simulation->selectedMap = startMap;
 	simulation->position = 0;
@@ -54,8 +54,8 @@ void initMapset(){
 #endif
 
 #ifdef RE50_36V
-	//initMap(&maps[0], -4800.0, 100.0, 0.0);
-	initMap(&maps[0], -9500, 60.0, 0.0);
+	initMap(&maps[0], -4800.0, 100.0, 0.0);
+	//initMap(&maps[0], -9500, 60.0, 0.0);
 	initMap(&maps[1], -9000.0, 100.0, 0.0);
 	initMap(&maps[2], -4800.0, 45.0, 0.0);
 	initMap(&maps[3], -14000.0, 100.0, 0.0);
@@ -148,6 +148,9 @@ SimulationResult simulate(Simulation_ptr simulation, float startPosition, float 
 		simulation->steps[startIndex + i].dt = dt;
 		simulation->steps[startIndex + i].dE = dE;
 
+		simulation->steps[startIndex + i].TmotorCase = simulation->TmotorCase;
+		simulation->steps[startIndex + i].Twindings = simulation->Twindings;
+
 		simulation->position += SPACE_STEP;
 		simulation->velocity = simulation->velocity + a * dt;
 		simulation->time += dt;
@@ -175,14 +178,14 @@ void printSimulation(Simulation_ptr simulation){
 	printf("Sim res %d   time %f   energy %f\n", simulation->result, simulation->time, simulation->energy);
 
 	#ifndef USE_COMPACT_STEP
-		printf("map   x   v   ft  fslope   faero   ftyres   fres   a   dt   dE\n");
+		printf("map   x   v   ft  fslope   faero   ftyres   fres   a   dt   dE   TmotorCase   TWindings\n");
 	#else
 		printf("map   x   v   fslope   a   dt   dE\n");
 	#endif
 
 	for(int i = 0; i < SIM_STEP_COUNT; i++){
 		#ifndef USE_COMPACT_STEP
-			printf("%d  %f  %f  %f   %f   %f   %f   %f   %f   %f   %f\n",
+			printf("%d  %f  %f  %f   %f   %f   %f   %f   %f   %f   %f   %f   %f\n",
 				simulation->steps[i].map,
 				simulation->steps[i].xi,
 				simulation->steps[i].vi,
@@ -193,7 +196,9 @@ void printSimulation(Simulation_ptr simulation){
 				simulation->steps[i].fres,
 				simulation->steps[i].a,
 				simulation->steps[i].dt,
-				simulation->steps[i].dE
+				simulation->steps[i].dE,
+				simulation->steps[i].TmotorCase,
+				simulation->steps[i].Twindings
 			);
 		#else
 			printf("%d  %f  %f  %f   %f   %f   %f\n",
@@ -216,13 +221,13 @@ void simulationToCsv(Simulation_ptr simulation, FILE* file){
 	fprintf(file, "total energy, %f\n", simulation->energy);
 
 	#ifndef USE_COMPACT_STEP
-		fprintf(file, "map,x,slope,radius,vi,ft,fslope,faero,ftyres,fres,ftot,a,dt,dE\n");
+		fprintf(file, "map,x,slope,radius,vi,ft,fslope,faero,ftyres,fres,ftot,a,dt,dE,TmotorCase,Twindings\n");
 	#else
 		fprintf(file, "map,x,vi,ft,a,dt,dE\n");
 	#endif
 	for(int i = 0; i < SIM_STEP_COUNT; i++){
 		#ifndef USE_COMPACT_STEP
-			fprintf(file, "%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
+			fprintf(file, "%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
 					simulation->steps[i].map,
 					simulation->steps[i].xi,
 					simulation->steps[i].slope,
@@ -236,7 +241,9 @@ void simulationToCsv(Simulation_ptr simulation, FILE* file){
 					simulation->steps[i].ftraction - simulation->steps[i].fres,
 					simulation->steps[i].a,
 					simulation->steps[i].dt,
-					simulation->steps[i].dE
+					simulation->steps[i].dE,
+					simulation->steps[i].TmotorCase,
+					simulation->steps[i].Twindings
 				);
 		#else
 			fprintf(file, "%d,%f,%f,%f,%f,%f,%f,\n",

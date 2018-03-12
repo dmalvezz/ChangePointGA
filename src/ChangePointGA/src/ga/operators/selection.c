@@ -103,7 +103,7 @@ int rankSelection(Generation_ptr generation){
 }
 
 
-#define LINEAR_RANK_SP 1.3f
+#define LINEAR_RANK_SP 1.5f
 
 int linearRankWithPressureSelection(Generation_ptr generation){
 	int i = 0;

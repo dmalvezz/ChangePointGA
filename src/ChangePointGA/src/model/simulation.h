@@ -23,8 +23,8 @@
 //Motors list
 //#define RE40_24V
 //#define RE40_48V
-#define RE50_24V
-//#define RE50_36V
+//#define RE50_24V
+#define RE50_36V
 
 //Keep time invalid simulations
 #define KEEP_TIME_INVALID	0
@@ -37,30 +37,63 @@
 #include "../window/window.h"
 #include "../utils/mathutils.h"
 
+//#define N_LAP
+//#define ALL_LAPS
+#define PATTERN_LAPS
+
+#ifdef N_LAP
+	#define LAP_COUNT	3
+	#define START_MAP	0
+
+	#define START_VELOCITY	6.1
+	#define END_VELOCITY	6.1
+
+	#define MIN_AVG_SPEED 7.0
+	#define MAX_TIME	((float)TRACK_END_POINT / MIN_AVG_SPEED)
+
+	#define INITIAL_T_WINDINGS	38
+	#define INITIAL_T_MOTOR		35
+
+#endif
+
+#ifdef ALL_LAPS
+	#define LAP_COUNT	15
+	#define START_MAP	1
+
+	#define START_VELOCITY	0.0
+	#define END_VELOCITY	0.0
+
+	#define MAX_TIME	((float)RACE_TIME)
+
+	#define INITIAL_T_WINDINGS	25
+	#define INITIAL_T_MOTOR		25
+#endif
+
+#ifdef PATTERN_LAPS
+	#define LAP_COUNT	5
+	#define START_MAP	1
+
+	#define START_VELOCITY	0.0
+	#define END_VELOCITY	0.0
+
+	#define PATTERN_START_LAP	2
+	#define PATTERN_END_LAP		4
+	#define PATTERN_REPEAT		((RACE_LAPS - LAP_COUNT)/(PATTERN_END_LAP - PATTERN_START_LAP))
+
+	#define MAX_TIME	((float)712)
+
+	#define INITIAL_T_WINDINGS	25
+	#define INITIAL_T_MOTOR		25
+#endif
+
 //Simulation params
 #define SPACE_STEP	1.0
-#define LAP_COUNT	1
 
 //Track param
 #define TRACK_START_POINT	0
 #define TRACK_END_POINT		(TRACK_LENGTH * LAP_COUNT)
 #define SIM_STEP_COUNT		(TRACK_END_POINT / (int)SPACE_STEP)
 
-//#define FIRST_LAP
-#ifdef FIRST_LAP
-	#define MIN_AVG_SPEED 6.74
-#elif LAST_LAP
-	#define MIN_AVG_SPEED 6.74
-#else
-	#define MIN_AVG_SPEED 6.95
-#endif
-
-#define MAX_TIME	((float)TRACK_END_POINT / MIN_AVG_SPEED)
-
-//Simulation initial conditions
-#define START_VELOCITY	6.3
-#define END_VELOCITY	6.3
-#define START_MAP		0
 #define MAP_COUNT		4
 
 typedef enum SimulationResult{
@@ -94,6 +127,9 @@ typedef struct SimulationStep{
 	float a;
 	float dt;
 	float dE;
+
+	float TmotorCase;
+	float Twindings;
 }SimulationStep;
 
 typedef SimulationStep* SimulationStep_ptr;
