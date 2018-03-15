@@ -4,6 +4,7 @@
  *  Created on: Jan 12, 2018
  *      Author: davide
  */
+/*
 #include "commands.h"
 
 char errorBuffer[80];
@@ -373,3 +374,4 @@ void printExplorerWindow(GA* ga, int index){
 
 	wrefresh(explorerWindow);
 }
+*/

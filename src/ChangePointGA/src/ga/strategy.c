@@ -25,6 +25,7 @@ void initStrategy(Strategy_ptr strategy, int spaceStep){
 }
 
 void printStrategy(Strategy_ptr strategy){
+	/*
 	wprintw(debugWindow, "Size: %d\n", strategy->size);
 	wprintw(debugWindow, "CP: ");
 
@@ -35,6 +36,7 @@ void printStrategy(Strategy_ptr strategy){
 
 	printf("\n");
 	wrefresh(debugWindow);
+	*/
 }
 
 void strategyToFile(Strategy_ptr strategy, const char* stratName){

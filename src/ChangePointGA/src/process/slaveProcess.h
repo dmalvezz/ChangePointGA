@@ -19,7 +19,7 @@
 #include <stdio.h>
 
 #include "../ga/ga.h"
-#include "../window/console.h"
+//#include "../window/console.h"
 
 typedef struct SlaveProcess{
 	//Proc info

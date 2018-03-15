@@ -282,6 +282,7 @@ void saveSimulationParams(const char* fileName){
 }
 
 void printSimulationParams(){
+	/*
 	char simFlags[8];
 	int flagsCount = 0;
 	int row = 0;
@@ -308,6 +309,7 @@ void printSimulationParams(){
 		mvwprintw(simParamWindow, row++, 1, "   a0:%.2f  a1:%.2f  a2:%.2f", maps[i].a0, maps[i].a1, maps[i].a2);
 	}
 	*/
-	wrefresh(simParamWindow);
+	//wrefresh(simParamWindow);
+
 }
 

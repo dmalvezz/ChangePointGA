@@ -67,12 +67,12 @@ int fitnessProportionalSelection(Generation_ptr generation){
 	return i - 1;
 }
 
-#define MIN_TOURNAMENT_ROUNDS	1
+#define MIN_TOURNAMENT_ROUNDS	3
 #define MAX_TOURNAMENT_ROUNDS	3
 
 int tournamentSelection(Generation_ptr generation){
 	int min = generation->count - 1;//randInt(0, generation->count - 1);
-	int round = randInt(MIN_TOURNAMENT_ROUNDS, MAX_TOURNAMENT_ROUNDS);
+	int round = MAX_TOURNAMENT_ROUNDS;//randInt(MIN_TOURNAMENT_ROUNDS, MAX_TOURNAMENT_ROUNDS);
 	int r;
 
 	for(int i = 0; i < round; i++){

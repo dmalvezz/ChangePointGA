@@ -11,7 +11,7 @@
 
 
 void printChangePoint(ChangePoint point){
-	wprintw(debugWindow, "{%d, %d}", point.positionIndex, point.action);
+	//wprintw(debugWindow, "{%d, %d}", point.positionIndex, point.action);
 }
 
 int getCurrentMap(Action action, int map){

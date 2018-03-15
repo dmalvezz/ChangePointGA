@@ -6,7 +6,7 @@
  */
 
 #include "window.h"
-
+/*
 WINDOW *gaOutputWindow = NULL, *gaParamWindow = NULL, *simParamWindow = NULL, *commandWindow = NULL, *explorerWindow = NULL;
 WINDOW* debugWindow = NULL;
 
@@ -54,3 +54,4 @@ void disposeWindows(){
 #endif
 	endwin();
 }
+*/

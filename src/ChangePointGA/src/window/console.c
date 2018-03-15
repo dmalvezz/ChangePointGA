@@ -5,6 +5,7 @@
  *      Author: davide
  */
 
+/*
 #include "console.h"
 
 #include <ncurses.h>
@@ -246,3 +247,4 @@ void disposeConsole(){
 	//Dispose argv
 	disposeArgv();
 }
+*/

@@ -45,12 +45,12 @@ void initMaster(MasterProcess* mProcess, int worldId, int color){
 	mProcess->currBest = INFINITY;
 
 	//Init console
-	initWindows();
-	initConsole();
+	//initWindows();
+	//initConsole();
 
 	//Init ga
 	initGA(&mProcess->ga,
-			linearRankWithPressureSelection,
+			tournamentSelection,
 			singlePointCrossover,
 			energyFitness
 		);
@@ -63,8 +63,8 @@ void initMaster(MasterProcess* mProcess, int worldId, int color){
 
 void execMaster(MasterProcess* mProcess){
 	//Refresh console
-	printGAParams(&mProcess->ga);
-	printSimulationParams();
+	//printGAParams(&mProcess->ga);
+	//printSimulationParams();
 
 	//Run first gen
 	evalGenerationFitness(mProcess->ga.currentGeneration, mProcess->ga.fitnessFunction, &mProcess->comm);
@@ -98,7 +98,7 @@ void execMaster(MasterProcess* mProcess){
 			mProcess->currBest = mProcess->ga.currentGeneration->statistics.best.fitness;
 		}
 		//Update console
-		updateConsole(&mProcess->ga, &mProcess->loop);
+		//updateConsole(&mProcess->ga, &mProcess->loop);
 	}
 
 	//Save strategy and generation
@@ -132,8 +132,8 @@ void disposeMaster(MasterProcess* mProcess){
 	#endif
 
 	//Dispose windows
-	disposeWindows();
-	disposeConsole();
+	//disposeWindows();
+	//disposeConsole();
 }
 
 
@@ -200,12 +200,11 @@ void genetic(MasterProcess* mProcess){
 		//Get time
 		generationTime = getTimeElapsed(generationTimer);
 
-		int row = 0;
-		wclear(gaOutputWindow);
-		box(gaOutputWindow,0,0);
+		//int row = 0;
+		//wclear(gaOutputWindow);
+		//box(gaOutputWindow,0,0);
 		//Print generation info
-		mvwprintw(gaOutputWindow, row++, 1, "GA output");
-		mvwprintw(gaOutputWindow, row++, 1, "Gen %lu   individuals %d/%d   child %d   mutations %d",
+		printf("Gen %lu   individuals %d/%d   child %d   mutations %d \n",
 				ga->generationCount,
 				ga->currentGeneration->count,
 				ga->currentGeneration->size,
@@ -214,7 +213,7 @@ void genetic(MasterProcess* mProcess){
 			);
 
 		//Print best
-		mvwprintw(gaOutputWindow, row++, 1, "Best fitness %.2f   energy %.2f   time %.2f/%.2f",
+		printf("Best fitness %.2f   energy %.2f   time %.2f/%.2f \n",
 				ga->currentGeneration->statistics.best.fitness,
 				ga->currentGeneration->statistics.bestOutput.energy,
 				ga->currentGeneration->statistics.bestOutput.time,
@@ -223,7 +222,7 @@ void genetic(MasterProcess* mProcess){
 
 		//Print stats
 
-		mvwprintw(gaOutputWindow, row++, 1, "Stat fmin %.2f   fmed %.2f   lavg %d   inv %.2f   sim %.2f   lch %lu",
+		printf("Stat fmin %.2f   fmed %.2f   lavg %d   inv %.2f   sim %.2f   lch %lu \n",
 				ga->currentGeneration->statistics.fitnessStat.min,
 				ga->currentGeneration->statistics.fitnessStat.median,
 				(int)ga->currentGeneration->statistics.lengthStat.avg,
@@ -233,7 +232,7 @@ void genetic(MasterProcess* mProcess){
 			);
 
 		//Print time
-		mvwprintw(gaOutputWindow, row++, 1, "Time ft %0.3lf   st %0.3lf   ut %0.3lf   et %0.3lf   ct %0.3lf   mt %0.3lf",
+		printf("Time ft %0.3lf   st %0.3lf   ut %0.3lf   et %0.3lf   ct %0.3lf   mt %0.3lf \n",
 				fitnessTime,
 				sortTime,
 				statTime,
@@ -241,13 +240,14 @@ void genetic(MasterProcess* mProcess){
 				crossoverTime,
 				mutationTime
 			);
-		mvwprintw(gaOutputWindow, row++, 1, "Total %0.5lf    ser %0.5lf   par %0.5lf   comm %0.5lf",
+		printf("Total %0.5lf    ser %0.5lf   par %0.5lf   comm %0.5lf \n",
 				generationTime,
 				sortTime + statTime + elitismTime + crossoverTime + mutationTime,
 				fitnessTime - commTime,
 				commTime
 				);
-		wrefresh(gaOutputWindow);
+		printf("=====================================================\n");
+		//wrefresh(gaOutputWindow);
 	}
 
 	#ifdef SAVE_TIMES

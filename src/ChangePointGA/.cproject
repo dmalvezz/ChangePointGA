@@ -34,7 +34,6 @@
 							<tool command="mpicc -fopenmp" id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.863426829" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug">
 								<option id="gnu.c.link.option.libs.1434029797" name="Libraries (-l)" superClass="gnu.c.link.option.libs" useByScannerDiscovery="false" valueType="libs">
 									<listOptionValue builtIn="false" value="m"/>
-									<listOptionValue builtIn="false" value="ncurses"/>
 								</option>
 								<option id="gnu.c.link.option.noshared.244001028" name="No shared libraries (-static)" superClass="gnu.c.link.option.noshared" useByScannerDiscovery="false" value="false" valueType="boolean"/>
 								<option id="gnu.c.link.option.ldflags.651153399" name="Linker flags" superClass="gnu.c.link.option.ldflags" useByScannerDiscovery="false" value="" valueType="string"/>

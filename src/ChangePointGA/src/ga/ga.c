@@ -87,6 +87,7 @@ void disposeGA(GA* ga){
 }
 
 void printGAParams(GA* ga){
+	/*
 	functionReg* regPtr;
 
 	wclear(gaParamWindow);
@@ -111,6 +112,7 @@ void printGAParams(GA* ga){
 	}
 
 	wrefresh(gaParamWindow);
+	*/
 }
 
 void saveGAParams(GA* ga, const char* fileName){
