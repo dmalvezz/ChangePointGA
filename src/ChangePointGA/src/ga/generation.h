@@ -57,7 +57,7 @@ typedef Generation* Generation_ptr;
 
 typedef float (*FitnessFunction)(Generation_ptr generation, int index);
 typedef int (*SelectionFunction)(Generation_ptr generation);
-typedef void (*CrossoverFunction)(Strategy_ptr parent1, Strategy_ptr parent2, Strategy_ptr child1, Strategy_ptr child2, int cut);
+typedef void (*CrossoverFunction)(Strategy_ptr parent1, Strategy_ptr parent2, Strategy_ptr child1, Strategy_ptr child2);
 typedef void (*MutationFunction)(Strategy_ptr strategy);
 
 
@@ -143,7 +143,10 @@ extern int linearRankWithPressureSelection(Generation_ptr generation);
 
 /*****Crossover functions*****/
 //Apply single point crossover and create 2 children
-extern void singlePointCrossover(Strategy_ptr parent1, Strategy_ptr parent2, Strategy_ptr child1, Strategy_ptr child2, int cut);
+extern void singlePointCrossover(Strategy_ptr parent1, Strategy_ptr parent2, Strategy_ptr child1, Strategy_ptr child2);
+
+//Apply multi point crossover and create 2 children
+extern void multiPointCrossover(Strategy_ptr parent1, Strategy_ptr parent2, Strategy_ptr child1, Strategy_ptr child2);
 
 //Apply crossover to current generation and save it in next generation
 extern int crossover(Generation_ptr currentGeneration, Generation_ptr nextGeneration, SelectionFunction selection, CrossoverFunction crossover);

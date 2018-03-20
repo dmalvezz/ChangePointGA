@@ -60,6 +60,7 @@ void initGA(GA* ga, SelectionFunction selectionFunction, CrossoverFunction cross
 
 	//Crossover functions
 	registerFunctions(singlePointCrossover, "singlePoint");
+	registerFunctions(multiPointCrossover, "multiPoint");
 
 	//Mutation functions
 	registerFunctions(addRandomChangePoint, "addRandom");

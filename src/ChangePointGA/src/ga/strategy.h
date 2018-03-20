@@ -24,10 +24,11 @@
 
 //Min/Max genome size
 #define MIN_CHANGE_POINT 	3
-#define MAX_CHANGE_POINT 	100
+#define MAX_CHANGE_POINT 	(100 * LAP_COUNT)
 
 //Thread count to use in simulation
 #define SIM_THREAD_COUNT	4
+
 
 typedef struct Strategy{
 	int size;									//Num of change points used

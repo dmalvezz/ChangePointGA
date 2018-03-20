@@ -50,8 +50,8 @@ void initMaster(MasterProcess* mProcess, int worldId, int color){
 
 	//Init ga
 	initGA(&mProcess->ga,
-			tournamentSelection,
-			singlePointCrossover,
+			fitnessProportionalSelection,
+			multiPointCrossover,
 			energyFitness
 		);
 	addGAMutation(&mProcess->ga, addRandomChangePoint, 				ADD_POINT_MUTATION_RATE);
@@ -59,6 +59,16 @@ void initMaster(MasterProcess* mProcess, int worldId, int color){
 	addGAMutation(&mProcess->ga, moveRandomChangePoint, 			CHANGE_POS_MUTATION_RATE);
 	addGAMutation(&mProcess->ga, changeRandomChangePointAction, 	CHANGE_ACT_MUTATION_RATE);
 	addGAMutation(&mProcess->ga, filterStrategy, 					FILTER_MUTATION_RATE);
+
+#ifdef AUTO_LOAD_GENERATION
+	if(access(GENERATION_FILE, F_OK ) != -1 ) {
+		generationFromFile(mProcess->ga.currentGeneration, GENERATION_FILE);
+	}
+#endif
+
+	//Sve settings
+	saveSimulationParams(SIMULATION_FILE);
+	saveGAParams(&mProcess->ga, GA_FILE);
 }
 
 void execMaster(MasterProcess* mProcess){
@@ -102,8 +112,6 @@ void execMaster(MasterProcess* mProcess){
 	}
 
 	//Save strategy and generation
-	saveSimulationParams(SIMULATION_FILE);
-	saveGAParams(&mProcess->ga, GA_FILE);
 	strategyToFile(&mProcess->ga.currentGeneration->statistics.best, BEST_FILE);
 	generationToFile(mProcess->ga.currentGeneration, GENERATION_FILE);
 }

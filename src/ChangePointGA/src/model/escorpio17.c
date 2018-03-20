@@ -122,7 +122,7 @@ float getForcebearings(){
 }
 
 float getForceSlope(float TrackSlope){
-	return VehicleMass * gravity * sin(TrackSlope);
+	return VehicleMass * gravity * sin_f(TrackSlope);
 }
 
 float getForceAero(float Speed, float TrackRadiusInv){
@@ -154,9 +154,9 @@ float getForceTyres(float Speed, float TrackRadiusInv){
 	if (Fzo<0) Fzo = 0;
 	// caratteristiche delle gomme !!!!!!!!!!!!
 	// The magic formula
-	float Car = (a30 + a31*TyrePressure)*sin(2 * atan(Fzr / 1000 / (a40 + a41*TyrePressure))) * 180 / 3.14;
-	float Cai = (a30 + a31*TyrePressure)*sin(2 * atan(Fzi / 1000 / (a40 + a41*TyrePressure))) * 180 / 3.14;
-	float Cao = (a30 + a31*TyrePressure)*sin(2 * atan(Fzo / 1000 / (a40 + a41*TyrePressure))) * 180 / 3.14;
+	float Car = (a30 + a31*TyrePressure)*sin_f(2 * atan_f(Fzr / 1000 / (a40 + a41*TyrePressure))) * 180 / 3.14;
+	float Cai = (a30 + a31*TyrePressure)*sin_f(2 * atan_f(Fzi / 1000 / (a40 + a41*TyrePressure))) * 180 / 3.14;
+	float Cao = (a30 + a31*TyrePressure)*sin_f(2 * atan_f(Fzo / 1000 / (a40 + a41*TyrePressure))) * 180 / 3.14;
 	float Crr = TyresCr * (-0.0156*pow(TyrePressure, 3) + 0.289*pow(TyrePressure, 2) - 1.803*TyrePressure + 4.587);
 	float Cri = Crr;
 	float Cro = Crr;
@@ -164,8 +164,8 @@ float getForceTyres(float Speed, float TrackRadiusInv){
 	float angleo, anglei;
 	if (TrackRadiusInv != 0)
 	{
-		angleo = atan(VehicleWheelBase / (1 / TrackRadiusInv + VehicleTrack / 2));
-		anglei = atan(VehicleWheelBase / (1 / TrackRadiusInv - VehicleTrack / 2));
+		angleo = atan_f(VehicleWheelBase / (1 / TrackRadiusInv + VehicleTrack / 2));
+		anglei = atan_f(VehicleWheelBase / (1 / TrackRadiusInv - VehicleTrack / 2));
 	}
 	else angleo = anglei = 0;
 	//angleo = anglei; // Sterzo parallelo
@@ -202,7 +202,7 @@ float getForceTyres(float Speed, float TrackRadiusInv){
 
 	// Ricerca iterativa
 	// Determino iterativamente il miglior angolo beta che individua la posizione del centro di rotazione
-	//float betamax = asin(VehicleXg*TrackRadiusInv);
+	//float betamax = asin_f(VehicleXg*TrackRadiusInv);
 
 	float Slipo, Slipi, Slipr, e;
 	float Fyr, Fyi, Fyo;
@@ -212,14 +212,22 @@ float getForceTyres(float Speed, float TrackRadiusInv){
 
 
 	//printf("betamax %f\n", betamax);
+	float sin_angleo = sin_f(angleo);
+	float cos_angleo = cos_f(angleo);
+	float sin_anglei = sin_f(anglei);
+	float cos_anglei = cos_f(anglei);
+	float sin_beta,cos_beta;
+
 
 	for (int it = 0; it < 5; it++) {
+		sin_beta = sin_f(beta);
+		cos_beta = cos_f(beta);
 		//Slip angles
 		if (TrackRadiusInv > 0.0000001 || TrackRadiusInv < -0.0000001) {
-			e = VehicleXg - sin(beta) / TrackRadiusInv;
-			Slipr = atan(e*TrackRadiusInv / cos(beta));
-			Slipi = anglei - atan((VehicleWheelBase - e) / (1 / TrackRadiusInv*cos(beta) - VehicleTrack / 2));
-			Slipo = angleo - atan((VehicleWheelBase - e) / (1 / TrackRadiusInv*cos(beta) + VehicleTrack / 2));
+			e = VehicleXg - sin_beta / TrackRadiusInv;
+			Slipr = atan_f(e*TrackRadiusInv / cos_beta);
+			Slipi = anglei - atan_f((VehicleWheelBase - e) / (1 / TrackRadiusInv*cos_beta - VehicleTrack / 2));
+			Slipo = angleo - atan_f((VehicleWheelBase - e) / (1 / TrackRadiusInv*cos_beta + VehicleTrack / 2));
 		}
 		else {
 			e = 0;
@@ -231,32 +239,31 @@ float getForceTyres(float Speed, float TrackRadiusInv){
 		/*FLAT_fo = */Fyo = Cao*Slipo + Cambo*Cao / 10;
 
 		// Equazione dell'equilibrio lungo l'asse trasversale
-		y = Fc*cos(beta) + Fxo*sin(angleo) + Fxi*sin(anglei) - Fyr - Fyo*cos(angleo) - Fyi*cos(anglei);
+		y = Fc*cos_beta + Fxo*sin_angleo + Fxi*sin_anglei - Fyr - Fyo*cos_angleo - Fyi*cos_anglei;
 		dy = 1;
 
 		if (TrackRadiusInv > 0.0000001 || TrackRadiusInv < -0.0000001) {
-			dy = -Fc * sin(beta);
+			dy = -Fc * sin_beta;
 
-			//printf("vado qui");
 			/*
-			dfyr = Car * 1 / (1 + pow(e * TrackRadiusInv / cos(beta), 2)) * (-1 + e * TrackRadiusInv * sin(beta) / pow(cos(beta), 2));
+			dfyr = Car * 1 / (1 + pow(e * TrackRadiusInv / cos_f(beta), 2)) * (-1 + e * TrackRadiusInv * sin_f(beta) / pow(cos_f(beta), 2));
 
-			dfyo = Cao * cos(angleo) * (-1 / (1 + pow((VehicleWheelBase - e) / (cos(beta) / TrackRadiusInv + VehicleTrack / 2), 2)))
-				* ((pow(cos(beta) / TrackRadiusInv, 2) + (VehicleTrack * cos(beta) + 2 * (VehicleWheelBase - e) * sin(beta) / (2 * TrackRadiusInv))) / (pow(cos(beta) / TrackRadiusInv + VehicleTrack / 2, 2)));
+			dfyo = Cao * cos_f(angleo) * (-1 / (1 + pow((VehicleWheelBase - e) / (cos_f(beta) / TrackRadiusInv + VehicleTrack / 2), 2)))
+				* ((pow(cos_f(beta) / TrackRadiusInv, 2) + (VehicleTrack * cos_f(beta) + 2 * (VehicleWheelBase - e) * sin_f(beta) / (2 * TrackRadiusInv))) / (pow(cos_f(beta) / TrackRadiusInv + VehicleTrack / 2, 2)));
 
-			dfyi = Cai * cos(anglei) * (-1 / (1 + pow((VehicleWheelBase - e) / (cos(beta) / TrackRadiusInv - VehicleTrack / 2), 2)))
-				* ((pow(cos(beta) / TrackRadiusInv, 2) - (VehicleTrack * cos(beta) + 2 * (VehicleWheelBase - e) * sin(beta) / (2 * TrackRadiusInv))) / (pow(cos(beta) / TrackRadiusInv - VehicleTrack / 2, 2)));
+			dfyi = Cai * cos_f(anglei) * (-1 / (1 + pow((VehicleWheelBase - e) / (cos_f(beta) / TrackRadiusInv - VehicleTrack / 2), 2)))
+				* ((pow(cos_f(beta) / TrackRadiusInv, 2) - (VehicleTrack * cos_f(beta) + 2 * (VehicleWheelBase - e) * sin_f(beta) / (2 * TrackRadiusInv))) / (pow(cos_f(beta) / TrackRadiusInv - VehicleTrack / 2, 2)));
 			*/
 
-			dfyr = Car * (-1 + e * TrackRadiusInv * sin(beta) / pow(cos(beta), 2)) / (1 + pow(e * TrackRadiusInv / cos(beta), 2)) ;
+			dfyr = Car * (-1 + e * TrackRadiusInv * sin_beta / pow(cos_beta, 2)) / (1 + pow(e * TrackRadiusInv / cos_beta, 2)) ;
 
-			dfyo = -Cao * cos(angleo) *
-				(pow(cos(beta) / TrackRadiusInv, 2) + (VehicleTrack * cos(beta) + 2 * (VehicleWheelBase - e) * sin(beta) / (2 * TrackRadiusInv))) /
-				(pow(VehicleWheelBase - e, 2) + (pow(cos(beta) / TrackRadiusInv + VehicleTrack / 2, 2)));
+			dfyo = -Cao * cos_angleo *
+				(pow(cos_beta / TrackRadiusInv, 2) + (VehicleTrack * cos_beta + 2 * (VehicleWheelBase - e) * sin_beta / (2 * TrackRadiusInv))) /
+				(pow(VehicleWheelBase - e, 2) + (pow(cos_beta / TrackRadiusInv + VehicleTrack / 2, 2)));
 
-			dfyi = -Cai * cos(anglei) *
-				(pow(cos(beta) / TrackRadiusInv, 2) - (VehicleTrack * cos(beta) + 2 * (VehicleWheelBase - e) * sin(beta) / (2 * TrackRadiusInv))) /
-				(pow(VehicleWheelBase - e, 2) + (pow(cos(beta) / TrackRadiusInv - VehicleTrack / 2, 2)));
+			dfyi = -Cai * cos_f(anglei) *
+				(pow(cos_beta / TrackRadiusInv, 2) - (VehicleTrack * cos_beta + 2 * (VehicleWheelBase - e) * sin_beta / (2 * TrackRadiusInv))) /
+				(pow(VehicleWheelBase - e, 2) + (pow(cos_beta / TrackRadiusInv - VehicleTrack / 2, 2)));
 
 			dy -= (dfyr + dfyo + dfyi);
 		}
@@ -266,7 +273,7 @@ float getForceTyres(float Speed, float TrackRadiusInv){
 
 	}
 
-	//float eq = Fc*cos(beta) + Fxo*sin(angleo) + Fxi*sin(anglei) - (Fyr + Fyo*cos(angleo) + Fyi*cos(anglei));
+	//float eq = Fc*cos_f(beta) + Fxo*sin_f(angleo) + Fxi*sin_f(anglei) - (Fyr + Fyo*cos_f(angleo) + Fyi*cos_f(anglei));
 
 
 	//printf("beta2 %f  eq %f \n", beta, eq);
@@ -276,17 +283,17 @@ float getForceTyres(float Speed, float TrackRadiusInv){
 
 	// Ho finalmente trovato il beta giusto
 
-	TractiveForce = Fxr + Fxo*cos(angleo) + Fxi*cos(anglei) + Fyo*sin(angleo) + Fyi*sin(anglei) - Fc*sin(beta);
+	TractiveForce = Fxr + Fxo*cos_angleo + Fxi*cos_anglei + Fyo*sin_angleo + Fyi*sin_anglei - Fc*sin_f(beta);
 	// Introduce now cornering factor correction
 	float straightTractiveForce = Fzi*Cri + Fzo*Cro + Fzr*Crr;
 
 	TractiveForce = TractiveForce + (TractiveForce - straightTractiveForce)*(TyresCorneringCorrFactor - 1) * 2;
 	//float TractiveForceb; // Tractive perpendicolare a Fc
-	//TractiveForceb = Fxr*cos(beta) + Fxo*cos(angleo-beta) + Fxi*cos(anglei-beta)+ Fyo*sin(anglei-beta) + Fyi*sin(anglei-beta) - Fyr*sin(beta);
+	//TractiveForceb = Fxr*cos_f(beta) + Fxo*cos_f(angleo-beta) + Fxi*cos_f(anglei-beta)+ Fyo*sin_f(anglei-beta) + Fyi*sin_f(anglei-beta) - Fyr*sin_f(beta);
 
 	/*
-	//if (FrontWheelMaxFy<Fyo*cos(angleo)) FrontWheelMaxFy = Fyo*cos(angleo);
-	//if (FrontWheelMaxFy<Fyi*cos(anglei)) FrontWheelMaxFy = Fyi*cos(anglei);
+	//if (FrontWheelMaxFy<Fyo*cos_f(angleo)) FrontWheelMaxFy = Fyo*cos_f(angleo);
+	//if (FrontWheelMaxFy<Fyi*cos_f(anglei)) FrontWheelMaxFy = Fyi*cos_f(anglei);
 
 	//if (FrontWheelMaxSlip<Slipi) FrontWheelMaxSlip = Slipi;
 	//if (FrontWheelMaxSlip<Slipo) FrontWheelMaxSlip = Slipo;

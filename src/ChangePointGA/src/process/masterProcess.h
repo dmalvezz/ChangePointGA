@@ -20,6 +20,9 @@
 //Autosave on each new best strategies
 #define AUTO_SAVE
 
+//If generation.bin file exists load that
+#define AUTO_LOAD_GENERATION
+
 //Master process global variables
 typedef struct MasterProcess{
 	//Proc info

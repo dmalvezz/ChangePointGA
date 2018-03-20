@@ -37,8 +37,8 @@
 #include "../window/window.h"
 #include "../utils/mathutils.h"
 
-#define N_LAP
-//#define ALL_LAPS
+//#define N_LAP
+#define ALL_LAPS
 //#define PATTERN_LAPS
 
 #ifdef N_LAP
