@@ -127,7 +127,7 @@ void statisticsToFile(Generation_ptr generation, unsigned long int generationCou
 
 
 
-double evalGenerationFitness(Generation_ptr generation, FitnessFunction fitnessFunction, MPI_Comm* comm){
+double evalGenerationFitness(Generation_ptr generation, FitnessFunction fitnessFunction, int* comm){
 	//Simulate
 	double commTime = 0, timer;
 
@@ -141,6 +141,7 @@ double evalGenerationFitness(Generation_ptr generation, FitnessFunction fitnessF
 	}
 	//Use slaves
 	else{
+		/*
 		char cmd;
 		int size;
 		MPI_Comm_size(*comm, &size);
@@ -180,6 +181,8 @@ double evalGenerationFitness(Generation_ptr generation, FitnessFunction fitnessF
 		commTime += (getTime() - timer);
 
 		//free(strategies);
+		 */
+
 	}
 
 	//Eval fitness

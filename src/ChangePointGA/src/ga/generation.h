@@ -14,7 +14,7 @@
 #include <math.h>
 #include <string.h>
 #include <omp.h>
-#include <mpi.h>
+//#include <mpi.h>
 
 #include "statistic.h"
 #include "strategy.h"
@@ -105,7 +105,7 @@ extern float energyDiversityFitness(Generation_ptr generation, int index);
 
 
 //Eval fitness for all individuals
-extern double evalGenerationFitness(Generation_ptr generation, FitnessFunction fitness, MPI_Comm* comm);
+extern double evalGenerationFitness(Generation_ptr generation, FitnessFunction fitness, int* comm);
 
 //Sort individual by fitness value
 extern void sortGenerationByFitness(Generation_ptr generation);

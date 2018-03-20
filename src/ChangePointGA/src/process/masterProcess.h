@@ -27,7 +27,7 @@
 typedef struct MasterProcess{
 	//Proc info
 	int worldId;		//Process id in the world
-	MPI_Comm comm;		//Communicator with slaves
+	//MPI_Comm comm;		//Communicator with slaves
 
 	//Ga
 	int loop;

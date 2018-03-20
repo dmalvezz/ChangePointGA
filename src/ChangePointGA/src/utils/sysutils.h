@@ -42,10 +42,10 @@ static int getKey(void){
 
 
 static double getTime(){
-   return MPI_Wtime();
+   return 0;
 }
 
 static double getTimeElapsed(double start){
-	double end = MPI_Wtime();
+	double end = 0;
 	return end - start;
 }

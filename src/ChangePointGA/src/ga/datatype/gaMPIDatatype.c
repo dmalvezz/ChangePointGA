@@ -11,7 +11,7 @@
 #include "../../model/simulation.h"
 
 #include "assert.h"
-
+/*
 MPI_Datatype MPI_CHANGEPOINT;
 MPI_Datatype MPI_SIMULATION_STEP;
 MPI_Datatype MPI_SIMULATION;
@@ -130,20 +130,24 @@ static void initMPIStrategy(){
 	assert(MPI_Type_create_struct(structlen, blocklengths, displacements,types, &MPI_STRATEGY) == MPI_SUCCESS);
 	assert(MPI_Type_commit(&MPI_STRATEGY) == MPI_SUCCESS);
 }
-
+*/
 
 void initGAMPIDatatypes(){
+	/*
 	initMPIChangePoint();
 	initMPISimulationStep();
 	initMPISimulation();
 	initMPISimulationOutput();
 	initMPIStrategy();
+	*/
 }
 
 void disposteGAMPIDatatypes(){
+	/*
 	MPI_Type_free(&MPI_CHANGEPOINT);
 	MPI_Type_free(&MPI_SIMULATION_STEP);
 	MPI_Type_free(&MPI_SIMULATION);
 	MPI_Type_free(&MPI_SIMULATION_OUTPUT);
 	MPI_Type_free(&MPI_STRATEGY);
+	*/
 }

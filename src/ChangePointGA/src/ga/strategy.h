@@ -17,7 +17,7 @@
 #include <unistd.h>
 
 #include "changepoint.h"
-#include "datatype/gaMPIDatatype.h"
+//#include "datatype/gaMPIDatatype.h"
 #include "../model/simulation.h"
 #include "../utils/arrayutils.h"
 #include "../utils/mathutils.h"

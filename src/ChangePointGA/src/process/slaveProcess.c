@@ -10,12 +10,13 @@
 void initSlave(SlaveProcess* sProcess, int worldId, int color){
 	//Process info
 	sProcess->worldId = worldId;
-	MPI_Comm_split(MPI_COMM_WORLD, color, worldId, &sProcess->comm);
+	//MPI_Comm_split(MPI_COMM_WORLD, color, worldId, &sProcess->comm);
 
 	sProcess->strategies = (Strategy_ptr)malloc(sizeof(Strategy) * POPULATION_SIZE);
 }
 
 void execSlave(SlaveProcess* sProcess){
+	/*
 	char cmd;
 	int loop = 1;
 
@@ -61,6 +62,7 @@ void execSlave(SlaveProcess* sProcess){
 		}
 
 	}
+	*/
 }
 
 void disposeSlave(SlaveProcess* sProcess){

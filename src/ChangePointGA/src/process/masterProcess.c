@@ -12,7 +12,7 @@ static void genetic(MasterProcess* mProcess);
 void initMaster(MasterProcess* mProcess, int worldId, int color){
 	//Init process
 	mProcess->worldId = worldId;
-	MPI_Comm_split(MPI_COMM_WORLD, color, worldId, &mProcess->comm);
+	//MPI_Comm_split(MPI_COMM_WORLD, color, worldId, &mProcess->comm);
 
 	//Loop flag
 	mProcess->loop = 1;
@@ -77,7 +77,7 @@ void execMaster(MasterProcess* mProcess){
 	//printSimulationParams();
 
 	//Run first gen
-	evalGenerationFitness(mProcess->ga.currentGeneration, mProcess->ga.fitnessFunction, &mProcess->comm);
+	evalGenerationFitness(mProcess->ga.currentGeneration, mProcess->ga.fitnessFunction, NULL);
 	sortGenerationByFitness(mProcess->ga.currentGeneration);
 	updateGenerationStatistics(mProcess->ga.currentGeneration);
 
@@ -119,7 +119,7 @@ void execMaster(MasterProcess* mProcess){
 void disposeMaster(MasterProcess* mProcess){
 	//Close all slave process
 	char cmd = SLAVE_QUIT_CMD;
-	MPI_Bcast(&cmd, 1, MPI_CHAR, 0, mProcess->comm);
+	//MPI_Bcast(&cmd, 1, MPI_CHAR, 0, mProcess->comm);
 
 	//Dispose GA
 	disposeGA(&mProcess->ga);
@@ -152,7 +152,7 @@ void genetic(MasterProcess* mProcess){
 	int childCount = 0, mutationCount = 0;
 
 	//Timers
-	double generationTimer, timer;
+	clock_t generationTimer, timer;
 	double generationTime, fitnessTime, commTime, sortTime, statTime, elitismTime, crossoverTime, mutationTime;
 
 	//Start timer
@@ -178,7 +178,7 @@ void genetic(MasterProcess* mProcess){
 
 	//Eval fitness
 	timer = getTime();
-	commTime = evalGenerationFitness(ga->nextGeneration, ga->fitnessFunction, &mProcess->comm);
+	commTime = evalGenerationFitness(ga->nextGeneration, ga->fitnessFunction, NULL);
 	fitnessTime = getTimeElapsed(timer);
 
 	//Sort individual by fitness
