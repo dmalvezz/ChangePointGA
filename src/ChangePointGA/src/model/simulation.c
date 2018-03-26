@@ -116,6 +116,10 @@ SimulationResult simulate(Simulation_ptr simulation, float startPosition, float 
 			}
 
 			dt = (sqrt(delta) - simulation->velocity) / a;
+
+			if(dt < 0){
+				dt = SPACE_STEP / simulation->velocity;
+			}
 		}
 		else{
 			delta = -1;
