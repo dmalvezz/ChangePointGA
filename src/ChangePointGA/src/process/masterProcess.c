@@ -50,8 +50,8 @@ void initMaster(MasterProcess* mProcess, int worldId, int color){
 
 	//Init ga
 	initGA(&mProcess->ga,
-			fitnessProportionalSelection,
-			multiPointCrossover,
+			linearRankWithPressureSelection,
+			singlePointCrossover,
 			energyFitness
 		);
 	addGAMutation(&mProcess->ga, addRandomChangePoint, 				ADD_POINT_MUTATION_RATE);
@@ -165,9 +165,11 @@ void genetic(MasterProcess* mProcess){
 
 	//Perform mutations
 	timer = getTime();
-	for(int i = 0; i < ga->mutationCount; i++){
-		mutationCount += mutation(ga->nextGeneration, ga->mutationsFunction[i], ga->mutationRates[i]);
-	}
+	//for(int j = 0; j < LAP_COUNT; j++){
+		for(int i = 0; i < ga->mutationCount; i++){
+			mutationCount += mutation(ga->nextGeneration, ga->mutationsFunction[i], ga->mutationRates[i]);
+		}
+	//}
 	mutationTime = getTimeElapsed(timer);
 
 	//Perform elitism selection

@@ -1,0 +1,11 @@
+Fitness: energy
+Selection: linearRank
+Crossover: multiPoint
+Mutations:
+ 0) addRandom              0.15      
+ 1) removeRandom           0.15      
+ 2) moveRandom             0.15      
+ 3) changeRandom           0.15      
+ 4) filter                 0.00      
+Population size: 100
+Strategy size: 3 - 500

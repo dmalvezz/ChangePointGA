@@ -61,26 +61,26 @@ void multiPointCrossover(Strategy_ptr parent1, Strategy_ptr parent2, Strategy_pt
 		cut = (randFloat(0, TRACK_LENGTH) + TRACK_LENGTH * i) / SPACE_STEP;
 
 		if (i % 2 == 0) {
-			while(index1 < parent1->size && parent1->points[i].positionIndex <= cut){
+			while(index1 < parent1->size && parent1->points[index1].positionIndex <= cut){
 				tmpChild1[child1->size] = parent1->points[index1];
 				child1->size++;
 				index1++;
 			}
 
-			while(index2 < parent2->size && parent2->points[i].positionIndex <= cut){
+			while(index2 < parent2->size && parent2->points[index2].positionIndex <= cut){
 				tmpChild2[child2->size] = parent2->points[index2];
 				child2->size++;
 				index2++;
 			}
 		}
 		else{
-			while(index1 < parent1->size && parent1->points[i].positionIndex <= cut){
+			while(index1 < parent1->size && parent1->points[index1].positionIndex <= cut){
 				tmpChild2[child2->size] = parent1->points[index1];
 				child2->size++;
 				index1++;
 			}
 
-			while(index2 < parent2->size && parent2->points[i].positionIndex <= cut){
+			while(index2 < parent2->size && parent2->points[index2].positionIndex <= cut){
 				tmpChild1[child1->size] = parent2->points[index2];
 				child1->size++;
 				index2++;
