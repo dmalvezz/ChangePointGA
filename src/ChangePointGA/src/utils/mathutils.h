@@ -48,7 +48,7 @@ static float randFloat(float min, float max){
 }
 
 static int isZero(float val){
-	if(val > -FLT_EPSILON && val < FLT_EPSILON){
+	if(val >= -0.00001 && val <= 0.00001){
 		return 1;
 	}
 
@@ -98,6 +98,5 @@ static double fast_atan(double x){
 #define sin_f	fast_sin
 #define cos_f	fast_cos
 #define atan_f	fast_atan
-
 
 #endif
