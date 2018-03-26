@@ -47,7 +47,7 @@ static float randFloat(float min, float max){
 }
 
 static int isZero(float val){
-	if(val > -FLT_EPSILON && val < FLT_EPSILON){
+	if(val > -0.000001 && val < 0.000001){
 		return 1;
 	}
 

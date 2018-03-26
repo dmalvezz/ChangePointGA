@@ -11,6 +11,7 @@ void elitism(Generation_ptr currentGeneration, Generation_ptr nextGeneration, fl
 	int count = max(1, currentGeneration->count * elitismPercentage);
 
 	memcpy(nextGeneration->individuals, currentGeneration->individuals, count * sizeof(Strategy));
+
 }
 
 int FUSS(Generation_ptr currentGeneration, Generation_ptr nextGeneration){

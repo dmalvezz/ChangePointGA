@@ -23,8 +23,8 @@
 //Motors list
 //#define RE40_24V
 //#define RE40_48V
-//#define RE50_24V
-#define RE50_36V
+#define RE50_24V
+//#define RE50_36V
 
 //Keep time invalid simulations
 #define KEEP_TIME_INVALID	0
@@ -38,8 +38,8 @@
 #include "../utils/mathutils.h"
 
 //#define N_LAP
-//#define ALL_LAPS
-#define PATTERN_LAPS
+#define ALL_LAPS
+//#define PATTERN_LAPS
 
 #ifdef N_LAP
 	#define LAP_COUNT	3
