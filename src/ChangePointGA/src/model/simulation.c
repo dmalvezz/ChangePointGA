@@ -116,9 +116,7 @@ SimulationResult simulate(Simulation_ptr simulation, float startPosition, float 
 
 			dt = (sqrt(delta) - simulation->velocity) / a;
 
-			if(dt < 0){
-				dt = SPACE_STEP / simulation->velocity;
-			}
+
 		}
 		else{
 			delta = -1;
@@ -232,7 +230,7 @@ void simulationToCsv(Simulation_ptr simulation, FILE* file){
 	#endif
 	for(int i = 0; i < SIM_STEP_COUNT; i++){
 		#ifndef USE_COMPACT_STEP
-			fprintf(file, "%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
+			fprintf(file, "%d,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f\n",
 					simulation->steps[i].map,
 					simulation->steps[i].xi,
 					simulation->steps[i].slope,
