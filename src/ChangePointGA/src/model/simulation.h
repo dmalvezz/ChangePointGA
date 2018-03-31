@@ -37,16 +37,16 @@
 #include "../window/window.h"
 #include "../utils/mathutils.h"
 
-//#define N_LAP
-#define ALL_LAPS
+#define N_LAP
+//#define ALL_LAPS
 //#define PATTERN_LAPS
 
 #ifdef N_LAP
-	#define LAP_COUNT	3
+	#define LAP_COUNT	1
 	#define START_MAP	0
 
-	#define START_VELOCITY	6.1
-	#define END_VELOCITY	6.1
+	#define START_VELOCITY	7.0
+	#define END_VELOCITY	7.0
 
 	#define MIN_AVG_SPEED 7.0
 	#define MAX_TIME	((float)TRACK_END_POINT / MIN_AVG_SPEED)
