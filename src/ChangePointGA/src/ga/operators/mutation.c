@@ -10,7 +10,8 @@
 void addRandomChangePoint(Strategy_ptr strategy){
 	if(strategy->size < MAX_CHANGE_POINT){
 		int r = randInt(0, strategy->size);
-
+		//int randPos = randInt(0, TRACK_END_POINT / SPACE_STEP);
+		//int r = getChangePointNearAt(strategy, randPos) + 1;
 
 		addElement(strategy->points, r, strategy->size, sizeof(ChangePoint));
 
@@ -118,6 +119,7 @@ void filterStrategy(Strategy_ptr strategy){
 
 	}
 
+	/*
 	//Remove spikes
 	for(int i = 1; i < strategy->size; i++){
 		if(strategy->points[i - 1].action != strategy->points[i].action &&
@@ -128,6 +130,7 @@ void filterStrategy(Strategy_ptr strategy){
 			i = i - 2;
 		}
 	}
+	*/
 
 	//Add random changepoint if under the min size
 	while(strategy->size < MIN_CHANGE_POINT){
