@@ -111,16 +111,29 @@ void multiPointCrossover(Strategy_ptr parent1, Strategy_ptr parent2, Strategy_pt
 	}
 }
 
+
+//static int p[100];
+
 int crossover(Generation_ptr currentGeneration, Generation_ptr nextGeneration,
 		SelectionFunction selectionFunction, CrossoverFunction crossoverFunction){
 	int parentIndex1, parentIndex2;
 	int childCount = 0;
 	//wclear(debugWindow);
 
+	//for (int i = 0; i < 100; i++)p[i]=0;
+
 
 	while(nextGeneration->count < currentGeneration->size){
 		parentIndex1 = selectionFunction(currentGeneration);
 		parentIndex2 = selectionFunction(currentGeneration);
+
+		//p[parentIndex1]++;
+		//p[parentIndex2]++;
+
+		nextGeneration->individuals[nextGeneration->count].parent1 = parentIndex1;
+		nextGeneration->individuals[nextGeneration->count].parent2 = parentIndex2;
+		nextGeneration->individuals[nextGeneration->count + 1].parent1 = parentIndex1;
+		nextGeneration->individuals[nextGeneration->count + 1].parent2 = parentIndex2;
 
 		crossoverFunction(
 				&currentGeneration->individuals[parentIndex1],
@@ -137,7 +150,15 @@ int crossover(Generation_ptr currentGeneration, Generation_ptr nextGeneration,
 */
 		nextGeneration->count += 2;
 		childCount += 2;
+
 	}
+
+
+	//for (int i = 0; i < 100; i++)printf("%d ", p[i]);
+	//char c;
+	//scanf("%c", &c);
+
+
 	//wrefresh(debugWindow);
 	//while(getch() == ERR);
 	return childCount;

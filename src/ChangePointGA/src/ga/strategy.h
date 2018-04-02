@@ -33,6 +33,7 @@
 typedef struct Strategy{
 	int size;									//Num of change points used
 	float fitness;								//Strategy fitness
+	int parent1, parent2;
 	ChangePoint points[MAX_CHANGE_POINT];		//Change points
 }Strategy;
 
@@ -50,6 +51,12 @@ extern void strategyToFile(Strategy_ptr strategy, const char* fileName);
 
 //Load strategy from csv
 extern void strategyFromCsv(Strategy_ptr strategy, const char* fileName);
+
+//Save the strategy map profile
+extern void getMapProfile(Strategy_ptr strategy, float* profile);
+
+//Update change points status
+extern void updateChangePointsStatus(Strategy_ptr strategy);
 
 //Compare function used by sort
 extern int compareStrategyFitness(const void* elem1, const void* elem2);

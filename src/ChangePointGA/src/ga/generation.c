@@ -122,6 +122,16 @@ void statisticsToFile(Generation_ptr generation, unsigned long int generationCou
 	printStatisticCsvData(&generation->statistics.fitnessSimilarityStat, file);
 	printStatisticCsvData(&generation->statistics.fitnessAbsSimilarityStat, file);
 
+	printStatisticCsvData(&generation->statistics.neutralGenes, file);
+	printStatisticCsvData(&generation->statistics.activeToNeutral, file);
+	printStatisticCsvData(&generation->statistics.neutralToActive, file);
+
+	printStatisticCsvData(&generation->statistics.bestChildrenStat, file);
+
+	fprintf(file, "%d,   %d,",
+			generation->statistics.bestChildrenCount,
+			generation->statistics.bestChildrenInvalid
+	);
 	fprintf(file, "\n");
 }
 
@@ -189,6 +199,7 @@ double evalGenerationFitness(Generation_ptr generation, FitnessFunction fitnessF
 		for(int i = 0; i < generation->count; i++){
 			//Update fitness
 			generation->individuals[i].fitness = fitnessFunction(generation, i);
+			updateChangePointsStatus(&generation->individuals[i]);
 		}
 	}
 
@@ -227,12 +238,15 @@ void sortGenerationByFitness(Generation_ptr generation){
 	qsortkeyvalue(generation->individuals, generation->simOutputs, 0, generation->count - 1);
 }
 
-#include <assert.h>
 void updateGenerationStatistics(Generation_ptr generation){
 	//Init
 	generation->statistics.fitnessSum = 0;
 	generation->statistics.fitnessSumInverse = 0;
 	generation->statistics.invalidCount = 0;
+
+	generation->statistics.bestChildrenCount = 0;
+	generation->statistics.bestChildrenInvalid = 0;
+
 	for(int i = 0; i < SIM_RESULT_COUNT; i++){
 		generation->statistics.invalidTypeCount[i] = 0;
 	}
@@ -242,12 +256,28 @@ void updateGenerationStatistics(Generation_ptr generation){
 	resetStatistic(&generation->statistics.genotypeSimilarityStat, generation->count);
 	resetStatistic(&generation->statistics.genotypeAbsSimilarityStat, generation->count);
 
+	resetStatistic(&generation->statistics.neutralGenes, generation->count);
+	resetStatistic(&generation->statistics.activeToNeutral, generation->count);
+	resetStatistic(&generation->statistics.neutralToActive, generation->count);
+
+	int neutralCount, activeToNeutral, neutralToActive;
+
 	for(int i = 0; i < generation->count; i++){
 		generation->statistics.invalidTypeCount[generation->simOutputs[i].result]++;
 
 		updateStatistic(&generation->statistics.lengthStat, generation->individuals[i].size, i);
 		updateStatistic(&generation->statistics.genotypeSimilarityStat, generation->individuals[i].size - generation->statistics.best.size, i);
 		updateStatistic(&generation->statistics.genotypeAbsSimilarityStat, fabs(generation->individuals[i].size - generation->statistics.best.size), i);
+
+		if(generation->individuals[i].parent1 == 0 || generation->individuals[i].parent2 == 0){
+			if(generation->simOutputs[i].result == SIM_OK){
+				generation->statistics.bestChildrenCount++;
+			}
+			else{
+				generation->statistics.bestChildrenInvalid++;
+			}
+		}
+
 
 		if(generation->simOutputs[i].result != SIM_OK){
 			generation->statistics.invalidCount++;
@@ -256,6 +286,28 @@ void updateGenerationStatistics(Generation_ptr generation){
 			generation->statistics.fitnessSumInverse += 1.0 / generation->individuals[i].fitness;
 			generation->statistics.fitnessSum = generation->individuals[i].fitness;
 		}
+
+		neutralCount = activeToNeutral = neutralToActive = 0;
+		for(int j = 0; j < generation->individuals[i].size; j++){
+			if(generation->individuals[i].points[j].currStatus == GENE_NEUTRAL){
+				neutralCount++;
+			}
+
+			if(generation->individuals[i].points[j].currStatus == GENE_NEUTRAL &&
+					generation->individuals[i].points[j].prevStatus == GENE_ACTIVE){
+				activeToNeutral++;
+			}
+
+			if(generation->individuals[i].points[j].currStatus == GENE_ACTIVE &&
+					generation->individuals[i].points[j].prevStatus == GENE_NEUTRAL){
+				neutralToActive++;
+			}
+		}
+
+		updateStatistic(&generation->statistics.neutralGenes, neutralCount, i);
+		updateStatistic(&generation->statistics.activeToNeutral, activeToNeutral, i);
+		updateStatistic(&generation->statistics.neutralToActive, neutralToActive, i);
+
 	}
 
 	//Reset statistics working with only the valid population
@@ -264,12 +316,19 @@ void updateGenerationStatistics(Generation_ptr generation){
 	resetStatistic(&generation->statistics.fitnessAbsSimilarityStat, generation->count - generation->statistics.invalidCount);
 	resetStatistic(&generation->statistics.fenotypeSimilarityStat, generation->count - generation->statistics.invalidCount);
 
+	resetStatistic(&generation->statistics.bestChildrenStat, generation->statistics.bestChildrenCount);
+
+	int j = 0;
 	for(int i = 0; i < generation->count - generation->statistics.invalidCount; i++){
 		updateStatistic(&generation->statistics.fitnessStat, generation->individuals[i].fitness, i);
 		updateStatistic(&generation->statistics.fitnessSimilarityStat, generation->individuals[i].fitness - generation->statistics.best.fitness , i);
 		updateStatistic(&generation->statistics.fitnessAbsSimilarityStat, fabs(generation->individuals[i].fitness - generation->statistics.best.fitness) , i);
 		updateStatistic(&generation->statistics.fenotypeSimilarityStat, evalStrategySimilarity(&generation->individuals[i], &generation->statistics.best), i);
 
+
+		if(generation->individuals[i].parent1 == 0 || generation->individuals[i].parent2 == 0){
+			updateStatistic(&generation->statistics.bestChildrenStat, generation->individuals[i].fitness, j++);
+		}
 	}
 
 	//Finalize the statistics
@@ -280,12 +339,11 @@ void updateGenerationStatistics(Generation_ptr generation){
 	finalizeStatistic(&generation->statistics.fitnessSimilarityStat);
 	finalizeStatistic(&generation->statistics.fitnessAbsSimilarityStat);
 	finalizeStatistic(&generation->statistics.fenotypeSimilarityStat);
+	finalizeStatistic(&generation->statistics.bestChildrenStat);
+	finalizeStatistic(&generation->statistics.neutralGenes);
+	finalizeStatistic(&generation->statistics.activeToNeutral);
+	finalizeStatistic(&generation->statistics.neutralToActive);
 
-	if(generation->statistics.fenotypeSimilarityStat.avg == NAN){
-		assert(0);
-
-
-	}
 
 	//Save best
 	if(generation->simOutputs[0].result == SIM_OK &&

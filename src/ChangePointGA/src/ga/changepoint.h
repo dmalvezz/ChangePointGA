@@ -23,8 +23,16 @@ typedef enum Action{
 	ACTION_PLUS = 2,
 }Action;
 
+typedef enum GeneStatus{
+	GENE_NEUTRAL = 0,
+	GENE_ACTIVE = 1,
+	GENE_UNKNOWN = -1
+}GeneStatus;
+
 
 typedef struct ChangePoint{
+	GeneStatus prevStatus, currStatus;
+
 	unsigned int positionIndex;			//Position index
 	Action action;						//Action
 }ChangePoint;

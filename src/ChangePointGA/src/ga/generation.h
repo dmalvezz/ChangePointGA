@@ -33,11 +33,20 @@ typedef struct GenerationStats{
 
 	Statistic lengthStat;						//Statistics on genome length
 	Statistic fitnessStat;						//Statistics on fitness
+
 	Statistic fitnessSimilarityStat;			//Statistics on fitnesses similarity
 	Statistic fitnessAbsSimilarityStat;			//Statistics on fitnesses absolute similarity
 	Statistic genotypeSimilarityStat;			//Statistics on genome similarity
 	Statistic genotypeAbsSimilarityStat;		//Statistics on genome absolute similarity
 	Statistic fenotypeSimilarityStat;			//Statistics on fenotype similarity
+
+	int bestChildrenCount;						//Best strategy's children count
+	int bestChildrenInvalid;					//Best strategy's invalid children count
+	Statistic bestChildrenStat;					//Statistics on best strategy's children
+
+	Statistic neutralGenes;						//Statistics on neutral genes
+	Statistic activeToNeutral;				//Statistics on neutral genes becoming non neutral
+	Statistic neutralToActive;				//Statistics on neutral becoming neutral
 
 	Strategy best;								//Best strategy found so far
 	SimulationOutput bestOutput;				//Best strategy simulation output

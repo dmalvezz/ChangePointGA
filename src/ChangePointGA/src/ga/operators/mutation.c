@@ -26,6 +26,8 @@ void addRandomChangePoint(Strategy_ptr strategy){
 		}
 
 		strategy->points[r].action = randInt(ACTION_MINUS, ACTION_PLUS);
+		strategy->points[r].currStatus = GENE_UNKNOWN;
+		strategy->points[r].prevStatus = GENE_UNKNOWN;
 		strategy->size++;
 
 		/*

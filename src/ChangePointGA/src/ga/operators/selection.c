@@ -112,6 +112,7 @@ int linearRankWithPressureSelection(Generation_ptr generation){
 
 	while(i < generation->count && p <= r){
 		p += (2.0f - LINEAR_RANK_SP + 2.0f * (LINEAR_RANK_SP - 1.0f) * (generation->count - (i + 1)) /(generation->count - 1))/generation->count;
+		//p += (float)(generation->count - i) / ((generation->count + 1) * generation->count / 2);
 		i++;
 	}
 

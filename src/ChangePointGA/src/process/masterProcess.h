@@ -36,6 +36,7 @@ typedef struct MasterProcess{
 	//Files
 	FILE* statisticsFile;
 	FILE* timesFile;
+	FILE* profilesFile;
 
 	float currBest;
 	FILE* bestFile;

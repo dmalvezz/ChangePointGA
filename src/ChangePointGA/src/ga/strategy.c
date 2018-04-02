@@ -19,6 +19,8 @@ void initStrategy(Strategy_ptr strategy, int spaceStep){
 		positionIndexMin = changePointStep * i;
 		positionIndexMax = changePointStep * (i + 1);
 
+		strategy->points[i].prevStatus = GENE_UNKNOWN;
+		strategy->points[i].currStatus = GENE_UNKNOWN;
 		strategy->points[i].positionIndex = randFloat(positionIndexMin, positionIndexMax) / spaceStep;
 		strategy->points[i].action = randInt(ACTION_MINUS, ACTION_PLUS);
 	}
@@ -96,6 +98,44 @@ void strategyFromCsv(Strategy_ptr strategy, const char* fileName){
 	}
 	fclose(file);
 }
+
+void getMapProfile(Strategy_ptr strategy, float* profile){
+	int map = START_MAP;
+	int index = 0;
+
+	for(int i = 0; i < SIM_STEP_COUNT; i++){
+		while(index < strategy->size && strategy->points[index].positionIndex == i){
+			map = getCurrentMap(strategy->points[index].action, map);
+			index++;
+		}
+		profile[i] = map;
+	}
+}
+
+void updateChangePointsStatus(Strategy_ptr strategy){
+	int map = START_MAP;
+	int prevMap = START_MAP;
+	int index = 0;
+
+	for(int i = 0; i < SIM_STEP_COUNT; i++){
+		while(index < strategy->size && strategy->points[index].positionIndex == i){
+			prevMap = map;
+			map = getCurrentMap(strategy->points[index].action, map);
+
+			//Update gene status
+			strategy->points[index].prevStatus = strategy->points[index].currStatus;
+			if(prevMap == map){
+				strategy->points[index].currStatus = GENE_NEUTRAL;
+			}
+			else{
+				strategy->points[index].currStatus = GENE_ACTIVE;
+			}
+
+			index++;
+		}
+	}
+}
+
 
 int compareStrategyFitness(const void* elem1, const void* elem2) {
     Strategy_ptr str1 = (Strategy_ptr)elem1;

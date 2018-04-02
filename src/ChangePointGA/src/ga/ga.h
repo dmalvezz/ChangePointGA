@@ -26,7 +26,7 @@
 #define REMOVE_POINT_MUTATION_RATE 		0.15f
 #define CHANGE_POS_MUTATION_RATE 		0.15f
 #define CHANGE_ACT_MUTATION_RATE		0.15f
-#define FILTER_MUTATION_RATE			0.15f
+#define FILTER_MUTATION_RATE			0.0f
 
 #define INVALID_THRESHOLD 	0.40
 #define MAX_LAST_CHANGE		1000
@@ -34,8 +34,10 @@
 //Save define
 #define SAVE_STATISTICS
 #define SAVE_TIMES
+#define SAVE_PROFILES
 #define BEST_FILE			"best"
 #define GENERATION_FILE		"generation.bin"
+#define PROFILES_FILE		"profiles.bin"
 #define SIMULATION_FILE		"simparam.txt"
 #define GA_FILE				"gaparam.txt"
 #define STATISTICS_FILE		"statistics.csv"

@@ -28,6 +28,15 @@ void initMaster(MasterProcess* mProcess, int worldId, int color){
 		printStatisticCsvHeader("fenotypeSim", mProcess->statisticsFile);
 		printStatisticCsvHeader("fitnessSim", mProcess->statisticsFile);
 		printStatisticCsvHeader("fitnessAbsSim", mProcess->statisticsFile);
+
+		printStatisticCsvHeader("neutral", mProcess->statisticsFile);
+		printStatisticCsvHeader("activeToNeutral", mProcess->statisticsFile);
+		printStatisticCsvHeader("neutralToActive", mProcess->statisticsFile);
+
+
+		printStatisticCsvHeader("bestChildren", mProcess->statisticsFile);
+		fprintf(mProcess->statisticsFile, "bestChildrenCount, bestChildrenInvalid,");
+
 		fprintf(mProcess->statisticsFile, "\n");
 	#endif
 
@@ -35,6 +44,11 @@ void initMaster(MasterProcess* mProcess, int worldId, int color){
 		//Create time file
 		mProcess->timesFile = fopen(TIME_FILE, "wt");
 		fprintf(mProcess->timesFile, "generation, mutation, crossover, elitism, simulation, sort, stats, comm,\n");
+	#endif
+
+	#ifdef SAVE_PROFILES
+		//Create profiles file
+		mProcess->profilesFile = fopen(PROFILES_FILE, "wb");
 	#endif
 
 	#ifdef KEEP_BEST
@@ -66,7 +80,7 @@ void initMaster(MasterProcess* mProcess, int worldId, int color){
 	}
 #endif
 
-	//Sve settings
+	//Save settings
 	saveSimulationParams(SIMULATION_FILE);
 	saveGAParams(&mProcess->ga, GA_FILE);
 }
@@ -77,7 +91,7 @@ void execMaster(MasterProcess* mProcess){
 	//printSimulationParams();
 
 	//Run first gen
-	evalGenerationFitness(mProcess->ga.currentGeneration, mProcess->ga.fitnessFunction, &mProcess->comm);
+	evalGenerationFitness(mProcess->ga.currentGeneration, mProcess->ga.fitnessFunction, /*&mProcess->comm*/ NULL);
 	sortGenerationByFitness(mProcess->ga.currentGeneration);
 	updateGenerationStatistics(mProcess->ga.currentGeneration);
 
@@ -90,7 +104,6 @@ void execMaster(MasterProcess* mProcess){
 			//Save statistic
 			statisticsToFile(mProcess->ga.currentGeneration, mProcess->ga.generationCount, mProcess->statisticsFile);
 		#endif
-
 
 		//Auto save
 		if(mProcess->currBest > mProcess->ga.currentGeneration->statistics.best.fitness){
@@ -107,6 +120,7 @@ void execMaster(MasterProcess* mProcess){
 
 			mProcess->currBest = mProcess->ga.currentGeneration->statistics.best.fitness;
 		}
+
 		//Update console
 		//updateConsole(&mProcess->ga, &mProcess->loop);
 	}
@@ -134,6 +148,11 @@ void disposeMaster(MasterProcess* mProcess){
 		fclose(mProcess->timesFile);
 	#endif
 
+	#ifdef SAVE_PROFILES
+		//Create profiles file
+		fclose(mProcess->profilesFile);
+	#endif
+
 	#ifdef KEEP_BEST
 		//Close best file
 		fclose(mProcess->bestFile);
@@ -143,7 +162,6 @@ void disposeMaster(MasterProcess* mProcess){
 	//disposeWindows();
 	//disposeConsole();
 }
-
 
 void genetic(MasterProcess* mProcess){
 	GA* ga = &mProcess->ga;
@@ -165,11 +183,10 @@ void genetic(MasterProcess* mProcess){
 
 	//Perform mutations
 	timer = getTime();
-	//for(int j = 0; j < LAP_COUNT; j++){
-		for(int i = 0; i < ga->mutationCount; i++){
-			mutationCount += mutation(ga->nextGeneration, ga->mutationsFunction[i], ga->mutationRates[i]);
-		}
-	//}
+	for(int i = 0; i < ga->mutationCount; i++){
+		mutationCount += mutation(ga->nextGeneration, ga->mutationsFunction[i], ga->mutationRates[i]);
+	}
+
 	mutationTime = getTimeElapsed(timer);
 
 	//Perform elitism selection
@@ -180,7 +197,7 @@ void genetic(MasterProcess* mProcess){
 
 	//Eval fitness
 	timer = getTime();
-	commTime = evalGenerationFitness(ga->nextGeneration, ga->fitnessFunction, &mProcess->comm);
+	commTime = evalGenerationFitness(ga->nextGeneration, ga->fitnessFunction, /*&mProcess->comm*/ NULL);
 	fitnessTime = getTimeElapsed(timer);
 
 	//Sort individual by fitness
@@ -256,7 +273,20 @@ void genetic(MasterProcess* mProcess){
 				fitnessTime - commTime,
 				commTime
 				);
+
 		printf("=====================================================\n");
+
+
+		#ifdef SAVE_PROFILES
+			//Create profiles file
+			float profile[SIM_STEP_COUNT];
+			for(int i = 0; i < mProcess->ga.currentGeneration->count; i++){
+				getMapProfile(&mProcess->ga.currentGeneration->individuals[i], profile);
+				fwrite(profile, sizeof(float), SIM_STEP_COUNT, mProcess->profilesFile);
+			}
+			fflush(mProcess->profilesFile);
+		#endif
+
 		//wrefresh(gaOutputWindow);
 	}
 
