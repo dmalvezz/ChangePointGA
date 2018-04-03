@@ -17,6 +17,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include <stdint.h>
+#include <gsl/gsl_rng.h>
 
 #ifndef M_PI
 	#define M_PI	3.14159265359
@@ -34,24 +36,23 @@
 	#define swapv(x, y) do { __typeof__(x) SWAP = x; x = y; y = SWAP; } while (0)
 #endif
 
-static void randInit(){
-	srand(time(NULL));
-}
+extern gsl_rng* rng;
 
-static int randInt(int min, int max){
-	return (rand() % (max - min + 1)) + min;
-}
+extern void randInit();
+extern int randInt(int min, int max);
+extern float randFloat(float min, float max);
 
-static float randFloat(float min, float max){
-	return ((float)rand() / INT_MAX) * (max - min) + min;
-}
+extern int isZero(float val);
 
-static int isZero(float val){
-	if(val >= -0.00001 && val <= 0.00001){
-		return 1;
-	}
 
-	return 0;
-}
+extern double fast_sin(double x);
+
+extern double fast_cos(double x);
+
+extern double fast_atan(double x);
+
+#define sin_f	fast_sin
+#define cos_f	fast_cos
+#define atan_f	fast_atan
 
 #endif
