@@ -23,8 +23,8 @@
 //Motors list
 //#define RE40_24V
 //#define RE40_48V
-#define RE50_24V
-//#define RE50_36V
+//#define RE50_24V
+#define RE50_36V
 
 //Keep time invalid simulations
 #define KEEP_TIME_INVALID	0
@@ -37,9 +37,9 @@
 #include "../window/window.h"
 #include "../utils/mathutils.h"
 
-#define N_LAP
+//#define N_LAP
 //#define ALL_LAPS
-//#define PATTERN_LAPS
+#define PATTERN_LAPS
 
 #ifdef N_LAP
 	#define LAP_COUNT	1
@@ -48,8 +48,8 @@
 	#define START_VELOCITY	7.0
 	#define END_VELOCITY	7.0
 
-	#define MIN_AVG_SPEED 7.0
-	#define MAX_TIME	((float)TRACK_END_POINT / MIN_AVG_SPEED)
+	#define MIN_AVG_SPEED 6.95
+	#define MAX_TIME		((float)TRACK_END_POINT / MIN_AVG_SPEED)
 
 	#define INITIAL_T_WINDINGS	38
 	#define INITIAL_T_MOTOR		35

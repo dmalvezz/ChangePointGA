@@ -133,8 +133,8 @@
 	//Trasmissione
 	#define TransmissionEff   	0.99
 	//#define TransmissionRatio 	(1 / 26.0)    //RE50 36V new ratio
-	#define TransmissionRatio 	(1 / 25.0)    //RE50 36V new ratio
-	//#define TransmissionRatio 	(1 / 22.3)    //RE50 36V new ratio
+	//#define TransmissionRatio 	(1 / 25.0)    //RE50 36V new ratio
+	#define TransmissionRatio 	(1 / 22.3)    //RE50 36V new ratio
 	//no#define TransmissionRatio 	(1 / 22.94)    //RE50 36V new ratio
 	//no#define TransmissionRatio 	(1 / 21.66)    //RE50 36V new ratio
 

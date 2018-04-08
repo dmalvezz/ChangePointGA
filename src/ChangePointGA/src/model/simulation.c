@@ -25,18 +25,19 @@ void initSimulation(Simulation_ptr simulation, float startVelocity, int startMap
 
 void initMapset(){
 #ifdef RE50_24V
+/*
 	initMap(&maps[0], -100000, 1000.0, 0.0);
 	initMap(&maps[1], -9800, 100.0, 0.0);
 	//initMap(&maps[2], -5600.0, 40.0, 0.0);
 	initMap(&maps[2], -9500, 60.0, 0.0);
 	initMap(&maps[3], -4800.0, 45.0, 0.0);
+	*/
 
-	/*
 	initMap(&maps[0], -4800.0, 100.0, 0.0);
 	initMap(&maps[1], -9000.0, 100.0, 0.0);
 	initMap(&maps[2], -14000.0, 100.0, 0.0);
 	initMap(&maps[3], -4800.0, 45.0, 0.0);
-	*/
+
 
 	/*
 	initMap(&maps[0], -4800.0, 45.0, 0.0);
@@ -57,8 +58,8 @@ void initMapset(){
 	initMap(&maps[0], -4800.0, 100.0, 0.0);
 	//initMap(&maps[0], -9500, 60.0, 0.0);
 	initMap(&maps[1], -9000.0, 100.0, 0.0);
-	initMap(&maps[2], -4800.0, 45.0, 0.0);
-	//initMap(&maps[2], -9500, 60.0, 0.0);
+	//initMap(&maps[2], -4800.0, 45.0, 0.0);
+	initMap(&maps[2], -9500, 60.0, 0.0);
 
 	initMap(&maps[3], -14000.0, 100.0, 0.0);
 #endif

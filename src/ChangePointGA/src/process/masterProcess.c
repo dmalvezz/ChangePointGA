@@ -74,11 +74,31 @@ void initMaster(MasterProcess* mProcess, int worldId, int color){
 	addGAMutation(&mProcess->ga, changeRandomChangePointAction, 	CHANGE_ACT_MUTATION_RATE);
 	addGAMutation(&mProcess->ga, filterStrategy, 					FILTER_MUTATION_RATE);
 
-#ifdef AUTO_LOAD_GENERATION
-	if(access(GENERATION_FILE, F_OK ) != -1 ) {
-		generationFromFile(mProcess->ga.currentGeneration, GENERATION_FILE);
-	}
-#endif
+	#ifdef AUTO_LOAD_GENERATION
+		if(access(GENERATION_FILE, F_OK ) != -1 ) {
+			generationFromFile(mProcess->ga.currentGeneration, GENERATION_FILE);
+		}
+	#endif
+
+	#ifdef LOAD_SEEDS
+		int i = mProcess->ga.currentGeneration->count - 1;
+		struct dirent *dp;
+		DIR *dfd;
+		if ((dfd = opendir(SEED_DIR)) != NULL){
+			char filename[100];
+			while ((dp = readdir(dfd)) != NULL && i > 0){
+				  sprintf(filename, "%s/%s", SEED_DIR, dp->d_name);
+
+				  if(strlen(filename) > 4 && !strcmp(filename + strlen(filename) - 4, ".csv")){
+					  strategyFromCsv(&mProcess->ga.currentGeneration->individuals[i], filename);
+					  i--;
+					  printf("loaded %s\n", filename);
+				  }
+
+			}
+		}
+	#endif
+	//strategyFromCsv(&mProcess->ga.currentGeneration->individuals[0], "str.csv");
 
 	//Save settings
 	saveSimulationParams(SIMULATION_FILE);
@@ -92,6 +112,12 @@ void execMaster(MasterProcess* mProcess){
 
 	//Run first gen
 	evalGenerationFitness(mProcess->ga.currentGeneration, mProcess->ga.fitnessFunction, /*&mProcess->comm*/ NULL);
+	for(int i = 0; i < POPULATION_SIZE; i++){
+		printf("%d %f %f\n", mProcess->ga.currentGeneration->simOutputs[i].result,
+				mProcess->ga.currentGeneration->simOutputs[i].energy,
+				mProcess->ga.currentGeneration->simOutputs[i].time);
+	}
+
 	sortGenerationByFitness(mProcess->ga.currentGeneration);
 	updateGenerationStatistics(mProcess->ga.currentGeneration);
 
@@ -112,10 +138,13 @@ void execMaster(MasterProcess* mProcess){
 
 			#ifdef KEEP_BEST
 				//Save the new best
+				float profile[SIM_STEP_COUNT];
+				getMapProfile(&mProcess->ga.currentGeneration->statistics.best, profile);
 				for(int i = 0; i < SIM_STEP_COUNT; i++){
-					fprintf(mProcess->bestFile, "%d,", mProcess->ga.currentGeneration->statistics.best.simulation.steps[i].map);
+					fprintf(mProcess->bestFile, "%d,", (int)profile[i]);
 				}
 				fprintf(mProcess->bestFile, "\n");
+				fflush(mProcess->bestFile);
 			#endif
 
 			mProcess->currBest = mProcess->ga.currentGeneration->statistics.best.fitness;
@@ -186,6 +215,7 @@ void genetic(MasterProcess* mProcess){
 	for(int i = 0; i < ga->mutationCount; i++){
 		mutationCount += mutation(ga->nextGeneration, ga->mutationsFunction[i], ga->mutationRates[i]);
 	}
+
 
 	mutationTime = getTimeElapsed(timer);
 
@@ -276,19 +306,28 @@ void genetic(MasterProcess* mProcess){
 
 		printf("=====================================================\n");
 
-
-		#ifdef SAVE_PROFILES
-			//Create profiles file
-			float profile[SIM_STEP_COUNT];
-			for(int i = 0; i < mProcess->ga.currentGeneration->count; i++){
-				getMapProfile(&mProcess->ga.currentGeneration->individuals[i], profile);
-				fwrite(profile, sizeof(float), SIM_STEP_COUNT, mProcess->profilesFile);
-			}
-			fflush(mProcess->profilesFile);
-		#endif
-
 		//wrefresh(gaOutputWindow);
+
+		if(ga->currentGeneration->statistics.lastChange == 1000){
+			for(int i = 0; i < ga->currentGeneration->count / 2 - 1; i++){
+				initStrategy(&ga->currentGeneration->individuals[ga->currentGeneration->count / 2 + i], SPACE_STEP);
+			}
+		}
 	}
+
+	#ifdef SAVE_PROFILES
+		//Create profiles file
+		float profile[SIM_STEP_COUNT];
+		for(int i = 0; i < mProcess->ga.currentGeneration->count; i++){
+			getMapProfile(&mProcess->ga.currentGeneration->individuals[i], profile);
+			for(int i = 0; i < SIM_STEP_COUNT; i++){
+				fprintf(mProcess->profilesFile, "%d,", (int)profile[i]);
+			}
+			fprintf(mProcess->profilesFile, "\n");
+			//fwrite(profile, sizeof(float), SIM_STEP_COUNT, mProcess->profilesFile);
+		}
+		fflush(mProcess->profilesFile);
+	#endif
 
 	#ifdef SAVE_TIMES
 		//Save times

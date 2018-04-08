@@ -48,7 +48,7 @@ static float randFloat(float min, float max){
 }
 
 static int isZero(float val){
-	if(val >= -0.00001 && val <= 0.00001){
+	if(val >= -0.000001 && val <= 0.000001){
 		return 1;
 	}
 
@@ -95,8 +95,8 @@ static double fast_atan(double x){
 	return x - x3/3 + x3*x2 / 5 + x3*x3*x / 7 - x3*x3*x3/9;
 }
 
-#define sin_f	fast_sin
-#define cos_f	fast_cos
-#define atan_f	fast_atan
+#define sin_f	sin
+#define cos_f	cos
+#define atan_f	atan
 
 #endif

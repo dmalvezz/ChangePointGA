@@ -283,7 +283,7 @@ void parallelSimulateStrategy(Strategy_ptr strategies, SimulationOutput_ptr simO
 	{
 		Simulation sim;
 
-		#pragma omp for
+		#pragma omp for private(sim)
 		for(int i = 0; i < count; i++){
 			//Simulate the strategy
 			simulateStrategy(&strategies[i], &sim, startVelocity, endVelocity, startMap, keepTimeInvalid);

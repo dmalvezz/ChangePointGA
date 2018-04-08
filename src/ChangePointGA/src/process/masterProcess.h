@@ -15,13 +15,16 @@
 #include "slaveProcess.h"
 
 //Keep trace of all best strategies
-//#define KEEP_BEST
+#define KEEP_BEST
 
 //Autosave on each new best strategies
 #define AUTO_SAVE
 
 //If generation.bin file exists load that
 #define AUTO_LOAD_GENERATION
+
+//Load seed strategy
+#define LOAD_SEEDS
 
 //Master process global variables
 typedef struct MasterProcess{

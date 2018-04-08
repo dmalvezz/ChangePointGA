@@ -17,6 +17,9 @@
 #include <math.h>
 #include <time.h>
 #include <stdio.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #include "../ga/ga.h"
 //#include "../window/console.h"
