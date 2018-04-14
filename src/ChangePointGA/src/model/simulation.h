@@ -23,8 +23,8 @@
 //Motors list
 //#define RE40_24V
 //#define RE40_48V
-//#define RE50_24V
-#define RE50_36V
+#define RE50_24V
+//#define RE50_36V
 
 //Keep time invalid simulations
 #define KEEP_TIME_INVALID	0
@@ -80,7 +80,8 @@
 	#define PATTERN_END_LAP		4
 	#define PATTERN_REPEAT		((RACE_LAPS - LAP_COUNT)/(PATTERN_END_LAP - PATTERN_START_LAP))
 
-	#define MAX_TIME	((float)1000)
+	//#define MAX_TIME	((float)RACE_TIME)
+	extern float MAX_TIME;
 
 	#define INITIAL_T_WINDINGS	25
 	#define INITIAL_T_MOTOR		25

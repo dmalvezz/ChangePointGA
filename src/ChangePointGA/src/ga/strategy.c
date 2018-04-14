@@ -251,7 +251,7 @@ void simulateStrategy(Strategy_ptr strategy, Simulation_ptr simulation, float st
 
 				simulation->time += patternLapsTime * PATTERN_REPEAT;
 
-				if(simulation->time <= RACE_TIME){
+				if(simulation->time <= MAX_TIME || KEEP_TIME_INVALID){
 					if(simulation->steps[TRACK_LENGTH * PATTERN_START_LAP - 1].map == 0 &&
 							simulation->steps[TRACK_LENGTH * PATTERN_START_LAP].map != 0 &&
 							simulation->steps[TRACK_LENGTH * PATTERN_END_LAP - 1].map != 0){

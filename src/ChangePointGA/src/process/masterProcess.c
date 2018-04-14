@@ -7,7 +7,13 @@
 
 #include "masterProcess.h"
 
+#define SINGLE_GA
+//#define LEADERS_FOLLOWERS
+
+static void prepareGA(MasterProcess* mProcess);
+static void execGA(MasterProcess* mProcess, int generationMax);
 static void genetic(MasterProcess* mProcess);
+
 
 void initMaster(MasterProcess* mProcess, int worldId, int color){
 	//Init process
@@ -17,6 +23,85 @@ void initMaster(MasterProcess* mProcess, int worldId, int color){
 	//Loop flag
 	mProcess->loop = 1;
 
+	//Init console
+	//initWindows();
+	//initConsole();
+
+#ifdef SINGLE_GA
+	prepareGA(mProcess);
+#endif
+}
+
+void execMaster(MasterProcess* mProcess){
+	#ifdef SINGLE_GA
+		execGA(mProcess, 1);
+	#endif
+
+	#ifdef LEADERS_FOLLOWERS
+		Strategy leaders[POPULATION_SIZE];
+		char dirName[16];
+
+		for(int i = 0; i < 5; i++){
+			sprintf(dirName, "run%d", i);
+			mkdir(dirName, 0700);
+			chdir(dirName);
+
+			prepareGA(mProcess);
+
+			execGA(mProcess, 10000);
+			memcpy(&leaders[i * 10], mProcess->ga.currentGeneration->individuals, sizeof(Strategy) * 10);
+
+			disposeGA(&mProcess->ga);
+
+			chdir("..");
+		}
+
+		prepareGA(mProcess);
+		memcpy(mProcess->ga.currentGeneration->individuals, leaders, sizeof(Strategy) * 50);
+
+		execGA(mProcess, 100000);
+
+		disposeGA(&mProcess->ga);
+
+	#endif
+}
+
+void disposeMaster(MasterProcess* mProcess){
+	//Close all slave process
+	char cmd = SLAVE_QUIT_CMD;
+	MPI_Bcast(&cmd, 1, MPI_CHAR, 0, mProcess->comm);
+
+	//Dispose GA
+	#ifdef SINGLE_GA
+		disposeGA(&mProcess->ga);
+	#endif
+
+	#ifdef SAVE_STATISTICS
+		//Close statistics file
+		fclose(mProcess->statisticsFile);
+	#endif
+
+	#ifdef SAVE_TIMES
+		//Close times file
+		fclose(mProcess->timesFile);
+	#endif
+
+	#ifdef SAVE_PROFILES
+		//Create profiles file
+		fclose(mProcess->profilesFile);
+	#endif
+
+	#ifdef KEEP_BEST
+		//Close best file
+		fclose(mProcess->bestFile);
+	#endif
+
+	//Dispose windows
+	//disposeWindows();
+	//disposeConsole();
+}
+
+void prepareGA(MasterProcess* mProcess){
 	#ifdef SAVE_STATISTICS
 		//Create statistics file
 		mProcess->statisticsFile = fopen(STATISTICS_FILE, "wt");
@@ -58,15 +143,11 @@ void initMaster(MasterProcess* mProcess, int worldId, int color){
 
 	mProcess->currBest = INFINITY;
 
-	//Init console
-	//initWindows();
-	//initConsole();
-
 	//Init ga
 	initGA(&mProcess->ga,
 			linearRankWithPressureSelection,
 			singlePointCrossover,
-			energyFitness
+			energyTimeFitness
 		);
 	addGAMutation(&mProcess->ga, addRandomChangePoint, 				ADD_POINT_MUTATION_RATE);
 	addGAMutation(&mProcess->ga, removeRandomChangePoint, 			REMOVE_POINT_MUTATION_RATE);
@@ -105,7 +186,7 @@ void initMaster(MasterProcess* mProcess, int worldId, int color){
 	saveGAParams(&mProcess->ga, GA_FILE);
 }
 
-void execMaster(MasterProcess* mProcess){
+void execGA(MasterProcess* mProcess, int generationMax){
 	//Refresh console
 	//printGAParams(&mProcess->ga);
 	//printSimulationParams();
@@ -122,7 +203,16 @@ void execMaster(MasterProcess* mProcess){
 	updateGenerationStatistics(mProcess->ga.currentGeneration);
 
 	//Loop
+#ifdef SINGLE_GA
 	while(mProcess->loop){
+#endif
+
+#ifdef LEADERS_FOLLOWERS
+	while(mProcess->ga.generationCount < generationMax){
+#endif
+		//MAX_TIME = 2200 * exp(-0.00000093 * (mProcess->ga.generationCount + 1));
+		//MAX_TIME = RACE_TIME + 60.0 * (1.0 - (float)mProcess->ga.generationCount / 50000.0);
+		//if(MAX_TIME < RACE_TIME)MAX_TIME = RACE_TIME;
 		//Run genetics
 		genetic(mProcess);
 
@@ -132,9 +222,9 @@ void execMaster(MasterProcess* mProcess){
 		#endif
 
 		//Auto save
+		generationToFile(mProcess->ga.currentGeneration, GENERATION_FILE);
 		if(mProcess->currBest > mProcess->ga.currentGeneration->statistics.best.fitness){
 			strategyToFile(&mProcess->ga.currentGeneration->statistics.best, BEST_FILE);
-			generationToFile(mProcess->ga.currentGeneration, GENERATION_FILE);
 
 			#ifdef KEEP_BEST
 				//Save the new best
@@ -157,39 +247,6 @@ void execMaster(MasterProcess* mProcess){
 	//Save strategy and generation
 	strategyToFile(&mProcess->ga.currentGeneration->statistics.best, BEST_FILE);
 	generationToFile(mProcess->ga.currentGeneration, GENERATION_FILE);
-}
-
-void disposeMaster(MasterProcess* mProcess){
-	//Close all slave process
-	char cmd = SLAVE_QUIT_CMD;
-	MPI_Bcast(&cmd, 1, MPI_CHAR, 0, mProcess->comm);
-
-	//Dispose GA
-	disposeGA(&mProcess->ga);
-
-	#ifdef SAVE_STATISTICS
-		//Close statistics file
-		fclose(mProcess->statisticsFile);
-	#endif
-
-	#ifdef SAVE_TIMES
-		//Close times file
-		fclose(mProcess->timesFile);
-	#endif
-
-	#ifdef SAVE_PROFILES
-		//Create profiles file
-		fclose(mProcess->profilesFile);
-	#endif
-
-	#ifdef KEEP_BEST
-		//Close best file
-		fclose(mProcess->bestFile);
-	#endif
-
-	//Dispose windows
-	//disposeWindows();
-	//disposeConsole();
 }
 
 void genetic(MasterProcess* mProcess){

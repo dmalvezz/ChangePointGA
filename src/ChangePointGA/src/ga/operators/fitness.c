@@ -19,9 +19,12 @@ float energySquaredFitness(Generation_ptr generation, int index){
 float energyTimeFitness(Generation_ptr generation, int index){
 	//return strategy->simulation.energy + pow(strategy->simulation.time - (MAX_TIME), 10);
 	float fitness =  generation->simOutputs[index].energy;
+	fitness +=  fabs(generation->simOutputs[index].time - RACE_TIME) + sqrt(fabs(generation->simOutputs[index].time - RACE_TIME));
+	/*
 	if(generation->simOutputs[index].time > MAX_TIME){
 		fitness = fitness + 100 + exp(2 * fabs(MAX_TIME - generation->simOutputs[index].time));
 	}
+	*/
 
 	return fitness;
 }

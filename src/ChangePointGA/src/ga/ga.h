@@ -34,7 +34,7 @@
 //Save define
 #define SAVE_STATISTICS
 #define SAVE_TIMES
-#define SAVE_PROFILES
+//#define SAVE_PROFILES
 #define SEED_DIR			"seed"
 #define BEST_FILE			"best"
 #define GENERATION_FILE		"generation.bin"
